@@ -6,7 +6,7 @@ A modern, comprehensive hotel management system built with React/Next.js and Nod
 
 ### Prerequisites
 - Node.js 18+ 
-- MongoDB 5+
+- PostgreSQL 14+
 - Git
 
 ### Installation & Setup
@@ -51,7 +51,7 @@ npm run dev:frontend  # Frontend: http://localhost:3000
 # Core Configuration
 PORT=5000
 NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/airvikbook
+DATABASE_URL="postgresql://postgres:password@localhost:5432/airvikbook?schema=public"
 JWT_SECRET=your-super-secret-jwt-key
 JWT_REFRESH_SECRET=your-super-secret-refresh-key
 FRONTEND_URL=http://localhost:3000
@@ -82,6 +82,99 @@ GOOGLE_CLIENT_ID=your-google-client-id
 # Feature Flags
 NEXT_PUBLIC_ENABLE_SMS=true
 NEXT_PUBLIC_ENABLE_WHATSAPP=true
+```
+
+## 🗄️ PostgreSQL Database Setup
+
+### Installation
+
+**macOS (using Homebrew):**
+```bash
+brew install postgresql@14
+brew services start postgresql@14
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+**Windows:**
+Download and install PostgreSQL from [postgresql.org](https://www.postgresql.org/download/windows/)
+
+### Database Setup
+
+1. **Connect to PostgreSQL:**
+```bash
+# Default connection (adjust if needed)
+psql -U postgres
+```
+
+2. **Create Database:**
+```sql
+CREATE DATABASE airvikbook;
+CREATE USER airvikbook_user WITH PASSWORD 'your_secure_password';
+GRANT ALL PRIVILEGES ON DATABASE airvikbook TO airvikbook_user;
+```
+
+3. **Exit PostgreSQL:**
+```sql
+\q
+```
+
+### Environment Configuration
+
+Update your `backend/.env` file with your PostgreSQL credentials:
+```bash
+DATABASE_URL="postgresql://airvikbook_user:your_secure_password@localhost:5432/airvikbook?schema=public"
+```
+
+### Prisma Setup
+
+After setting up PostgreSQL and environment variables:
+
+```bash
+cd backend
+
+# Install dependencies
+npm install
+
+# Generate Prisma Client
+npm run db:generate
+
+# Push schema to database (for development)
+npm run db:push
+
+# OR run migrations (for production-like workflow)
+npm run db:migrate
+
+# Open Prisma Studio (optional - database GUI)
+npm run db:studio
+```
+
+### Database Commands Reference
+
+```bash
+# Generate Prisma Client after schema changes
+npm run db:generate
+
+# Push schema changes to database (development)
+npm run db:push
+
+# Create and run migrations (production)
+npm run db:migrate
+
+# Reset database (⚠️ destroys all data)
+npx prisma migrate reset
+
+# Seed database with initial data
+npm run db:seed
+
+# Open Prisma Studio
+npm run db:studio
 ```
 
 ## 📁 Project Structure

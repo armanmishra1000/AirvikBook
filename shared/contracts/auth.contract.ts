@@ -14,7 +14,7 @@ export interface AuthUser {
   id: string;
   email: string;
   fullName: string;
-  role: 'guest' | 'staff' | 'admin' | 'owner';
+  role: 'GUEST' | 'STAFF' | 'ADMIN' | 'OWNER';
   profilePicture?: string;
   googleId?: string;
 }

@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model for Authentication
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  password          String?   // Optional for social login users
+  fullName          String
+  mobileNumber      String?
+  role              UserRole  @default(GUEST)
+  profilePicture    String?
+  googleId          String?   @unique
+  isEmailVerified   Boolean   @default(false)
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  isActive          Boolean   @default(true)
+
+  // Relations (to be added as features are developed)
+  // bookings          Booking[]
+  // reviews           Review[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  GUEST
+  STAFF
+  ADMIN
+  OWNER
+}
+
+// Property Model
+model Property {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  address     String
+  city        String
+  state       String
+  country     String
+  zipCode     String
+  phone       String?
+  email       String?
+  website     String?
+  checkInTime String   @default("15:00")
+  checkOutTime String  @default("11:00")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true)
+
+  // Relations
+  buildings   Building[]
+  
+  @@map("properties")
+}
+
+// Building Model (for multi-building properties)
+model Building {
+  id          String   @id @default(cuid())
+  propertyId  String
+  name        String
+  description String?
+  floors      Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true)
+
+  // Relations
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  rooms       Room[]
+
+  @@map("buildings")
+}
+
+// Room Type Model
+model RoomType {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  basePrice   Decimal  @db.Decimal(10, 2)
+  maxOccupancy Int     @default(2)
+  bedType     String?
+  roomSize    String?
+  amenities   String[] // JSON array of amenities
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true)
+
+  // Relations
+  rooms       Room[]
+
+  @@map("room_types")
+}
+
+// Room Model
+model Room {
+  id          String     @id @default(cuid())
+  buildingId  String
+  roomTypeId  String
+  roomNumber  String
+  floor       Int?
+  status      RoomStatus @default(AVAILABLE)
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  isActive    Boolean    @default(true)
+
+  // Relations
+  building    Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  roomType    RoomType   @relation(fields: [roomTypeId], references: [id])
+  // bookings    Booking[]
+
+  @@unique([buildingId, roomNumber])
+  @@map("rooms")
+}
+
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+  OUT_OF_ORDER
+  CLEANING
+}
+
+// Session Model for JWT token management
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  token       String   @unique
+  refreshToken String  @unique
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true)
+
+  @@map("sessions")
+}

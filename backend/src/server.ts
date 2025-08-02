@@ -2,12 +2,15 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import mongoose from 'mongoose';
+import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import { Request, Response } from 'express';
 
 // Load environment variables
 dotenv.config();
+
+// Initialize Prisma Client
+const prisma = new PrismaClient();
 
 // Create Express app
 const app = express();
@@ -71,10 +74,10 @@ app.use((err: any, _req: Request, res: Response, _next: any) => {
 // Database connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/airvikbook');
-    console.log('✅ MongoDB connected successfully');
+    await prisma.$connect();
+    console.log('✅ PostgreSQL connected successfully');
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
+    console.error('❌ PostgreSQL connection error:', error);
     process.exit(1);
   }
 };
@@ -96,6 +99,19 @@ const startServer = async () => {
 process.on('unhandledRejection', (err: any) => {
   console.error('Unhandled Promise Rejection:', err);
   process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('🔄 Gracefully shutting down...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('🔄 Gracefully shutting down...');
+  await prisma.$disconnect();
+  process.exit(0);
 });
 
 // Start the server

@@ -5,7 +5,7 @@
 ## 🎯 Project Context
 - **Project**: AirVikBook Hotel Management System
 - **Type**: Full-stack web application
-- **Backend**: Node.js + Express + TypeScript + MongoDB
+- **Backend**: Node.js + Express + TypeScript + PostgreSQL + Prisma
 - **Frontend**: Next.js 14 + React + TypeScript + Tailwind CSS
 - **Development**: 100% AI-assisted development
 
@@ -92,28 +92,34 @@ PUT    /api/v1/auth/profile           // Update user profile
 
 ### Backend Structure
 ```
-backend/src/
-├── models/                           # MongoDB Schemas
-│   └── [feature].model.ts           # e.g., user.model.ts, booking.model.ts
-├── services/                        # Business Logic Layer
-│   └── [feature]/
-│       └── [feature].service.ts     # e.g., user/user.service.ts
-├── controllers/                     # Request Handlers
-│   └── [feature]/
-│       └── [feature].controller.ts  # e.g., user/user.controller.ts
-├── routes/                          # Route Definitions
-│   └── [feature].routes.ts          # e.g., user.routes.ts
-├── middleware/                      # Middleware Functions
-│   ├── auth.middleware.ts           # Authentication middleware
-│   ├── validation.middleware.ts     # Request validation
-│   └── error.middleware.ts          # Error handling
-├── utils/                           # Utility Functions
-│   ├── response.utils.ts            # Standard API responses
-│   ├── validation.utils.ts          # Input validation helpers
-│   └── token.utils.ts               # JWT token utilities
-└── config/                          # Configuration Files
-    ├── database.config.ts           # MongoDB connection
-    └── environment.config.ts        # Environment variables
+backend/
+├── src/
+│   ├── services/                    # Business Logic Layer
+│   │   └── [feature]/
+│   │       └── [feature].service.ts # e.g., user/user.service.ts
+│   ├── controllers/                 # Request Handlers
+│   │   └── [feature]/
+│   │       └── [feature].controller.ts # e.g., user/user.controller.ts
+│   ├── routes/                      # Route Definitions
+│   │   └── [feature].routes.ts      # e.g., user.routes.ts
+│   ├── middleware/                  # Middleware Functions
+│   │   ├── auth.middleware.ts       # Authentication middleware
+│   │   ├── validation.middleware.ts # Request validation
+│   │   └── error.middleware.ts      # Error handling
+│   ├── utils/                       # Utility Functions
+│   │   ├── response.utils.ts        # Standard API responses
+│   │   ├── validation.utils.ts      # Input validation helpers
+│   │   └── token.utils.ts           # JWT token utilities
+│   ├── types/                       # TypeScript type definitions
+│   │   └── [feature].types.ts       # Generated from Prisma schema
+│   └── config/                      # Configuration Files
+│       ├── database.config.ts       # Prisma client configuration
+│       └── environment.config.ts    # Environment variables
+├── prisma/                          # Prisma Configuration
+│   ├── schema.prisma               # Database schema definition
+│   ├── migrations/                 # Database migrations
+│   └── seed.ts                     # Database seeding script
+└── package.json                    # Dependencies and scripts
 ```
 
 ### Frontend Structure
@@ -143,62 +149,94 @@ frontend/src/
     └── validation.utils.ts          # Form validation helpers
 ```
 
-## 🛢️ Database Schema Patterns
+## 🛢️ Database Schema Patterns (Prisma)
 
-### Standard Schema Structure
-```typescript
-import mongoose, { Document, Schema } from 'mongoose';
-
-// TypeScript Interface
-export interface I[Feature] extends Document {
-  // Required base fields
-  _id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  isActive: boolean;
+### Prisma Schema Structure
+```prisma
+// Standard model structure in schema.prisma
+model [Feature] {
+  // Primary key (always use cuid())
+  id        String   @id @default(cuid())
   
   // Feature-specific fields
-  // Add your fields here
-}
-
-// MongoDB Schema
-const [Feature]Schema = new Schema({
-  // Feature-specific fields with validation
+  // Add your fields here with proper types and constraints
   
   // Standard base fields (ALWAYS INCLUDE)
-  isActive: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-}, { 
-  timestamps: true,  // Automatically manage createdAt/updatedAt
-  versionKey: false  // Remove __v field
-});
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  
+  // Relations (if any)
+  // relatedModel RelatedModel @relation(fields: [fieldId], references: [id])
+  
+  // Table mapping
+  @@map("[feature]s")
+}
 
-// Indexes for performance
-[Feature]Schema.index({ createdAt: -1 });
-[Feature]Schema.index({ isActive: 1 });
-
-// Export model
-export const [Feature] = mongoose.model<I[Feature]>('[Feature]', [Feature]Schema);
+// Enums for type safety
+enum [Feature]Status {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
 ```
 
-### User Schema Example
+### Generated TypeScript Types
 ```typescript
-// User model structure for reference
-export interface IUser extends Document {
-  _id: string;
-  email: string;
-  password?: string;
-  fullName: string;
-  mobileNumber?: string;
-  role: 'guest' | 'staff' | 'admin' | 'owner';
-  profilePicture?: string;
-  googleId?: string;
-  isEmailVerified: boolean;
-  lastLoginAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  isActive: boolean;
+// Prisma automatically generates types from schema
+import { PrismaClient, User, UserRole } from '@prisma/client';
+
+// Prisma client initialization
+const prisma = new PrismaClient();
+
+// Service usage example
+export class [Feature]Service {
+  async create[Feature](data: Prisma.[Feature]CreateInput) {
+    return await prisma.[feature].create({
+      data,
+    });
+  }
+  
+  async get[Feature]ById(id: string) {
+    return await prisma.[feature].findUnique({
+      where: { id },
+      include: {
+        // Include related models if needed
+      },
+    });
+  }
+}
+```
+
+### User Model Example (Prisma Schema)
+```prisma
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String?   // Optional for social login
+  fullName        String
+  mobileNumber    String?
+  role            UserRole  @default(GUEST)
+  profilePicture  String?
+  googleId        String?   @unique
+  isEmailVerified Boolean   @default(false)
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  isActive        Boolean   @default(true)
+  
+  // Relations
+  bookings        Booking[]
+  reviews         Review[]
+  
+  @@map("users")
+}
+
+enum UserRole {
+  GUEST
+  STAFF
+  ADMIN
+  OWNER
 }
 ```
 
@@ -333,7 +371,7 @@ describe('[Component]', () => {
 # Core Configuration
 PORT=5000
 NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/airvikbook
+DATABASE_URL="postgresql://postgres:password@localhost:5432/airvikbook?schema=public"
 JWT_SECRET=development-secret-key
 JWT_REFRESH_SECRET=development-refresh-secret
 FRONTEND_URL=http://localhost:3000
