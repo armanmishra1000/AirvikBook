@@ -26,7 +26,7 @@ app.use(morgan('dev'));
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
 
 // Health check route
-app.get(`${API_PREFIX}/health`, (req: Request, res: Response) => {
+app.get(`${API_PREFIX}/health`, (_req: Request, res: Response) => {
   res.json({
     success: true,
     data: {
@@ -38,7 +38,7 @@ app.get(`${API_PREFIX}/health`, (req: Request, res: Response) => {
 });
 
 // Root route
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
   res.json({
     success: true,
     data: {
@@ -50,7 +50,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // 404 handler
-app.use((req: Request, res: Response) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     error: 'Route not found',
@@ -59,7 +59,7 @@ app.use((req: Request, res: Response) => {
 });
 
 // Error handler
-app.use((err: any, req: Request, res: Response, next: any) => {
+app.use((err: any, _req: Request, res: Response, _next: any) => {
   console.error('Error:', err);
   res.status(err.status || 500).json({
     success: false,
