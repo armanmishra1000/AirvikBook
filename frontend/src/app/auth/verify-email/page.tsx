@@ -36,8 +36,14 @@ export default function VerifyEmailPage() {
     const emailParam = searchParams.get('email');
     const tokenParam = searchParams.get('token');
     
+    console.log('🔍 URL Params - Raw email:', emailParam);
+    console.log('🔍 URL Params - Raw token:', tokenParam);
+    
     if (emailParam) {
-      setEmail(emailParam);
+      // Decode the email parameter (handles %40 -> @)
+      const decodedEmail = decodeURIComponent(emailParam);
+      console.log('📧 Decoded email:', decodedEmail);
+      setEmail(decodedEmail);
     }
     
     if (tokenParam) {
@@ -52,7 +58,9 @@ export default function VerifyEmailPage() {
     
     // If both token and email are provided, auto-verify
     if (tokenParam && emailParam) {
-      verifyEmailWithToken(tokenParam, emailParam);
+      const decodedEmail = decodeURIComponent(emailParam);
+      console.log('🚀 Auto-verifying with decoded email:', decodedEmail);
+      verifyEmailWithToken(tokenParam, decodedEmail);
     }
   }, [searchParams, router]);
 
@@ -104,30 +112,39 @@ export default function VerifyEmailPage() {
   const verifyEmailWithToken = async (verificationToken: string, userEmail: string) => {
     if (!mounted.current) return;
     
+    console.log('🔍 Starting email verification with token:', verificationToken.substring(0, 10) + '...');
+    console.log('📧 Email to verify:', userEmail);
+    
     setIsVerifying(true);
     setVerificationError('');
     setError('');
     setMessage('');
 
     try {
+      console.log('📡 Calling verification API...');
       const response = await UserRegistrationService.verifyEmail({
         token: verificationToken,
         email: userEmail
       });
 
+      console.log('📨 API Response received:', response);
+
       if (!mounted.current) return;
 
       if (isSuccessResponse(response)) {
+        console.log('✅ Verification successful!');
         setIsVerified(true);
         setMessage('Email verified successfully! Redirecting to your account...');
         
         // Redirect to success page after a short delay
         setTimeout(() => {
           if (mounted.current) {
+            console.log('🔄 Redirecting to success page...');
             router.push('/auth/success');
           }
         }, 2000);
       } else {
+        console.log('❌ Verification failed:', response);
         setVerificationError(response.error || 'Email verification failed');
         
         // Handle specific error codes
@@ -140,6 +157,7 @@ export default function VerifyEmailPage() {
         }
       }
     } catch (error) {
+      console.error('🚨 Verification error:', error);
       if (mounted.current) {
         setVerificationError('Network error. Please check your connection and try again.');
       }
