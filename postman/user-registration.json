@@ -1,0 +1,378 @@
+{
+  "info": {
+    "name": "AirVikBook User Registration API",
+    "description": "Complete API test collection for user registration functionality",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has success property\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('success');",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "health"]
+        }
+      }
+    },
+    {
+      "name": "Check Email Availability - Available",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Email is available\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.data.available).to.be.true;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/check-email/{{testEmail}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "check-email", "{{testEmail}}"]
+        }
+      }
+    },
+    {
+      "name": "Register User - Success",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Registration successful\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.data).to.have.property('user');",
+              "    pm.expect(jsonData.data).to.have.property('tokens');",
+              "    pm.expect(jsonData.data.user).to.have.property('id');",
+              "    pm.expect(jsonData.data.user.email).to.equal(pm.environment.get('testEmail'));",
+              "    pm.expect(jsonData.data.user.isEmailVerified).to.be.false;",
+              "});",
+              "",
+              "pm.test(\"User data doesn't contain password\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data.user).to.not.have.property('password');",
+              "});",
+              "",
+              "pm.test(\"Tokens are provided\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data.tokens).to.have.property('accessToken');",
+              "    pm.expect(jsonData.data.tokens).to.have.property('refreshToken');",
+              "    ",
+              "    // Store tokens for future requests",
+              "    pm.environment.set('accessToken', jsonData.data.tokens.accessToken);",
+              "    pm.environment.set('refreshToken', jsonData.data.tokens.refreshToken);",
+              "    pm.environment.set('userId', jsonData.data.user.id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"SecurePass123!\",\n  \"fullName\": \"John Doe Test\",\n  \"mobileNumber\": \"+1234567890\",\n  \"acceptedTerms\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Register User - Duplicate Email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 409\", function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test(\"Email exists error\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "    pm.expect(jsonData.code).to.equal('EMAIL_EXISTS');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"SecurePass123!\",\n  \"fullName\": \"John Doe Test\",\n  \"mobileNumber\": \"+1234567890\",\n  \"acceptedTerms\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Register User - Invalid Data",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Validation error\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "    pm.expect(jsonData.code).to.equal('VALIDATION_ERROR');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"invalid-email\",\n  \"password\": \"weak\",\n  \"fullName\": \"A\",\n  \"acceptedTerms\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Check Email Availability - Taken",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 409\", function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test(\"Email is not available\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "    pm.expect(jsonData.code).to.equal('EMAIL_EXISTS');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/check-email/{{testEmail}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "check-email", "{{testEmail}}"]
+        }
+      }
+    },
+    {
+      "name": "Resend Verification Email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Verification email sent\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.data.emailSent).to.be.true;",
+              "    pm.expect(jsonData.data.expiresIn).to.equal('24 hours');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/resend-verification",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "resend-verification"]
+        }
+      }
+    },
+    {
+      "name": "Google OAuth Registration",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Google auth response structure\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    // Note: This will likely fail in tests without valid Google token",
+              "    // This is a placeholder for the API structure",
+              "    if (jsonData.success) {",
+              "        pm.expect(jsonData.data).to.have.property('user');",
+              "        pm.expect(jsonData.data).to.have.property('tokens');",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"googleToken\": \"invalid_google_token_for_testing\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/google",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "google"]
+        }
+      }
+    },
+    {
+      "name": "Verify Email - Invalid Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Invalid token error\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "    pm.expect(jsonData.code).to.equal('VERIFICATION_TOKEN_INVALID');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"invalid_verification_token_1234567890abcdef\",\n  \"email\": \"{{testEmail}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/verify-email",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "verify-email"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "testEmail",
+      "value": "test-{{$randomInt}}@example.com"
+    }
+  ]
+}

@@ -68,8 +68,9 @@ Based on project analysis:
 **Action**: Test complete user registration flow + Backend API + Push to GitHub
 
 ## Git Status
-**Branch**: feature/user-registration
+**Branch**: feature/user-registration (pushed to GitHub)
 **Last commit**: Backend B1 - Email verification model & token service (ACTUAL)
+**GitHub**: https://github.com/armanmishra1000/AirvikBook/tree/feature/user-registration
 **Files created**: 
 - EmailVerificationToken Prisma model with proper relationships
 - EmailVerificationTokenService with crypto-secure token generation (32 bytes)
