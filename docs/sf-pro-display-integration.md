@@ -143,7 +143,7 @@ frontend/
 ## Testing
 The font integration can be tested by:
 1. Running the development server
-2. Visiting the Shadcn demo page at `/`
+2. Visiting the demo page at `/`
 3. Checking the typography showcase section
 4. Verifying font loading in browser DevTools
 

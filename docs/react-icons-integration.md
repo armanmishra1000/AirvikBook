@@ -233,12 +233,11 @@ import { statusIcons } from "@/lib/icons"
 
 ## Component Integration
 
-### With Shadcn/ui Components
+### With Pure Tailwind CSS Components
 ```typescript
-import { Button } from "@/components/ui/button"
 import { FiPlus } from "@/lib/icons"
 
-<Button>
+<button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2">
   <FiPlus {...getIconProps('sm')} />
   Add Room
 </Button>
@@ -262,7 +261,7 @@ import { MdHotel } from "@/lib/icons"
 ## Testing
 The icon integration can be tested by:
 1. Running the development server
-2. Visiting the Shadcn demo page at `/`
+2. Visiting the demo page at `/`
 3. Checking the "React Icons Integration" section
 4. Verifying different icon sets, sizes, and colors
 5. Testing responsive behavior

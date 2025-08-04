@@ -948,7 +948,6 @@ This document outlines the complete feature set for a modern, scalable hotel man
 ### Frontend (Web-Only Platform)
 - **Framework**: Next.js v15+
 - **UI Library**: React v19+
-- **UI Components**: Shadcn/ui (built on Radix UI primitives)
 - **Styling**: Tailwind CSS (v4+) + CSS Modules
 - **Typography**: SF Pro Display font system
 - **Icons**: React Icons (Feather, Material Design, Bootstrap) + Lucide React

@@ -80,3 +80,7 @@ public/uploads/
 # Lock files (keep package-lock.json)
 yarn.lock
 pnpm-lock.yaml
+
+#docs
+automated-tasks-prompt-template-v3-corrected.md
+universal-features-prompt-template-v3-corrected.md

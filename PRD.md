@@ -20,7 +20,6 @@
 ### Frontend
 - **Framework**: Next.js 15+ (App Router)
 - **UI**: React 19+ with TypeScript
-- **UI Components**: Shadcn/ui (built on Radix UI)
 - **Styling**: Tailwind CSS 4.0
 - **Typography**: SF Pro Display font system
 - **Icons**: React Icons (20,000+ icons from 40+ sets) + Lucide React
@@ -163,29 +162,27 @@ POST /api/v1/email/send              # Send custom email
 GET  /api/v1/email/config            # Get email configuration status
 ```
 
-### 6. UI Component Pattern (Shadcn/ui)
+### 6. UI Component Pattern (Pure Tailwind CSS)
 ```typescript
-// Import Shadcn components
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
 // Use cn utility for conditional classes
 import { cn } from "@/lib/utils"
 
-// Component usage
-<Button variant="default" size="lg">
+// Component usage with pure Tailwind CSS
+<button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
   Book Now
-</Button>
+</button>
 
-<Card className={cn("w-full", isSelected && "border-primary")}>
-  <CardHeader>
-    <CardTitle>Room Details</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <Input placeholder="Guest name" />
-  </CardContent>
-</Card>
+<div className={cn("w-full border rounded-lg p-6", isSelected && "border-blue-500")}>
+  <div className="border-b pb-3 mb-4">
+    <h3 className="text-lg font-semibold">Room Details</h3>
+  </div>
+  <div>
+    <input 
+      placeholder="Guest name" 
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+</div>
 ```
 
 ### 7. Typography Pattern (SF Pro Display)
@@ -405,7 +402,7 @@ newman run postman/[feature].json  # API tests
 3. **Incorrect response format** (must match contract)
 4. **Creating duplicate code** (check existing first)
 5. **Skipping tests** (every task needs testing)
-6. **Not using Shadcn components** (use @/components/ui/* instead of custom components)
+6. **Not creating unnecessary custom components** (use pure Tailwind CSS for styling)
 7. **Incorrect cn utility usage** (use cn() for conditional classes)
 8. **Missing component imports** (import from @/components/ui/[component])
 9. **Wrong email configuration** (use Brevo SMTP, not AWS SES)
