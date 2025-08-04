@@ -240,7 +240,7 @@ import { FiPlus } from "@/lib/icons"
 <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2">
   <FiPlus {...getIconProps('sm')} />
   Add Room
-</Button>
+</button>
 ```
 
 ### With Cards and Lists
