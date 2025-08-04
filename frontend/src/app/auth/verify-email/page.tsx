@@ -16,6 +16,10 @@ export default function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [verificationError, setVerificationError] = useState('');
   const [isResending, setIsResending] = useState(false);
   const [resendCount, setResendCount] = useState(0);
   const [lastResendTime, setLastResendTime] = useState<number | null>(null);
@@ -27,14 +31,28 @@ export default function VerifyEmailPage() {
   const cooldownInterval = useRef<NodeJS.Timeout>();
   const mounted = useRef(true);
 
-  // Get email from URL params
+  // Get email and token from URL params
   useEffect(() => {
     const emailParam = searchParams.get('email');
+    const tokenParam = searchParams.get('token');
+    
     if (emailParam) {
       setEmail(emailParam);
-    } else {
-      // Redirect to registration if no email provided
+    }
+    
+    if (tokenParam) {
+      setToken(tokenParam);
+    }
+    
+    // If no email provided, redirect to registration
+    if (!emailParam) {
       router.push('/auth/register');
+      return;
+    }
+    
+    // If both token and email are provided, auto-verify
+    if (tokenParam && emailParam) {
+      verifyEmailWithToken(tokenParam, emailParam);
     }
   }, [searchParams, router]);
 
@@ -79,6 +97,58 @@ export default function VerifyEmailPage() {
       }
     }
   }, [lastResendTime, resendCount]);
+
+  /**
+   * Verify email with token (called when clicking verification link)
+   */
+  const verifyEmailWithToken = async (verificationToken: string, userEmail: string) => {
+    if (!mounted.current) return;
+    
+    setIsVerifying(true);
+    setVerificationError('');
+    setError('');
+    setMessage('');
+
+    try {
+      const response = await UserRegistrationService.verifyEmail({
+        token: verificationToken,
+        email: userEmail
+      });
+
+      if (!mounted.current) return;
+
+      if (isSuccessResponse(response)) {
+        setIsVerified(true);
+        setMessage('Email verified successfully! Redirecting to your account...');
+        
+        // Redirect to success page after a short delay
+        setTimeout(() => {
+          if (mounted.current) {
+            router.push('/auth/success');
+          }
+        }, 2000);
+      } else {
+        setVerificationError(response.error || 'Email verification failed');
+        
+        // Handle specific error codes
+        if (response.code === 'VERIFICATION_TOKEN_EXPIRED') {
+          setVerificationError('Verification link has expired. Please request a new one below.');
+        } else if (response.code === 'VERIFICATION_TOKEN_INVALID') {
+          setVerificationError('Invalid verification link. Please request a new one below.');
+        } else if (response.code === 'EMAIL_NOT_FOUND') {
+          setVerificationError('Email address not found. Please try registering again.');
+        }
+      }
+    } catch (error) {
+      if (mounted.current) {
+        setVerificationError('Network error. Please check your connection and try again.');
+      }
+    } finally {
+      if (mounted.current) {
+        setIsVerifying(false);
+      }
+    }
+  };
 
   /**
    * Handle resend verification email
@@ -127,37 +197,87 @@ export default function VerifyEmailPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-space-12 px-space-4 sm:px-space-6 lg:px-space-8">
       <div className="max-w-md w-full bg-white dark:bg-gray-800 p-space-8 rounded-lg shadow-lg">
-        {/* Header */}
+        {/* Header - Dynamic based on verification status */}
         <div className="text-center mb-space-8">
-          <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-space-4">
-            <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.3.16.65.16.95 0L20 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <h1 className="text-h1 text-gray-900 dark:text-white mb-space-2">
-            Check Your Email
-          </h1>
-          <p className="text-body text-gray-600 dark:text-gray-300">
-            We've sent a verification link to:
-          </p>
-          <p className="text-body font-semibold text-gray-900 dark:text-white mt-space-1">
-            {email}
-          </p>
+          {isVerifying ? (
+            // Verifying state
+            <>
+              <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-space-4">
+                <div className="animate-spin h-8 w-8 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full" />
+              </div>
+              <h1 className="text-h1 text-gray-900 dark:text-white mb-space-2">
+                Verifying Email...
+              </h1>
+              <p className="text-body text-gray-600 dark:text-gray-300">
+                Please wait while we verify your email address
+              </p>
+            </>
+          ) : isVerified ? (
+            // Success state
+            <>
+              <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-space-4">
+                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h1 className="text-h1 text-gray-900 dark:text-white mb-space-2">
+                Email Verified! 🎉
+              </h1>
+              <p className="text-body text-gray-600 dark:text-gray-300">
+                Your account has been successfully verified
+              </p>
+            </>
+          ) : verificationError ? (
+            // Error state
+            <>
+              <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mb-space-4">
+                <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h1 className="text-h1 text-gray-900 dark:text-white mb-space-2">
+                Verification Failed
+              </h1>
+              <p className="text-body text-gray-600 dark:text-gray-300">
+                There was a problem verifying your email
+              </p>
+            </>
+          ) : (
+            // Default state (waiting for verification)
+            <>
+              <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-space-4">
+                <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.3.16.65.16.95 0L20 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h1 className="text-h1 text-gray-900 dark:text-white mb-space-2">
+                Check Your Email
+              </h1>
+              <p className="text-body text-gray-600 dark:text-gray-300">
+                We've sent a verification link to:
+              </p>
+              <p className="text-body font-semibold text-gray-900 dark:text-white mt-space-1">
+                {email}
+              </p>
+            </>
+          )}
         </div>
 
-        {/* Instructions */}
-        <div className="mb-space-6">
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-space-4">
-            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-space-2">
-              What to do next:
-            </h3>
-            <ol className="text-sm text-blue-700 dark:text-blue-300 space-y-space-1">
-              <li>1. Check your email inbox (and spam folder)</li>
-              <li>2. Click the verification link in the email</li>
-              <li>3. You'll be redirected back to complete your registration</li>
-            </ol>
+        {/* Instructions - Only show if not verifying or verified */}
+        {!isVerifying && !isVerified && (
+          <div className="mb-space-6">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-space-4">
+              <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-space-2">
+                What to do next:
+              </h3>
+              <ol className="text-sm text-blue-700 dark:text-blue-300 space-y-space-1">
+                <li>1. Check your email inbox (and spam folder)</li>
+                <li>2. Click the verification link in the email</li>
+                <li>3. You'll be redirected back to complete your registration</li>
+              </ol>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Status Messages */}
         {message && (
@@ -166,17 +286,20 @@ export default function VerifyEmailPage() {
           </div>
         )}
 
-        {error && (
+        {(error || verificationError) && (
           <div className="mb-space-4 p-space-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-red-600 dark:text-red-400">
+              {verificationError || error}
+            </p>
           </div>
         )}
 
-        {/* Resend Section */}
-        <div className="text-center mb-space-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-space-3">
-            Didn't receive the email?
-          </p>
+        {/* Resend Section - Only show if not verifying and not verified successfully */}
+        {!isVerifying && !isVerified && (
+          <div className="text-center mb-space-6">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-space-3">
+              Didn't receive the email?
+            </p>
           
           {canResend ? (
             <button
@@ -209,30 +332,45 @@ export default function VerifyEmailPage() {
               {resendCount}/3 resends used
             </p>
           )}
-        </div>
+          </div>
+        )}
 
-        {/* Help Section */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-space-6">
-          <div className="text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-space-3">
-              Still having trouble?
-            </p>
-            <div className="space-y-space-2">
-              <button
-                onClick={() => router.push('/auth/register')}
-                className="block w-full text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
-              >
-                Try registering again
-              </button>
-              <a
-                href="/contact"
-                className="block w-full text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
-              >
-                Contact support
-              </a>
+        {/* Success Actions - Show when verified */}
+        {isVerified && (
+          <div className="text-center mb-space-6">
+            <button
+              onClick={() => router.push('/auth/success')}
+              className="w-full px-space-6 py-space-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              Continue to Dashboard
+            </button>
+          </div>
+        )}
+
+        {/* Help Section - Only show if not verified successfully */}
+        {!isVerified && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-space-6">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-space-3">
+                Still having trouble?
+              </p>
+              <div className="space-y-space-2">
+                <button
+                  onClick={() => router.push('/auth/register')}
+                  className="block w-full text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
+                >
+                  Try registering again
+                </button>
+                <a
+                  href="/contact"
+                  className="block w-full text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
+                >
+                  Contact support
+                </a>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Security Notice */}
         <div className="mt-space-6 p-space-3 bg-gray-50 dark:bg-gray-700 rounded-md">
