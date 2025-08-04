@@ -70,7 +70,7 @@ export const gradients = {
 
 export const typography = {
   fontFamily: {
-    primary: "'Agrandir', 'SF Pro Display', -apple-system, sans-serif",
+    primary: "'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
     secondary: "'Inter', 'SF Pro Display', -apple-system, sans-serif",
   },
   

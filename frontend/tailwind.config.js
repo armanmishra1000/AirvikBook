@@ -122,7 +122,7 @@ module.exports = {
   				'system-ui',
   				'sans-serif'
   			],
-  			'primary': ['Agrandir', 'SF Pro Display', '-apple-system', 'sans-serif'],
+  			'primary': ['SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
   			'secondary': ['Inter', 'SF Pro Display', '-apple-system', 'sans-serif'],
   		},
   		

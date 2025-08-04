@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Inter Font Import (Secondary Brand Font) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 /* SF Pro Display Font Faces */
 @font-face {
   font-family: 'SF Pro Display';
@@ -101,7 +104,31 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
+    --radius: 0.5rem;
+    
+    /* Brand Colors */
+    --airvik-black: 2 10 24;
+    --airvik-midnight: 16 16 60;
+    --airvik-purple: 67 34 170;
+    --airvik-blue: 19 62 227;
+    --airvik-cyan: 104 216 252;
+    --airvik-violet: 182 136 255;
+    --airvik-white: 248 249 254;
+    
+    /* Status Colors */
+    --status-available: 104 216 252;
+    --status-occupied: 19 62 227;
+    --status-maintenance: 182 136 255;
+    --status-unavailable: 177 42 42;
+    
+    /* Feedback Colors */
+    --success: 78 118 56;
+    --warning: 203 123 43;
+    --error: 177 42 42;
+    --info: 209 216 250;
+    
+    /* Shadow colors */
+    --shadow-color: 2 10 24
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -127,7 +154,17 @@
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
+    
+    /* Adjusted brand colors for dark mode */
+    --airvik-white: 2 10 24;
+    --airvik-black: 248 249 254;
+    --airvik-purple: 104 71 204;
+    --airvik-blue: 45 94 232;
+    --airvik-cyan: 123 220 252;
+    
+    /* Shadow adjustments */
+    --shadow-color: 248 249 254
   }
 }
 
@@ -136,16 +173,92 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sf-pro;
+    @apply bg-background text-foreground font-secondary;
     font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'pnum' 1, 'tnum' 0, 'onum' 1, 'lnum' 0, 'dlig' 0;
   }
   
-  /* Ensure SF Pro Display is used for all text elements */
+  /* Brand typography hierarchy */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sf-pro;
+    @apply font-primary;
   }
   
-  p, span, div, a, button, input, textarea, select, label {
+  /* Body text uses secondary font (Inter) */
+  p, span, div, a, input, textarea, select, label {
+    @apply font-secondary;
+  }
+  
+  /* Buttons and UI elements use primary font (SF Pro Display) */
+  button {
+    @apply font-primary;
+  }
+  
+  /* Fallback to SF Pro Display for compatibility */
+  .font-fallback {
     @apply font-sf-pro;
+  }
+}
+
+/* Brand System Utilities */
+@layer utilities {
+  /* Typography utilities */
+  .text-hero {
+    @apply text-[72px] font-bold leading-tight tracking-tighter font-primary;
+  }
+  
+  .text-display {
+    @apply text-[60px] font-bold leading-tight tracking-tighter font-primary;
+  }
+  
+  .text-h1 {
+    @apply text-[48px] font-bold leading-snug tracking-tight font-primary;
+  }
+  
+  .text-h2 {
+    @apply text-[36px] font-bold leading-snug tracking-tight font-primary;
+  }
+  
+  .text-h3 {
+    @apply text-[30px] font-semibold leading-normal font-primary;
+  }
+  
+  .text-h4 {
+    @apply text-[24px] font-semibold leading-normal font-primary;
+  }
+  
+  .text-h5 {
+    @apply text-[20px] font-semibold leading-relaxed font-primary;
+  }
+  
+  .text-h6 {
+    @apply text-[18px] font-semibold leading-relaxed font-primary;
+  }
+  
+  .text-body-lg {
+    @apply text-[18px] font-normal leading-relaxed font-secondary;
+  }
+  
+  .text-body {
+    @apply text-[16px] font-normal leading-relaxed font-secondary;
+  }
+  
+  .text-body-sm {
+    @apply text-[14px] font-normal leading-loose font-secondary;
+  }
+  
+  .text-button {
+    @apply text-[14px] font-medium tracking-wide uppercase font-primary;
+  }
+  
+  .text-caption {
+    @apply text-[12px] font-normal leading-relaxed font-secondary;
+  }
+  
+  .text-label {
+    @apply text-[14px] font-medium leading-relaxed font-secondary;
+  }
+  
+  /* Brand gradient text */
+  .text-gradient {
+    @apply bg-gradient-mid bg-clip-text text-transparent;
   }
 }

@@ -93,7 +93,7 @@
 ```css
 :root {
   /* Primary Font - Headers & UI */
-  --font-primary: 'Agrandir', 'SF Pro Display', -apple-system, sans-serif;
+  --font-primary: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   
   /* Secondary Font - Body & Content */
   --font-secondary: 'Inter', 'SF Pro Display', -apple-system, sans-serif;

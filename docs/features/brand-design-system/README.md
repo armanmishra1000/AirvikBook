@@ -42,7 +42,7 @@ Before creating ANY UI component:
 ### 🔤 Typography Quick Reference
 
 ```typescript
-// Headers (font-primary/Agrandir)
+// Headers (font-primary/SF Pro Display)
 'text-h1'  // 48px bold
 'text-h2'  // 36px bold  
 'text-h3'  // 30px semibold
