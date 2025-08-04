@@ -1,0 +1,254 @@
+'use client';
+
+/**
+ * Email Verification Pending Page
+ * 
+ * BRAND COMPLIANCE: Uses brand tokens and components
+ * COMPLETE USER FLOW: Verification pending with resend functionality
+ */
+
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { isSuccessResponse } from '../../../types/userRegistration.types';
+import UserRegistrationService from '../../../services/userRegistration.service';
+
+export default function VerifyEmailPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [email, setEmail] = useState('');
+  const [isResending, setIsResending] = useState(false);
+  const [resendCount, setResendCount] = useState(0);
+  const [lastResendTime, setLastResendTime] = useState<number | null>(null);
+  const [canResend, setCanResend] = useState(true);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  const cooldownInterval = useRef<NodeJS.Timeout>();
+  const mounted = useRef(true);
+
+  // Get email from URL params
+  useEffect(() => {
+    const emailParam = searchParams.get('email');
+    if (emailParam) {
+      setEmail(emailParam);
+    } else {
+      // Redirect to registration if no email provided
+      router.push('/auth/register');
+    }
+  }, [searchParams, router]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      mounted.current = false;
+      if (cooldownInterval.current) {
+        clearInterval(cooldownInterval.current);
+      }
+    };
+  }, []);
+
+  // Handle resend cooldown
+  useEffect(() => {
+    if (lastResendTime && resendCount >= 3) {
+      // 5 minute cooldown after 3 resends
+      const cooldownMs = 5 * 60 * 1000;
+      const elapsed = Date.now() - lastResendTime;
+      
+      if (elapsed < cooldownMs) {
+        setCanResend(false);
+        setResendCooldown(Math.ceil((cooldownMs - elapsed) / 1000));
+        
+        cooldownInterval.current = setInterval(() => {
+          if (!mounted.current) return;
+          
+          const newElapsed = Date.now() - lastResendTime;
+          const remaining = Math.ceil((cooldownMs - newElapsed) / 1000);
+          
+          if (remaining <= 0) {
+            setCanResend(true);
+            setResendCooldown(0);
+            setResendCount(0);
+            if (cooldownInterval.current) {
+              clearInterval(cooldownInterval.current);
+            }
+          } else {
+            setResendCooldown(remaining);
+          }
+        }, 1000);
+      }
+    }
+  }, [lastResendTime, resendCount]);
+
+  /**
+   * Handle resend verification email
+   */
+  const handleResendVerification = async () => {
+    if (!email || isResending || !canResend) return;
+
+    setIsResending(true);
+    setError('');
+    setMessage('');
+
+    try {
+      const response = await UserRegistrationService.resendVerification({ email });
+
+      if (isSuccessResponse(response)) {
+        setMessage('Verification email sent! Please check your inbox.');
+        setResendCount(prev => prev + 1);
+        setLastResendTime(Date.now());
+        
+        // Short cooldown between resends (1 minute)
+        setCanResend(false);
+        setTimeout(() => {
+          if (mounted.current) {
+            setCanResend(true);
+          }
+        }, 60000);
+      } else {
+        setError(response.error || 'Failed to resend verification email');
+      }
+    } catch (error) {
+      setError('Failed to resend verification email. Please try again.');
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  /**
+   * Format cooldown time
+   */
+  const formatCooldownTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-space-12 px-space-4 sm:px-space-6 lg:px-space-8">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 p-space-8 rounded-lg shadow-lg">
+        {/* Header */}
+        <div className="text-center mb-space-8">
+          <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-space-4">
+            <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26c.3.16.65.16.95 0L20 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h1 className="text-h1 text-gray-900 dark:text-white mb-space-2">
+            Check Your Email
+          </h1>
+          <p className="text-body text-gray-600 dark:text-gray-300">
+            We've sent a verification link to:
+          </p>
+          <p className="text-body font-semibold text-gray-900 dark:text-white mt-space-1">
+            {email}
+          </p>
+        </div>
+
+        {/* Instructions */}
+        <div className="mb-space-6">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-space-4">
+            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-space-2">
+              What to do next:
+            </h3>
+            <ol className="text-sm text-blue-700 dark:text-blue-300 space-y-space-1">
+              <li>1. Check your email inbox (and spam folder)</li>
+              <li>2. Click the verification link in the email</li>
+              <li>3. You'll be redirected back to complete your registration</li>
+            </ol>
+          </div>
+        </div>
+
+        {/* Status Messages */}
+        {message && (
+          <div className="mb-space-4 p-space-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+            <p className="text-sm text-green-600 dark:text-green-400">{message}</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-space-4 p-space-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* Resend Section */}
+        <div className="text-center mb-space-6">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-space-3">
+            Didn't receive the email?
+          </p>
+          
+          {canResend ? (
+            <button
+              onClick={handleResendVerification}
+              disabled={isResending}
+              className="inline-flex items-center px-space-4 py-space-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isResending ? (
+                <>
+                  <div className="animate-spin -ml-1 mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                  Sending...
+                </>
+              ) : (
+                'Resend Verification Email'
+              )}
+            </button>
+          ) : (
+            <div className="text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-space-1">
+                Please wait before requesting another email
+              </p>
+              <p className="text-sm font-mono text-gray-600 dark:text-gray-300">
+                {formatCooldownTime(resendCooldown)}
+              </p>
+            </div>
+          )}
+          
+          {resendCount > 0 && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-space-2">
+              {resendCount}/3 resends used
+            </p>
+          )}
+        </div>
+
+        {/* Help Section */}
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-space-6">
+          <div className="text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-space-3">
+              Still having trouble?
+            </p>
+            <div className="space-y-space-2">
+              <button
+                onClick={() => router.push('/auth/register')}
+                className="block w-full text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
+              >
+                Try registering again
+              </button>
+              <a
+                href="/contact"
+                className="block w-full text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
+              >
+                Contact support
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Security Notice */}
+        <div className="mt-space-6 p-space-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+          <div className="flex items-start space-x-space-2">
+            <svg className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+            <div>
+              <p className="text-xs text-gray-600 dark:text-gray-300">
+                <strong>Security Notice:</strong> The verification link will expire in 24 hours. 
+                If you don't verify your email within this time, you'll need to register again.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
