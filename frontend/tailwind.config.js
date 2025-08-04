@@ -63,7 +63,16 @@ module.exports = {
   		},
   		fontFamily: {
   			sans: [
-  				'Inter',
+  				'SF Pro Display',
+  				'-apple-system',
+  				'BlinkMacSystemFont',
+  				'system-ui',
+  				'sans-serif'
+  			],
+  			'sf-pro': [
+  				'SF Pro Display',
+  				'-apple-system',
+  				'BlinkMacSystemFont',
   				'system-ui',
   				'sans-serif'
   			]

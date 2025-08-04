@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import { Request, Response } from 'express';
+import emailRoutes from './routes/email.routes';
 
 // Load environment variables
 dotenv.config();
@@ -27,6 +28,9 @@ app.use(morgan('dev'));
 
 // API prefix
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
+
+// Routes
+app.use(`${API_PREFIX}/email`, emailRoutes);
 
 // Health check route
 app.get(`${API_PREFIX}/health`, (_req: Request, res: Response) => {

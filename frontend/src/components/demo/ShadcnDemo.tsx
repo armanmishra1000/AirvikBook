@@ -14,8 +14,41 @@ import { Calendar } from "@/components/ui/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { CalendarIcon, CheckIcon } from "lucide-react"
-import { useState } from "react"
+import { getTypographyClass, getFontClass } from "@/lib/fonts"
+import { 
+  CalendarIcon, 
+  CheckIcon, 
+  TypeIcon,
+  getIconProps,
+  FiHome,
+  FiUser,
+  FiUsers,
+  FiCreditCard,
+  FiWifi,
+  FiCheckCircle,
+  FiAlertTriangle,
+  FiXCircle,
+  FiInfo,
+  FiCoffee,
+  FiBell,
+  FiSettings,
+  FiHelpCircle,
+  FiLogOut,
+  FiCalendar,
+  FiBarChart,
+  MdHotel,
+  MdRoomService,
+  MdTv,
+  MdKitchen,
+  MdBalcony,
+  MdBathtub,
+  MdLocalLaundryService,
+  MdAirportShuttle,
+  MdLocalParking,
+  MdBusinessCenter,
+  BsBuilding
+} from "@/lib/icons"
+import React, { useState } from "react"
 
 export default function ShadcnDemo() {
   const [date, setDate] = useState<Date | undefined>(new Date())
@@ -24,19 +57,194 @@ export default function ShadcnDemo() {
   return (
     <div className="container mx-auto p-6 space-y-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Shadcn/ui Components Demo</h1>
-        <p className="text-muted-foreground">
-          AirVikBook Hotel Management System - UI Component Showcase
+        <h1 className={getTypographyClass('hero', 'mb-2')}>
+          AirVikBook
+        </h1>
+        <h2 className={getTypographyClass('h2', 'mb-4')}>
+          Shadcn/ui Components Demo
+        </h2>
+        <p className={getTypographyClass('subtitle')}>
+          Hotel Management System - UI Component Showcase with SF Pro Display
         </p>
       </div>
+
+      {/* Font Showcase */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TypeIcon className="h-5 w-5" />
+            SF Pro Display Typography
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3">
+            <div className={getTypographyClass('display')}>Display Text</div>
+            <div className={getTypographyClass('h1')}>Heading 1</div>
+            <div className={getTypographyClass('h2')}>Heading 2</div>
+            <div className={getTypographyClass('h3')}>Heading 3</div>
+            <div className={getTypographyClass('body')}>Body text with SF Pro Display</div>
+            <div className={getTypographyClass('bodySmall')}>Small body text</div>
+            <div className={getTypographyClass('caption')}>Caption text</div>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <span className={getFontClass('thin', 'base')}>Thin</span>
+            <span className={getFontClass('light', 'base')}>Light</span>
+            <span className={getFontClass('normal', 'base')}>Regular</span>
+            <span className={getFontClass('medium', 'base')}>Medium</span>
+            <span className={getFontClass('semibold', 'base')}>Semibold</span>
+            <span className={getFontClass('bold', 'base')}>Bold</span>
+            <span className={getFontClass('black', 'base')}>Black</span>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Alert */}
       <Alert>
         <CheckIcon className="h-4 w-4" />
         <AlertDescription>
-          Shadcn/ui has been successfully integrated into the project!
+          SF Pro Display font, react-icons, and Shadcn/ui have been successfully integrated into the project!
         </AlertDescription>
       </Alert>
+
+      {/* React Icons Showcase */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MdHotel {...getIconProps('md', 'primary')} />
+            React Icons Integration
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Navigation Icons */}
+          <div>
+            <h4 className={getTypographyClass('h4', 'mb-3')}>Navigation Icons</h4>
+            <div className="flex gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <FiHome {...getIconProps('md', 'primary')} />
+                <span className={getTypographyClass('bodySmall')}>Dashboard</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiUser {...getIconProps('md', 'primary')} />
+                <span className={getTypographyClass('bodySmall')}>Rooms</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiUsers {...getIconProps('md', 'primary')} />
+                <span className={getTypographyClass('bodySmall')}>Guests</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiCreditCard {...getIconProps('md', 'primary')} />
+                <span className={getTypographyClass('bodySmall')}>Payments</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Hotel Amenities */}
+          <div>
+            <h4 className={getTypographyClass('h4', 'mb-3')}>Hotel Amenities</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <FiWifi {...getIconProps('sm', 'muted')} />
+                <span className={getTypographyClass('bodySmall')}>WiFi</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <FiCoffee {...getIconProps('sm', 'muted')} />
+                <span className={getTypographyClass('bodySmall')}>Coffee</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <MdTv {...getIconProps('sm', 'muted')} />
+                <span className={getTypographyClass('bodySmall')}>Television</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <MdKitchen {...getIconProps('sm', 'muted')} />
+                <span className={getTypographyClass('bodySmall')}>Kitchenette</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <MdBalcony {...getIconProps('sm', 'muted')} />
+                <span className={getTypographyClass('bodySmall')}>Balcony</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <MdBathtub {...getIconProps('sm', 'muted')} />
+                <span className={getTypographyClass('bodySmall')}>Bathtub</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Hotel Services */}
+          <div>
+            <h4 className={getTypographyClass('h4', 'mb-3')}>Hotel Services</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <MdRoomService {...getIconProps('sm', 'info')} />
+                <span className={getTypographyClass('bodySmall')}>Room Service</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <MdLocalLaundryService {...getIconProps('sm', 'info')} />
+                <span className={getTypographyClass('bodySmall')}>Laundry</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <MdAirportShuttle {...getIconProps('sm', 'info')} />
+                <span className={getTypographyClass('bodySmall')}>Airport Shuttle</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <MdLocalParking {...getIconProps('sm', 'info')} />
+                <span className={getTypographyClass('bodySmall')}>Parking</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <MdBusinessCenter {...getIconProps('sm', 'info')} />
+                <span className={getTypographyClass('bodySmall')}>Business Center</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 border rounded-md">
+                <FiBell {...getIconProps('sm', 'info')} />
+                <span className={getTypographyClass('bodySmall')}>Concierge</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Icons */}
+          <div>
+            <h4 className={getTypographyClass('h4', 'mb-3')}>Status Icons</h4>
+            <div className="flex gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <FiCheckCircle {...getIconProps('sm', 'success')} />
+                <span className={getTypographyClass('bodySmall')}>Available</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiAlertTriangle {...getIconProps('sm', 'warning')} />
+                <span className={getTypographyClass('bodySmall')}>Maintenance</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiXCircle {...getIconProps('sm', 'destructive')} />
+                <span className={getTypographyClass('bodySmall')}>Unavailable</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FiInfo {...getIconProps('sm', 'info')} />
+                <span className={getTypographyClass('bodySmall')}>Information</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Icon Sizes */}
+          <div>
+            <h4 className={getTypographyClass('h4', 'mb-3')}>Icon Sizes</h4>
+            <div className="flex items-center gap-4">
+              <BsBuilding {...getIconProps('xs', 'muted')} />
+              <BsBuilding {...getIconProps('sm', 'muted')} />
+              <BsBuilding {...getIconProps('md', 'muted')} />
+              <BsBuilding {...getIconProps('lg', 'muted')} />
+              <BsBuilding {...getIconProps('xl', 'muted')} />
+              <BsBuilding {...getIconProps('2xl', 'muted')} />
+            </div>
+            <div className="flex gap-2 mt-2 text-xs text-muted-foreground">
+              <span>xs</span>
+              <span>sm</span>
+              <span>md</span>
+              <span>lg</span>
+              <span>xl</span>
+              <span>2xl</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Cards Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

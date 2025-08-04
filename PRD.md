@@ -20,17 +20,21 @@
 ### Frontend
 - **Framework**: Next.js 15+ (App Router)
 - **UI**: React 19+ with TypeScript
+- **UI Components**: Shadcn/ui (built on Radix UI)
 - **Styling**: Tailwind CSS 4.0
+- **Typography**: SF Pro Display font system
+- **Icons**: React Icons (20,000+ icons from 40+ sets) + Lucide React
 - **State**: Redux Toolkit
 - **Forms**: React Hook Form + Zod
 - **Auth**: NextAuth.js with Google OAuth
 
 ### Backend  
 - **Runtime**: Node.js with Express
-- **Database**: MongoDB with Mongoose
+- **Database**: PostgreSQL with Prisma ORM
 - **API**: RESTful with /api/v1 prefix
 - **Auth**: JWT (access in sessionStorage, refresh in localStorage)
 - **Validation**: Express-validator
+- **Email**: Nodemailer with Brevo SMTP integration
 
 ### Infrastructure
 - **Dev Server**: localhost:5000 (backend), localhost:3000 (frontend)
@@ -43,11 +47,12 @@
 Airvikbook/
 ├── backend/
 │   ├── src/
-│   │   ├── models/         # MongoDB schemas
+│   │   ├── models/         # Prisma schema definitions
 │   │   ├── controllers/    # Request handlers
-│   │   ├── services/       # Business logic
+│   │   ├── services/       # Business logic (including email service)
 │   │   ├── routes/         # API endpoints
 │   │   ├── middleware/     # Auth, validation
+│   │   ├── config/         # Configuration files (email, etc.)
 │   │   └── utils/          # Helpers
 │   └── server.ts           # Entry point
 ├── frontend/
@@ -108,6 +113,143 @@ POST   /api/v1/auth/register
 POST   /api/v1/auth/login
 GET    /api/v1/users/profile
 PUT    /api/v1/bookings/:id
+POST   /api/v1/email/test
+POST   /api/v1/email/welcome
+POST   /api/v1/email/booking-confirmation
+```
+
+### 4. Email Service Pattern (Brevo SMTP)
+```typescript
+// Import email service
+import { emailService } from '@/services/email.service'
+
+// Send welcome email
+const result = await emailService.sendWelcomeEmail(email, userName)
+
+// Send booking confirmation
+const result = await emailService.sendBookingConfirmation(email, bookingDetails)
+
+// Send password reset
+const result = await emailService.sendPasswordResetEmail(email, userName, resetToken)
+
+// Send custom email
+const result = await emailService.sendEmail({
+  to: email,
+  subject: 'Custom Subject',
+  html: '<h1>Custom HTML Content</h1>'
+})
+
+// Test email configuration
+const result = await emailService.testEmailConfiguration()
+```
+
+### 5. Email Configuration Pattern
+```typescript
+// Environment variables (backend/.env)
+SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-brevo-user
+SMTP_PASS=your-brevo-password
+FROM_EMAIL=your-verified-email@domain.com
+
+// Email API endpoints
+POST /api/v1/email/test              # Test email configuration
+POST /api/v1/email/welcome           # Send welcome email
+POST /api/v1/email/booking-confirmation  # Send booking confirmation
+POST /api/v1/email/password-reset    # Send password reset
+POST /api/v1/email/verify-email      # Send email verification
+POST /api/v1/email/send              # Send custom email
+GET  /api/v1/email/config            # Get email configuration status
+```
+
+### 6. UI Component Pattern (Shadcn/ui)
+```typescript
+// Import Shadcn components
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+// Use cn utility for conditional classes
+import { cn } from "@/lib/utils"
+
+// Component usage
+<Button variant="default" size="lg">
+  Book Now
+</Button>
+
+<Card className={cn("w-full", isSelected && "border-primary")}>
+  <CardHeader>
+    <CardTitle>Room Details</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Input placeholder="Guest name" />
+  </CardContent>
+</Card>
+```
+
+### 7. Typography Pattern (SF Pro Display)
+```typescript
+// Import typography utilities
+import { getTypographyClass, getFontClass } from "@/lib/fonts"
+
+// Typography presets usage
+<h1 className={getTypographyClass('hero')}>AirVikBook</h1>
+<h2 className={getTypographyClass('h1')}>Welcome</h2>
+<p className={getTypographyClass('body')}>Body text content</p>
+<span className={getTypographyClass('caption')}>Caption text</span>
+
+// Custom font combinations
+<div className={getFontClass('bold', 'xl')}>Bold Extra Large</div>
+<span className={getFontClass('medium', 'sm')}>Medium Small</span>
+
+// Direct Tailwind classes
+<h3 className="font-sf-pro text-2xl font-semibold">Custom Heading</h3>
+<p className="font-sf-pro text-base font-normal">Regular text</p>
+
+// Available typography presets:
+// hero, display, h1-h6, body, bodyLarge, bodySmall, 
+// button, buttonLarge, label, caption, subtitle
+```
+
+### 8. React Icons Pattern
+```typescript
+// Import icons from centralized utility
+import { 
+  FiHome, 
+  FiBed, 
+  MdHotel, 
+  BsBuilding,
+  hotelIcons,
+  navigationIcons,
+  getIconProps,
+  iconSets 
+} from "@/lib/icons"
+
+// Basic icon usage
+<FiHome size={20} className="text-primary" />
+<MdHotel {...getIconProps('lg', 'success')} />
+
+// Contextual icon usage
+<hotelIcons.wifi {...getIconProps('md', 'info')} />
+<navigationIcons.dashboard {...getIconProps('sm')} />
+
+// Dynamic icon sets
+{iconSets.roomAmenities.map((amenity, index) => (
+  <div key={index} className="flex items-center gap-2">
+    <amenity.icon {...getIconProps('sm', 'muted')} />
+    <span>{amenity.label}</span>
+  </div>
+))}
+
+// Status icons with dynamic rendering
+{React.createElement(statusIcons.success, getIconProps('sm', 'success'))}
+
+// Available icon libraries:
+// Fi (Feather) - Clean UI icons
+// Md (Material Design) - Hotel amenities & services  
+// Bs (Bootstrap) - Business & UI elements
+// Lucide - Premium icons (already integrated)
 ```
 
 ## 📋 Development Workflow
@@ -183,17 +325,19 @@ newman run postman/[feature].json  # API tests
 
 ## 📊 Database Schema Overview
 
-### Core Collections:
+### Core Tables:
 - **users**: Authentication, profiles, preferences
 - **properties**: Hotels, buildings, rooms
 - **bookings**: Reservations, status, payments
 - **rates**: Pricing, restrictions, availability
 - **payments**: Transactions, refunds, balances
+- **email_logs**: Email delivery tracking and analytics
 
 ### Relationships:
 - User → Many Bookings
 - Property → Many Rooms → Many Bookings
 - Booking → One User, One Room, Many Payments
+- Email Logs → Track all email communications
 
 ## 🚀 Development Guidelines
 
@@ -217,7 +361,7 @@ newman run postman/[feature].json  # API tests
 ### Required:
 - **Google OAuth**: Social login
 - **Payment Gateways**: RazorPay, ICICI Eazypay
-- **Email**: Amazon SES for notifications
+- **Email**: Brevo SMTP for notifications and communications
 
 ### Optional (Hotel Configurable):
 - **SMS**: Twilio, AWS SNS
@@ -261,6 +405,19 @@ newman run postman/[feature].json  # API tests
 3. **Incorrect response format** (must match contract)
 4. **Creating duplicate code** (check existing first)
 5. **Skipping tests** (every task needs testing)
+6. **Not using Shadcn components** (use @/components/ui/* instead of custom components)
+7. **Incorrect cn utility usage** (use cn() for conditional classes)
+8. **Missing component imports** (import from @/components/ui/[component])
+9. **Wrong email configuration** (use Brevo SMTP, not AWS SES)
+10. **Missing email environment variables** (SMTP_HOST, SMTP_USER, SMTP_PASS, FROM_EMAIL)
+11. **Not testing email functionality** (always test email sending)
+12. **Incorrect email service imports** (import from @/services/email.service)
+13. **Not using SF Pro Display font** (use font-sf-pro class or typography utilities)
+14. **Inconsistent typography** (use getTypographyClass() for consistency)
+15. **Missing font imports** (import from @/lib/fonts for typography utilities)
+16. **Using wrong icon libraries** (import from @/lib/icons, not directly from react-icons)
+17. **Inconsistent icon sizing** (use getIconProps() for consistent sizing and colors)
+18. **Missing icon context** (use hotelIcons, navigationIcons for semantic meaning)
 
 ## 📞 Support & Resources
 

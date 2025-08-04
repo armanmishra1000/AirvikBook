@@ -523,12 +523,17 @@ This document outlines the complete feature set for a modern, scalable hotel man
 **Integration**: Email/SMS Services  
 **Development Readiness**: HIGH
 
-#### 12.1.1 Email Automation
-- Welcome email sequences
-- Booking confirmations
-- Reminder notifications
-- Follow-up surveys
-- Marketing campaigns
+#### 12.1.1 Email Automation (Brevo SMTP)
+- **Brevo SMTP integration** with configurable settings
+- Welcome email sequences with HTML templates
+- Booking confirmations with booking details
+- Reminder notifications (check-in, check-out, payment)
+- Follow-up surveys and feedback collection
+- Marketing campaigns with personalization
+- **Email delivery tracking and analytics**
+- **Template management with visual editor**
+- **Rate limiting and bulk email support**
+- **Email verification and bounce handling**
 
 #### 12.1.2 SMS API Integration (Optional)
 - **Hotel can enable/disable SMS features**
@@ -565,13 +570,16 @@ This document outlines the complete feature set for a modern, scalable hotel man
 - **Emergency broadcast notifications**
 
 #### 12.1.5 Template Management
-- Email template designer
+- **Brevo SMTP email template designer**
+- **HTML email templates with responsive design**
 - SMS template library
 - **WhatsApp template designer**
-- Personalization variables
+- Personalization variables and dynamic content
 - Multi-language support
-- A/B testing
+- A/B testing for email campaigns
 - **Cross-platform template consistency**
+- **Email template versioning and history**
+- **Template performance analytics**
 
 ---
 
@@ -940,7 +948,10 @@ This document outlines the complete feature set for a modern, scalable hotel man
 ### Frontend (Web-Only Platform)
 - **Framework**: Next.js v15+
 - **UI Library**: React v19+
+- **UI Components**: Shadcn/ui (built on Radix UI primitives)
 - **Styling**: Tailwind CSS (v4+) + CSS Modules
+- **Typography**: SF Pro Display font system
+- **Icons**: React Icons (Feather, Material Design, Bootstrap) + Lucide React
 - **State Management**: Redux Toolkit
 - **Forms**: React Hook Form + Zod Validation
 - **Charts**: Chart.js
@@ -966,7 +977,7 @@ This document outlines the complete feature set for a modern, scalable hotel man
 ### Third-Party Services
 - **Authentication**: Google OAuth 2.0 (Gmail/Google login)
 - **Payments**: RazorPay, ICICI Eazypay - UPI
-- **Email**: Amazon SES
+- **Email**: Brevo SMTP (formerly Sendinblue)
 - **SMS**: Twilio, AWS SNS, MessageBird (Optional - Hotel Configurable) (multiple API)
 - **WhatsApp**: WhatsApp Business API/Twilio WhatsApp (Optional - Hotel Configurable)
 - **Maps**: Google Maps API

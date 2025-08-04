@@ -9,6 +9,7 @@ const nextConfig = {
   images: {
     domains: ['localhost', 'lh3.googleusercontent.com'], // For Google profile pictures
   },
+  // Font optimization - removed as it's not a valid option in Next.js 14
   async rewrites() {
     return [
       {
