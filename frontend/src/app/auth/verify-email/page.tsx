@@ -30,6 +30,7 @@ export default function VerifyEmailPage() {
 
   const cooldownInterval = useRef<NodeJS.Timeout>();
   const mounted = useRef(true);
+  const verificationAttempted = useRef(false);
 
   // Get email and token from URL params
   useEffect(() => {
@@ -56,10 +57,11 @@ export default function VerifyEmailPage() {
       return;
     }
     
-    // If both token and email are provided, auto-verify
-    if (tokenParam && emailParam) {
+    // If both token and email are provided, auto-verify (only once)
+    if (tokenParam && emailParam && !verificationAttempted.current) {
       const decodedEmail = decodeURIComponent(emailParam);
       console.log('🚀 Auto-verifying with decoded email:', decodedEmail);
+      verificationAttempted.current = true;
       verifyEmailWithToken(tokenParam, decodedEmail);
     }
   }, [searchParams, router]);
@@ -112,6 +114,12 @@ export default function VerifyEmailPage() {
   const verifyEmailWithToken = async (verificationToken: string, userEmail: string) => {
     if (!mounted.current) return;
     
+    // Prevent double verification
+    if (isVerifying) {
+      console.log('⚠️ Verification already in progress, skipping');
+      return;
+    }
+    
     console.log('🔍 Starting email verification with token:', verificationToken.substring(0, 10) + '...');
     console.log('📧 Email to verify:', userEmail);
     
@@ -128,32 +136,42 @@ export default function VerifyEmailPage() {
       });
 
       console.log('📨 API Response received:', response);
+      console.log('📨 Response details:', JSON.stringify(response, null, 2));
+      console.log('🔍 Mounted status:', mounted.current);
 
-      if (!mounted.current) return;
-
+      console.log('🔍 Checking isSuccessResponse:', isSuccessResponse(response));
+      console.log('🔍 Response.success:', response.success);
+      console.log('🔍 Response type:', typeof response.success);
+      
       if (isSuccessResponse(response)) {
         console.log('✅ Verification successful!');
-        setIsVerified(true);
-        setMessage('Email verified successfully! Redirecting to your account...');
         
-        // Redirect to success page after a short delay
+        // Only update state if component is still mounted
+        if (mounted.current) {
+          setIsVerified(true);
+          setMessage('Email verified successfully! Redirecting to your account...');
+        }
+        
+        // Always redirect, even if component unmounted (user will see success page)
         setTimeout(() => {
-          if (mounted.current) {
-            console.log('🔄 Redirecting to success page...');
-            router.push('/auth/success');
-          }
+          console.log('🔄 Redirecting to success page...');
+          router.push('/auth/success');
         }, 2000);
       } else {
         console.log('❌ Verification failed:', response);
-        setVerificationError(response.error || 'Email verification failed');
         
-        // Handle specific error codes
-        if (response.code === 'VERIFICATION_TOKEN_EXPIRED') {
-          setVerificationError('Verification link has expired. Please request a new one below.');
-        } else if (response.code === 'VERIFICATION_TOKEN_INVALID') {
-          setVerificationError('Invalid verification link. Please request a new one below.');
-        } else if (response.code === 'EMAIL_NOT_FOUND') {
-          setVerificationError('Email address not found. Please try registering again.');
+        // Only update state if component is still mounted
+        if (mounted.current) {
+          setVerificationError(response.error || 'Email verification failed');
+          
+          // Handle specific error codes
+          if (response.code === 'VERIFICATION_TOKEN_EXPIRED') {
+            setVerificationError('Verification link has expired. Please request a new one below.');
+          } else if (response.code === 'VERIFICATION_TOKEN_INVALID') {
+            setVerificationError('Invalid verification link. Please request a new one below.');
+          } else if (response.code === 'EMAIL_NOT_FOUND') {
+            setVerificationError('Email address not found. Please try registering again.');
+          }
         }
       }
     } catch (error) {
@@ -162,9 +180,11 @@ export default function VerifyEmailPage() {
         setVerificationError('Network error. Please check your connection and try again.');
       }
     } finally {
+      // Always set isVerifying to false, but check mounted status
       if (mounted.current) {
         setIsVerifying(false);
       }
+      console.log('🏁 Verification process completed. Mounted:', mounted.current);
     }
   };
 
