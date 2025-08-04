@@ -26,7 +26,7 @@ export class EmailService {
     this.fromEmail = process.env.FROM_EMAIL || 'noreply@airvikbook.com';
     
     // Create transporter with Brevo SMTP configuration
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
       port: parseInt(process.env.SMTP_PORT || '587'),
       secure: process.env.SMTP_SECURE === 'true', // false for TLS, true for SSL

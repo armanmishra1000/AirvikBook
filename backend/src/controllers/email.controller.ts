@@ -8,7 +8,7 @@ export class EmailController {
    * Test email configuration
    * POST /api/v1/email/test
    */
-  static async testEmailConfig(req: Request, res: Response) {
+  static async testEmailConfig(_req: Request, res: Response) {
     try {
       // Validate configuration first
       const configValidation = validateEmailConfig();
@@ -255,7 +255,7 @@ export class EmailController {
    * Get email configuration status
    * GET /api/v1/email/config
    */
-  static async getEmailConfig(req: Request, res: Response) {
+  static async getEmailConfig(_req: Request, res: Response) {
     try {
       const configValidation = validateEmailConfig();
       const configSummary = getEmailConfigSummary();

@@ -27,6 +27,7 @@ model User {
   isActive          Boolean   @default(true)
 
   // Relations (to be added as features are developed)
+  emailVerificationTokens EmailVerificationToken[]
   // bookings          Booking[]
   // reviews           Review[]
 
@@ -131,6 +132,23 @@ enum RoomStatus {
   MAINTENANCE
   OUT_OF_ORDER
   CLEANING
+}
+
+// Email Verification Token Model
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, email])
+  @@map("email_verification_tokens")
 }
 
 // Session Model for JWT token management
