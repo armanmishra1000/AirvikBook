@@ -146,6 +146,24 @@ model EmailVerificationToken {
 
 ---
 
+### Problem #6 - 2025-08-05 - Frontend Verification Flow Stuck
+**Problem**: After clicking email verification link the page stayed on "Verifying Email..." even though backend responded success.
+**Error Message**: None in UI; console showed `⚠️ Component unmounted, skipping response handling`.
+**Root Cause**: In development `React.StrictMode` mounts, unmounts, and remounts components. Verification API response arrived on first (now unmounted) component instance, skipping success handling.
+**Test Failed**: Manual end-to-end registration flow.
+
+**Solution Applied**:
+1. Removed early‐return when component was unmounted for network callbacks.
+2. Processed API response regardless of mount status; gated only `setState` calls with `mounted.current`.
+3. Added unconditional redirect to success page on success.
+4. Added `isVerifying` and `verificationAttempted` refs to avoid duplicate requests.
+
+**Test Result**: ✅ PASSED – Verification now shows success and redirects.
+**Prevention**: Always treat StrictMode double-render; never tie network response logic to component mounted state.
+**Code Changes**: `frontend/src/app/auth/verify-email/page.tsx` (39 insertions, 19 deletions)
+
+---
+
 *Problems will be logged here as they occur during implementation.*
 
 ## Troubleshooting Checklist

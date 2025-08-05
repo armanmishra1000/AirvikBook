@@ -24,7 +24,8 @@ export class AuthMiddleware {
       // Get token from Authorization header
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return ResponseUtil.error(res, 'Access token required', 'MISSING_TOKEN', 401);
+        ResponseUtil.error(res, 'Access token required', 'MISSING_TOKEN', 401);
+      return;
       }
 
       const token = authHeader.substring(7); // Remove 'Bearer ' prefix
@@ -33,7 +34,8 @@ export class AuthMiddleware {
       const validation = JwtService.validateAccessToken(token);
       if (!validation.isValid) {
         const statusCode = validation.code === 'TOKEN_EXPIRED' ? 401 : 403;
-        return ResponseUtil.error(res, validation.error!, validation.code!, statusCode);
+        ResponseUtil.error(res, validation.error!, validation.code!, statusCode);
+      return;
       }
 
       // Attach user info to request
@@ -46,7 +48,8 @@ export class AuthMiddleware {
       next();
     } catch (error) {
       console.error('Auth middleware error:', error);
-      return ResponseUtil.error(res, 'Token validation failed', 'AUTH_ERROR', 500);
+      ResponseUtil.error(res, 'Token validation failed', 'AUTH_ERROR', 500);
+      return;
     }
   }
 
@@ -83,13 +86,15 @@ export class AuthMiddleware {
   static requireRole(allowedRoles: string | string[]) {
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       if (!req.user) {
-        return ResponseUtil.error(res, 'Authentication required', 'AUTH_REQUIRED', 401);
+        ResponseUtil.error(res, 'Authentication required', 'AUTH_REQUIRED', 401);
+        return;
       }
 
       const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
       
       if (!roles.includes(req.user.role)) {
-        return ResponseUtil.error(res, 'Insufficient permissions', 'INSUFFICIENT_PERMISSIONS', 403);
+        ResponseUtil.error(res, 'Insufficient permissions', 'INSUFFICIENT_PERMISSIONS', 403);
+        return;
       }
 
       next();
@@ -101,7 +106,8 @@ export class AuthMiddleware {
    */
   static async requireEmailVerification(req: Request, res: Response, next: NextFunction): Promise<void> {
     if (!req.user) {
-      return ResponseUtil.error(res, 'Authentication required', 'AUTH_REQUIRED', 401);
+      ResponseUtil.error(res, 'Authentication required', 'AUTH_REQUIRED', 401);
+      return;
     }
 
     try {
@@ -115,15 +121,17 @@ export class AuthMiddleware {
       });
 
       if (!user || !user.isEmailVerified) {
-        return ResponseUtil.error(res, 'Email verification required', 'EMAIL_NOT_VERIFIED', 403, {
+          ResponseUtil.error(res, 'Email verification required', 'EMAIL_NOT_VERIFIED', 403, {
           message: 'Please verify your email address to access this resource'
         });
+        return;
       }
 
       next();
     } catch (error) {
       console.error('Email verification check error:', error);
-      return ResponseUtil.error(res, 'Verification check failed', 'VERIFICATION_ERROR', 500);
+      ResponseUtil.error(res, 'Verification check failed', 'VERIFICATION_ERROR', 500);
+      return;
     }
   }
 
@@ -132,7 +140,8 @@ export class AuthMiddleware {
    */
   static async requireActiveUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     if (!req.user) {
-      return ResponseUtil.error(res, 'Authentication required', 'AUTH_REQUIRED', 401);
+      ResponseUtil.error(res, 'Authentication required', 'AUTH_REQUIRED', 401);
+      return;
     }
 
     try {
@@ -146,13 +155,15 @@ export class AuthMiddleware {
       });
 
       if (!user || !user.isActive) {
-        return ResponseUtil.error(res, 'Account has been deactivated', 'ACCOUNT_DEACTIVATED', 403);
+        ResponseUtil.error(res, 'Account has been deactivated', 'ACCOUNT_DEACTIVATED', 403);
+        return;
       }
 
       next();
     } catch (error) {
       console.error('Active user check error:', error);
-      return ResponseUtil.error(res, 'Account status check failed', 'ACCOUNT_CHECK_ERROR', 500);
+      ResponseUtil.error(res, 'Account status check failed', 'ACCOUNT_CHECK_ERROR', 500);
+      return;
     }
   }
 
@@ -185,7 +196,7 @@ export class AuthMiddleware {
       }
 
       if (userRequest.count > options.maxRequests) {
-        return ResponseUtil.error(
+        ResponseUtil.error(
           res,
           options.message || 'Too many requests from this user',
           'USER_RATE_LIMIT_EXCEEDED',
@@ -194,6 +205,7 @@ export class AuthMiddleware {
             retryAfter: Math.ceil((userRequest.resetTime - now) / 1000)
           }
         );
+        return;
       }
 
       next();

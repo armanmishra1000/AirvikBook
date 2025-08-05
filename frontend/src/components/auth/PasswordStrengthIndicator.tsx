@@ -1,208 +1,156 @@
 'use client';
 
-/**
- * Password Strength Indicator Component
- * 
- * BRAND COMPLIANCE: Uses only brand tokens for colors and spacing
- * FEATURES: Real-time password strength validation with visual feedback
- */
-
 import React from 'react';
-import { PasswordStrength, PASSWORD_REQUIREMENTS } from '../../types/userRegistration.types';
+
+// =====================================================
+// PASSWORD STRENGTH INDICATOR COMPONENT
+// =====================================================
+// Brand-compliant component using ONLY airvik-* tokens
 
 interface PasswordStrengthIndicatorProps {
   password: string;
+  showRequirements?: boolean;
   className?: string;
 }
 
-export default function PasswordStrengthIndicator({ 
-  password, 
-  className = '' 
-}: PasswordStrengthIndicatorProps) {
-  
-  /**
-   * Calculate password strength
-   */
-  const calculateStrength = (password: string): PasswordStrength => {
-    const requirements = {
-      minLength: password.length >= PASSWORD_REQUIREMENTS.MIN_LENGTH,
-      hasUppercase: PASSWORD_REQUIREMENTS.UPPERCASE_PATTERN.test(password),
-      hasLowercase: PASSWORD_REQUIREMENTS.LOWERCASE_PATTERN.test(password),
-      hasNumber: PASSWORD_REQUIREMENTS.NUMBER_PATTERN.test(password),
-      hasSpecialChar: PASSWORD_REQUIREMENTS.SPECIAL_CHAR_PATTERN.test(password),
-    };
+interface PasswordRequirement {
+  id: string;
+  label: string;
+  test: (password: string) => boolean;
+}
 
-    const score = Object.values(requirements).filter(Boolean).length;
-    
-    const feedback: string[] = [];
-    
-    if (!requirements.minLength) {
-      feedback.push('At least 8 characters');
-    }
-    if (!requirements.hasUppercase) {
-      feedback.push('One uppercase letter');
-    }
-    if (!requirements.hasLowercase) {
-      feedback.push('One lowercase letter');
-    }
-    if (!requirements.hasNumber) {
-      feedback.push('One number');
-    }
-    if (!requirements.hasSpecialChar) {
-      feedback.push('One special character (!@#$%^&*)');
-    }
+const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
+  {
+    id: 'minLength',
+    label: 'At least 8 characters long',
+    test: (password: string) => password.length >= 8
+  },
+  {
+    id: 'uppercase',
+    label: 'Contains at least one uppercase letter',
+    test: (password: string) => /[A-Z]/.test(password)
+  },
+  {
+    id: 'lowercase',
+    label: 'Contains at least one lowercase letter',
+    test: (password: string) => /[a-z]/.test(password)
+  },
+  {
+    id: 'number',
+    label: 'Contains at least one number',
+    test: (password: string) => /\d/.test(password)
+  },
+  {
+    id: 'special',
+    label: 'Contains at least one special character',
+    test: (password: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+  }
+];
 
-    return {
-      score,
-      feedback,
-      requirements,
-    };
-  };
+export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
+  password,
+  showRequirements = true,
+  className = ''
+}) => {
+  // Calculate password strength
+  const fulfilledRequirements = PASSWORD_REQUIREMENTS.filter(req => req.test(password));
+  const strengthScore = fulfilledRequirements.length;
+  const strengthPercentage = (strengthScore / PASSWORD_REQUIREMENTS.length) * 100;
 
-  /**
-   * Get strength color based on score
-   */
-  const getStrengthColor = (score: number): string => {
-    switch (score) {
-      case 0:
-      case 1:
-        return 'bg-red-500';
-      case 2:
-        return 'bg-orange-500';
-      case 3:
-        return 'bg-yellow-500';
-      case 4:
-        return 'bg-lime-500';
-      case 5:
-        return 'bg-green-500';
-      default:
-        return 'bg-gray-300';
+  // Get strength level and color
+  const getStrengthInfo = () => {
+    if (strengthScore === 0) {
+      return { level: 'No password', color: 'bg-gray-300', textColor: 'text-gray-500' };
+    } else if (strengthScore <= 2) {
+      return { level: 'Weak', color: 'bg-error', textColor: 'text-error' };
+    } else if (strengthScore <= 3) {
+      return { level: 'Fair', color: 'bg-warning', textColor: 'text-warning' };
+    } else if (strengthScore <= 4) {
+      return { level: 'Good', color: 'bg-airvik-blue', textColor: 'text-airvik-blue' };
+    } else {
+      return { level: 'Strong', color: 'bg-success', textColor: 'text-success' };
     }
   };
 
-  /**
-   * Get strength text based on score
-   */
-  const getStrengthText = (score: number): string => {
-    switch (score) {
-      case 0:
-        return 'Enter password';
-      case 1:
-        return 'Very weak';
-      case 2:
-        return 'Weak';
-      case 3:
-        return 'Fair';
-      case 4:
-        return 'Good';
-      case 5:
-        return 'Strong';
-      default:
-        return '';
-    }
-  };
+  const strengthInfo = getStrengthInfo();
 
-  /**
-   * Get strength text color
-   */
-  const getStrengthTextColor = (score: number): string => {
-    switch (score) {
-      case 0:
-      case 1:
-        return 'text-red-600 dark:text-red-400';
-      case 2:
-        return 'text-orange-600 dark:text-orange-400';
-      case 3:
-        return 'text-yellow-600 dark:text-yellow-400';
-      case 4:
-        return 'text-lime-600 dark:text-lime-400';
-      case 5:
-        return 'text-green-600 dark:text-green-400';
-      default:
-        return 'text-gray-500 dark:text-gray-400';
-    }
-  };
-
-  // Don't show anything if no password
-  if (!password) {
+  if (!password && !showRequirements) {
     return null;
   }
 
-  const strength = calculateStrength(password);
-
   return (
-    <div className={`password-strength-indicator ${className}`}>
+    <div className={`w-full ${className}`}>
       {/* Strength Bar */}
-      <div className="flex items-center space-x-space-2 mb-space-2">
-        <div className="flex space-x-space-1 flex-1">
-          {[1, 2, 3, 4, 5].map((level) => (
+      {password && (
+        <div className="mb-space-4">
+          <div className="flex items-center justify-between mb-space-2">
+            <span className="text-label font-sf-pro text-airvik-black dark:text-airvik-white">
+              Password Strength
+            </span>
+            <span className={`text-caption font-sf-pro font-medium ${strengthInfo.textColor}`}>
+              {strengthInfo.level}
+            </span>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-radius-full h-2">
             <div
-              key={level}
-              className={`h-1 flex-1 rounded-full transition-colors duration-200 ${
-                level <= strength.score
-                  ? getStrengthColor(strength.score)
-                  : 'bg-gray-200 dark:bg-gray-600'
-              }`}
+              className={`h-2 rounded-radius-full transition-all duration-normal ${strengthInfo.color}`}
+              style={{ width: `${strengthPercentage}%` }}
             />
-          ))}
+          </div>
         </div>
-        <span className={`text-xs font-medium ${getStrengthTextColor(strength.score)}`}>
-          {getStrengthText(strength.score)}
-        </span>
-      </div>
+      )}
 
       {/* Requirements List */}
-      {strength.feedback.length > 0 && (
-        <div className="space-y-space-1">
-          <p className="text-xs text-gray-600 dark:text-gray-400">
-            Password must include:
+      {showRequirements && (
+        <div className="space-y-space-2">
+          <p className="text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-3">
+            Password Requirements:
           </p>
-          <ul className="space-y-space-1">
-            {Object.entries(strength.requirements).map(([key, met]) => {
-              let label = '';
-              switch (key) {
-                case 'minLength':
-                  label = 'At least 8 characters';
-                  break;
-                case 'hasUppercase':
-                  label = 'One uppercase letter (A-Z)';
-                  break;
-                case 'hasLowercase':
-                  label = 'One lowercase letter (a-z)';
-                  break;
-                case 'hasNumber':
-                  label = 'One number (0-9)';
-                  break;
-                case 'hasSpecialChar':
-                  label = 'One special character (!@#$%^&*)';
-                  break;
-                default:
-                  return null;
-              }
-
+          
+          <ul className="space-y-space-2">
+            {PASSWORD_REQUIREMENTS.map((requirement) => {
+              const isMetOrNoPassword = !password || requirement.test(password);
+              const isMet = password && requirement.test(password);
+              
               return (
-                <li key={key} className="flex items-center space-x-space-2">
-                  <div className={`w-3 h-3 rounded-full flex items-center justify-center ${
-                    met 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-gray-200 dark:bg-gray-600'
-                  }`}>
-                    {met && (
-                      <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path 
-                          fillRule="evenodd" 
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
-                          clipRule="evenodd" 
-                        />
+                <li
+                  key={requirement.id}
+                  className="flex items-center space-x-space-3"
+                >
+                  {/* Requirement Icon */}
+                  <div className={`flex-shrink-0 w-4 h-4 rounded-radius-full flex items-center justify-center transition-all duration-normal
+                    ${isMet 
+                      ? 'bg-success text-airvik-white' 
+                      : password 
+                        ? 'bg-error text-airvik-white' 
+                        : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                  >
+                    {isMet ? (
+                      <svg className="w-3 h-3" viewBox="0 0 12 12" fill="currentColor">
+                        <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
+                    ) : password ? (
+                      <svg className="w-3 h-3" viewBox="0 0 12 12" fill="currentColor">
+                        <path d="M9 3L3 9M3 3l6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    ) : (
+                      <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-radius-full" />
                     )}
                   </div>
-                  <span className={`text-xs ${
-                    met 
-                      ? 'text-green-600 dark:text-green-400' 
-                      : 'text-gray-500 dark:text-gray-400'
-                  }`}>
-                    {label}
+                  
+                  {/* Requirement Text */}
+                  <span className={`text-body font-sf-pro transition-colors duration-normal
+                    ${isMet 
+                      ? 'text-success' 
+                      : password 
+                        ? 'text-error' 
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    {requirement.label}
                   </span>
                 </li>
               );
@@ -211,46 +159,25 @@ export default function PasswordStrengthIndicator({
         </div>
       )}
 
-      {/* Success Message */}
-      {strength.score === 5 && (
-        <div className="flex items-center space-x-space-2 mt-space-2 p-space-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
-          <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-            <path 
-              fillRule="evenodd" 
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" 
-              clipRule="evenodd" 
-            />
-          </svg>
-          <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-            Strong password! Your account will be well protected.
-          </span>
-        </div>
-      )}
-
-      {/* Security Tips */}
-      {password.length > 0 && strength.score < 4 && (
-        <div className="mt-space-2 p-space-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-          <div className="flex items-start space-x-space-2">
-            <svg className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path 
-                fillRule="evenodd" 
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" 
-                clipRule="evenodd" 
-              />
-            </svg>
-            <div>
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-space-1">
-                Security Tips:
+      {/* Password Tips */}
+      {password && strengthScore < PASSWORD_REQUIREMENTS.length && (
+        <div className="mt-space-4 p-space-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-radius-md">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-airvik-blue mt-space-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-space-3">
+              <p className="text-body text-airvik-blue">
+                <strong>Tip:</strong> Use a mix of uppercase and lowercase letters, numbers, and special characters for a stronger password.
               </p>
-              <ul className="text-xs text-blue-600 dark:text-blue-400 space-y-space-1">
-                <li>• Use a unique password you don't use elsewhere</li>
-                <li>• Consider using a password manager</li>
-                <li>• Mix letters, numbers, and symbols</li>
-              </ul>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default PasswordStrengthIndicator;

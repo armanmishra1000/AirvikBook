@@ -251,11 +251,14 @@ export class JwtService {
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + 7); // 7 days
 
+      // Generate a unique session token
+      const sessionToken = require('crypto').randomBytes(32).toString('hex');
+
       // Store in sessions table
       await prisma.session.create({
         data: {
           userId,
-          token: 'access_placeholder', // We don't store access tokens
+          token: sessionToken, // Unique session identifier
           refreshToken,
           expiresAt: expiryDate,
           isActive: true

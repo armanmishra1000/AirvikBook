@@ -33,6 +33,7 @@ export default function GoogleOAuthButton({
 
   // Cleanup on unmount
   useEffect(() => {
+    mounted.current = true;
     return () => {
       mounted.current = false;
     };
@@ -50,12 +51,17 @@ export default function GoogleOAuthButton({
    * Load and initialize Google OAuth
    */
   const initializeGoogle = () => {
+    console.log('🚀 Initializing Google OAuth...');
+    
     // Check if Google script is already loaded
     if (window.google?.accounts) {
+      console.log('✅ Google script already loaded');
       setIsGoogleLoaded(true);
       return;
     }
 
+    console.log('📡 Loading Google OAuth script...');
+    
     // Load Google OAuth script
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
@@ -63,17 +69,54 @@ export default function GoogleOAuthButton({
     script.defer = true;
     
     script.onload = () => {
-      if (mounted.current && window.google?.accounts) {
-        setIsGoogleLoaded(true);
-      }
+      console.log('📦 Google script loaded, checking window.google...');
+      
+      // Check if Google OAuth is ready with multiple verification attempts
+      const checkGoogleReady = (attempt = 1, maxAttempts = 3) => {
+        console.log(`🔍 Attempt ${attempt}: Checking Google OAuth readiness...`);
+        console.log('🔍 mounted.current:', mounted.current);
+        console.log('🔍 window.google:', !!window.google);
+        console.log('🔍 window.google?.accounts:', !!window.google?.accounts);
+        console.log('🔍 window.google?.accounts?.id:', !!window.google?.accounts?.id);
+        
+        if (window.google?.accounts?.id) {
+          if (mounted.current) {
+            console.log('✅ Google OAuth ready!');
+            setIsGoogleLoaded(true);
+          } else {
+            console.log('⚠️ Google OAuth ready but component unmounted');
+          }
+          return;
+        }
+        
+        if (attempt < maxAttempts) {
+          console.log(`⏳ Google OAuth not ready, retrying in ${attempt * 500}ms...`);
+          setTimeout(() => checkGoogleReady(attempt + 1, maxAttempts), attempt * 500);
+        } else {
+          console.error('❌ Google OAuth failed to initialize after multiple attempts');
+          if (mounted.current) {
+            onError?.('Google authentication failed to initialize. Please refresh the page.');
+          }
+        }
+      };
+      
+      checkGoogleReady();
     };
     
-    script.onerror = () => {
-      console.error('Failed to load Google OAuth script');
-      onError?.('Failed to load Google authentication. Please try again.');
+    script.onerror = (error) => {
+      console.error('❌ Failed to load Google OAuth script:', error);
+      onError?.('Failed to load Google authentication. Please check your internet connection.');
     };
     
     document.head.appendChild(script);
+    
+    // Timeout fallback - if Google script doesn't load within 10 seconds
+    setTimeout(() => {
+      if (mounted.current && !isGoogleLoaded) {
+        console.error('⏰ Google OAuth script loading timeout (10s)');
+        onError?.('Google authentication is taking too long to load. Please refresh the page.');
+      }
+    }, 10000);
   };
 
   /**
@@ -84,12 +127,20 @@ export default function GoogleOAuthButton({
       return;
     }
 
+    // Check if Google client ID is configured
+    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!googleClientId || googleClientId === 'your-google-client-id') {
+      console.error('Google Client ID not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID in your .env.local file.');
+      onError?.('Google OAuth is not configured. Please contact support.');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       // Initialize Google OAuth client
       window.google.accounts.id.initialize({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+        client_id: googleClientId,
         callback: handleGoogleResponse,
         auto_select: false,
         cancel_on_tap_outside: true,
@@ -98,14 +149,9 @@ export default function GoogleOAuthButton({
       // Show the Google sign-in prompt
               window.google.accounts.id.prompt((notification: any) => {
         if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // Fallback to popup if prompt is not displayed
-          if (window.google?.accounts?.oauth2) {
-            window.google.accounts.oauth2.initTokenClient({
-              client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-              scope: 'openid email profile',
-              callback: handleTokenResponse,
-            }).requestAccessToken();
-          }
+                  console.log('Google prompt not displayed for registration');
+        // The button will handle the sign-in when clicked
+        setIsLoading(false);
         }
       });
     } catch (error) {
@@ -136,36 +182,12 @@ export default function GoogleOAuthButton({
     }
   };
 
-  /**
-   * Handle Google OAuth token response (OAuth2)
-   */
-  const handleTokenResponse = async (response: any) => {
-    if (!mounted.current) return;
 
-    try {
-      const accessToken = response.access_token;
-      
-      if (!accessToken) {
-        throw new Error('No Google access token received');
-      }
-
-      // For OAuth2 tokens, we need to get user info separately
-      const userInfoResponse = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`);
-      const userInfo = await userInfoResponse.json();
-      
-      // Create a JWT-like token for our backend (this is a simplified approach)
-      await processGoogleAuth(accessToken, userInfo);
-    } catch (error) {
-      console.error('Google token response handling error:', error);
-      setIsLoading(false);
-      onError?.('Google authentication failed. Please try again.');
-    }
-  };
 
   /**
    * Process Google authentication with backend
    */
-  const processGoogleAuth = async (googleToken: string, userInfo?: any) => {
+  const processGoogleAuth = async (googleToken: string) => {
     try {
       const authData = {
         googleToken,
@@ -255,11 +277,7 @@ declare global {
           prompt: (callback?: (notification: any) => void) => void;
           renderButton: (parent: Element, options: any) => void;
         };
-        oauth2: {
-          initTokenClient: (config: any) => {
-            requestAccessToken: () => void;
-          };
-        };
+
       };
     };
   }

@@ -28,6 +28,7 @@ model User {
 
   // Relations (to be added as features are developed)
   emailVerificationTokens EmailVerificationToken[]
+  sessions                Session[]
   // bookings          Booking[]
   // reviews           Review[]
 
@@ -153,14 +154,20 @@ model EmailVerificationToken {
 
 // Session Model for JWT token management
 model Session {
-  id          String   @id @default(cuid())
-  userId      String
-  token       String   @unique
-  refreshToken String  @unique
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isActive    Boolean  @default(true)
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  isActive     Boolean  @default(true)
+  deviceInfo   Json?    // Device fingerprint data
+  ipAddress    String?  // User IP address
+  userAgent    String?  // Browser user agent
+
+  // Relations
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
