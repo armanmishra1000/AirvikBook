@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { AuthController } from '../controllers/auth.controller';
 import { LoginController } from '../controllers/auth/login.controller';
+import { GoogleOAuthRedirectController } from '../controllers/auth/googleOAuthRedirect.controller';
 import { AuthMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -26,6 +27,13 @@ router.post(
   AuthController.validateGoogleAuth,
   AuthController.googleAuth
 );
+
+// ==================== GOOGLE OAUTH REDIRECT ROUTES ====================
+// GET /api/v1/auth/google/redirect
+router.get('/google/redirect', GoogleOAuthRedirectController.initiateOAuth);
+
+// GET /api/v1/auth/google/callback  
+router.get('/google/callback', GoogleOAuthRedirectController.handleCallback);
 
 // POST /api/v1/auth/verify-email
 router.post(

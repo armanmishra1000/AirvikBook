@@ -18,7 +18,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { RegistrationFormData, FormErrors, isSuccessResponse } from '../../types/userRegistration.types';
 import UserRegistrationService from '../../services/userRegistration.service';
-import GoogleOAuthButton from './GoogleOAuthButton';
+import GoogleOAuthRedirectButton from './GoogleOAuthRedirectButton';
 import PasswordStrengthIndicator from './PasswordStrengthIndicator';
 
 interface RegistrationFormProps {
@@ -228,11 +228,13 @@ export default function RegistrationForm({
 
         {/* Google OAuth Button */}
         <div className="mb-space-4">
-          <GoogleOAuthButton
-            onSuccess={onSuccess}
-            onError={onError}
+          <GoogleOAuthRedirectButton
+            type="register"
+            redirectTo="/dashboard"
             disabled={isLoading}
-          />
+          >
+            Sign up with Google
+          </GoogleOAuthRedirectButton>
         </div>
 
         {/* Divider */}

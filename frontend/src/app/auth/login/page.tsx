@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LoginForm } from '../../../components/auth/LoginForm';
-import { GoogleLoginButton } from '../../../components/auth/GoogleLoginButton';
+import GoogleOAuthRedirectButton from '../../../components/auth/GoogleOAuthRedirectButton';
 import { useAuth, useIsAuthenticated } from '../../../context/AuthContext';
 
 // =====================================================
@@ -88,12 +88,12 @@ const LoginPage: React.FC = () => {
           </div>
 
           {/* Google Login */}
-          <GoogleLoginButton
-            onSuccess={handleLoginSuccess}
-            onError={handleLoginError}
-            text="Sign in with Google"
-            showAccountLinking={true}
-          />
+          <GoogleOAuthRedirectButton
+            type="login"
+            redirectTo="/dashboard"
+          >
+            Sign in with Google
+          </GoogleOAuthRedirectButton>
         </div>
 
         {/* Footer Links */}
