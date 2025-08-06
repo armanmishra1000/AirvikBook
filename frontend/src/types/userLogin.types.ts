@@ -4,6 +4,14 @@
 // CRITICAL: NEVER import from shared/contracts/
 // All types must be defined locally to avoid build failures
 
+import {
+  ChangePasswordApiResponse,
+  SetPasswordApiResponse,
+  RemovePasswordApiResponse,
+  PasswordStatusApiResponse,
+  ResetTokenValidationApiResponse
+} from './passwordManagement.types';
+
 // =====================================================
 // API RESPONSE WRAPPER TYPES
 // =====================================================
@@ -264,6 +272,13 @@ export interface AuthContextValue {
   forgotPassword: (email: string) => Promise<ForgotPasswordApiResponse>;
   resetPassword: (token: string, newPassword: string) => Promise<ResetPasswordApiResponse>;
   verifyResetToken: (token: string) => Promise<TokenVerificationApiResponse>;
+  
+  // Enhanced Password Management
+  changePassword: (currentPassword: string, newPassword: string, confirmPassword: string, invalidateOtherSessions?: boolean) => Promise<ChangePasswordApiResponse>;
+  setPassword: (newPassword: string, confirmPassword: string) => Promise<SetPasswordApiResponse>;
+  removePassword: (currentPassword: string, confirmGoogleOnly: boolean) => Promise<RemovePasswordApiResponse>;
+  getPasswordStatus: () => Promise<PasswordStatusApiResponse>;
+  verifyResetTokenEnhanced: (token: string) => Promise<ResetTokenValidationApiResponse>;
   
   // Utilities
   isTokenExpired: () => boolean;

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { UserLoginService } from '../services/userLogin.service';
+import { PasswordManagementService } from '../services/passwordManagement.service';
 import {
   AuthState,
   AuthContextValue,
@@ -20,6 +21,13 @@ import {
   isSuccessResponse,
   LOGIN_ERROR_CODES
 } from '../types/userLogin.types';
+import {
+  ChangePasswordApiResponse,
+  SetPasswordApiResponse,
+  RemovePasswordApiResponse,
+  PasswordStatusApiResponse,
+  ResetTokenValidationApiResponse
+} from '../types/passwordManagement.types';
 
 // =====================================================
 // AUTH REDUCER ACTIONS
@@ -489,6 +497,80 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // =====================================================
+  // ENHANCED PASSWORD MANAGEMENT METHODS
+  // =====================================================
+
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword: string,
+    invalidateOtherSessions: boolean = false
+  ): Promise<ChangePasswordApiResponse> => {
+    try {
+      return await PasswordManagementService.changePassword(
+        currentPassword,
+        newPassword,
+        confirmPassword,
+        invalidateOtherSessions
+      );
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to change password',
+        code: 'PASSWORD_CHANGE_ERROR'
+      };
+    }
+  };
+
+  const setPassword = async (newPassword: string, confirmPassword: string): Promise<SetPasswordApiResponse> => {
+    try {
+      return await PasswordManagementService.setPassword(newPassword, confirmPassword);
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to set password',
+        code: 'PASSWORD_SET_ERROR'
+      };
+    }
+  };
+
+  const removePassword = async (currentPassword: string, confirmGoogleOnly: boolean): Promise<RemovePasswordApiResponse> => {
+    try {
+      return await PasswordManagementService.removePassword(currentPassword, confirmGoogleOnly);
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to remove password',
+        code: 'PASSWORD_REMOVE_ERROR'
+      };
+    }
+  };
+
+  const getPasswordStatus = async (): Promise<PasswordStatusApiResponse> => {
+    try {
+      return await PasswordManagementService.getPasswordStatus();
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to get password status',
+        code: 'PASSWORD_STATUS_ERROR'
+      };
+    }
+  };
+
+  const verifyResetTokenEnhanced = async (token: string): Promise<ResetTokenValidationApiResponse> => {
+    try {
+      return await PasswordManagementService.verifyResetToken(token);
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to verify reset token',
+        code: 'TOKEN_VERIFICATION_ERROR'
+      };
+    }
+  };
+
+  // =====================================================
   // UTILITY METHODS
   // =====================================================
 
@@ -532,6 +614,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     forgotPassword,
     resetPassword,
     verifyResetToken,
+    
+    // Enhanced Password Management
+    changePassword,
+    setPassword,
+    removePassword,
+    getPasswordStatus,
+    verifyResetTokenEnhanced,
     
     // Utilities
     isTokenExpired,
