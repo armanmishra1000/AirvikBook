@@ -31,6 +31,7 @@ Based on project analysis:
 <!-- AI will update this after each task -->
 - ✅ Backend B1: User model extended with profile fields
 - ✅ Backend B2: Profile service layer created
+- ✅ Backend B3: File storage with security implemented
 - ❌ Frontend: Not started
 - ❌ Testing: Not started
 - ✅ Documentation: Created (FEATURE-ANALYSIS, INTEGRATION-POINTS, API-CONTRACT, FEATURE-SPEC, TASK-BREAKDOWN)
@@ -62,18 +63,18 @@ Based on project analysis:
 - Interactive states complete: ❌ (Not Started - will implement hover, focus, active, disabled states)
 
 ## Next Task
-**Current**: Backend B3 - File Storage Integration
-**File to create**: `backend/src/services/storage/fileStorage.service.ts`, `backend/src/middleware/fileUpload.middleware.ts`, `backend/src/utils/imageOptimization.ts`
-**Dependencies**: B2 completed - Profile service layer created successfully
-**Estimated Time**: 60 minutes
+**Current**: Backend B4 - Profile Controllers
+**File to create**: `backend/src/controllers/user/profile.controller.ts`, `backend/src/controllers/user/profilePicture.controller.ts`
+**Dependencies**: B3 completed - File storage with security implemented successfully
+**Estimated Time**: 45 minutes
 
-**Specific Requirements for B3**:
-- Create FileStorageService with secure file upload, validation, and optimization
-- Implement Multer middleware for profile picture uploads
-- Add image optimization utilities
-- Validate file size (5MB max), format (jpg, jpeg, png, webp), dimensions (100x100 to 2000x2000)
-- Sanitize filenames and implement secure file storage
-- Clean up old files when replacing profile pictures
+**Specific Requirements for B4**:
+- Create profile controllers implementing exact API contract
+- Implement endpoints: GET/PUT /user/profile, POST /user/profile/picture, POST /user/profile/picture/sync-google, PUT /user/profile/privacy, POST /user/profile/connect-google, DELETE /user/profile/disconnect-google
+- Use ResponseUtil.success/error for all responses
+- Apply proper validation middleware
+- Handle all error cases from API-CONTRACT.md
+- Follow exact response format specifications
 
 ## Git Status
 **Branch**: feature/user-profiles (to be created)
