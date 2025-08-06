@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import { Request, Response } from 'express';
 import emailRoutes from './routes/email.routes';
 import authRoutes from './routes/auth.routes';
+import profileRoutes from './routes/user/profile.routes';
 
 // Load environment variables
 dotenv.config();
@@ -33,6 +34,7 @@ const API_PREFIX = process.env.API_PREFIX || '/api/v1';
 // Routes
 app.use(`${API_PREFIX}/email`, emailRoutes);
 app.use(`${API_PREFIX}/auth`, authRoutes);
+app.use(`${API_PREFIX}/user`, profileRoutes);
 
 // Health check route
 app.get(`${API_PREFIX}/health`, (_req: Request, res: Response) => {
