@@ -11,6 +11,18 @@ import {
   PasswordStatusApiResponse,
   ResetTokenValidationApiResponse
 } from './passwordManagement.types';
+import {
+  ProfileUpdateRequest,
+  PrivacyUpdateRequest,
+  GetProfileApiResponse,
+  UpdateProfileApiResponse,
+  UpdatePrivacyApiResponse,
+  UploadPictureApiResponse,
+  SyncPictureApiResponse,
+  DeletePictureApiResponse,
+  ConnectGoogleApiResponse,
+  DisconnectGoogleApiResponse
+} from './userProfile.types';
 
 // =====================================================
 // API RESPONSE WRAPPER TYPES
@@ -284,6 +296,15 @@ export interface AuthContextValue {
   isTokenExpired: () => boolean;
   clearAuthState: () => void;
   updateLastActivity: () => void;
+  
+  // Profile Management Methods
+  updateProfile: (profileData: ProfileUpdateRequest) => Promise<UpdateProfileApiResponse>;
+  uploadProfilePicture: (file: File) => Promise<UploadPictureApiResponse>;
+  syncGoogleProfilePicture: () => Promise<SyncPictureApiResponse>;
+  updatePrivacySettings: (settings: PrivacyUpdateRequest) => Promise<UpdatePrivacyApiResponse>;
+  connectGoogleAccount: (token: string) => Promise<ConnectGoogleApiResponse>;
+  disconnectGoogleAccount: () => Promise<DisconnectGoogleApiResponse>;
+  refreshUserData: () => Promise<GetProfileApiResponse>;
 }
 
 // =====================================================

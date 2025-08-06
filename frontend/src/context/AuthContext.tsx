@@ -22,6 +22,19 @@ import {
   LOGIN_ERROR_CODES
 } from '../types/userLogin.types';
 import {
+  ProfileUpdateRequest,
+  PrivacyUpdateRequest,
+  GetProfileApiResponse,
+  UpdateProfileApiResponse,
+  UpdatePrivacyApiResponse,
+  UploadPictureApiResponse,
+  SyncPictureApiResponse,
+  DeletePictureApiResponse,
+  ConnectGoogleApiResponse,
+  DisconnectGoogleApiResponse
+} from '../types/userProfile.types';
+import { UserProfileService } from '../services/userProfile.service';
+import {
   ChangePasswordApiResponse,
   SetPasswordApiResponse,
   RemovePasswordApiResponse,
@@ -42,7 +55,10 @@ type AuthAction =
   | { type: 'UPDATE_USER'; payload: User }
   | { type: 'UPDATE_LAST_ACTIVITY' }
   | { type: 'CLEAR_ERROR' }
-  | { type: 'SET_LOADING'; payload: boolean };
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'PROFILE_UPDATE'; payload: { user: User; profilePicture?: string } }
+  | { type: 'PRIVACY_UPDATE'; payload: { privacySettings: any } }
+  | { type: 'GOOGLE_CONNECTION_UPDATE'; payload: { connectedAccounts: any } };
 
 // =====================================================
 // AUTH REDUCER
@@ -124,6 +140,25 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {
         ...state,
         isLoading: action.payload
+      };
+
+    case 'PROFILE_UPDATE':
+      return {
+        ...state,
+        user: action.payload.user,
+        lastActivity: new Date()
+      };
+
+    case 'PRIVACY_UPDATE':
+      return {
+        ...state,
+        lastActivity: new Date()
+      };
+
+    case 'GOOGLE_CONNECTION_UPDATE':
+      return {
+        ...state,
+        lastActivity: new Date()
       };
 
     default:
@@ -589,6 +624,202 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // =====================================================
+  // PROFILE MANAGEMENT METHODS
+  // =====================================================
+
+  const updateProfile = async (profileData: ProfileUpdateRequest): Promise<UpdateProfileApiResponse> => {
+    try {
+      const response = await UserProfileService.updateProfile(profileData);
+      
+      if (isSuccessResponse(response)) {
+        // Update user data in context - convert UserProfile to User
+        const updatedUser: User = {
+          id: response.data.user.id,
+          email: response.data.user.email,
+          fullName: response.data.user.fullName,
+          mobileNumber: response.data.user.mobileNumber,
+          role: authState.user?.role || 'GUEST',
+          profilePicture: response.data.user.profilePicture,
+          googleId: response.data.user.googleId,
+          isEmailVerified: authState.user?.isEmailVerified || false,
+          lastLoginAt: authState.user?.lastLoginAt,
+          createdAt: authState.user?.createdAt || new Date().toISOString(),
+          isActive: authState.user?.isActive || true
+        };
+        
+        dispatch({ 
+          type: 'PROFILE_UPDATE', 
+          payload: { 
+            user: updatedUser,
+            profilePicture: response.data.user.profilePicture 
+          } 
+        });
+      }
+      
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to update profile',
+        code: 'PROFILE_UPDATE_ERROR'
+      };
+    }
+  };
+
+  const uploadProfilePicture = async (file: File): Promise<UploadPictureApiResponse> => {
+    try {
+      const response = await UserProfileService.uploadProfilePicture(file);
+      
+      if (isSuccessResponse(response)) {
+        // Update user data with new profile picture
+        if (authState.user) {
+          dispatch({ 
+            type: 'PROFILE_UPDATE', 
+            payload: { 
+              user: { ...authState.user, profilePicture: response.data.profilePicture },
+              profilePicture: response.data.profilePicture 
+            } 
+          });
+        }
+      }
+      
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to upload profile picture',
+        code: 'PICTURE_UPLOAD_ERROR'
+      };
+    }
+  };
+
+  const syncGoogleProfilePicture = async (): Promise<SyncPictureApiResponse> => {
+    try {
+      const response = await UserProfileService.syncPictureFromGoogle();
+      
+      if (isSuccessResponse(response)) {
+        // Update user data with synced profile picture
+        if (authState.user) {
+          dispatch({ 
+            type: 'PROFILE_UPDATE', 
+            payload: { 
+              user: { ...authState.user, profilePicture: response.data.profilePicture },
+              profilePicture: response.data.profilePicture 
+            } 
+          });
+        }
+      }
+      
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to sync Google profile picture',
+        code: 'GOOGLE_SYNC_ERROR'
+      };
+    }
+  };
+
+  const updatePrivacySettings = async (settings: PrivacyUpdateRequest): Promise<UpdatePrivacyApiResponse> => {
+    try {
+      const response = await UserProfileService.updatePrivacy(settings);
+      
+      if (isSuccessResponse(response)) {
+        dispatch({ type: 'PRIVACY_UPDATE', payload: { privacySettings: response.data } });
+      }
+      
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to update privacy settings',
+        code: 'PRIVACY_UPDATE_ERROR'
+      };
+    }
+  };
+
+  const connectGoogleAccount = async (token: string): Promise<ConnectGoogleApiResponse> => {
+    try {
+      const response = await UserProfileService.connectGoogle(token);
+      
+      if (isSuccessResponse(response)) {
+        dispatch({ type: 'GOOGLE_CONNECTION_UPDATE', payload: { connectedAccounts: response.data.connectedAccounts } });
+        
+        // Update user data if profile updates were included
+        if (response.data.profileUpdates && authState.user) {
+          const updatedUser = { ...authState.user };
+          if (response.data.profileUpdates.profilePicture) {
+            updatedUser.profilePicture = response.data.profileUpdates.profilePicture;
+          }
+          if (response.data.profileUpdates.fullName) {
+            updatedUser.fullName = response.data.profileUpdates.fullName;
+          }
+          dispatch({ type: 'PROFILE_UPDATE', payload: { user: updatedUser } });
+        }
+      }
+      
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to connect Google account',
+        code: 'GOOGLE_CONNECTION_ERROR'
+      };
+    }
+  };
+
+  const disconnectGoogleAccount = async (): Promise<DisconnectGoogleApiResponse> => {
+    try {
+      const response = await UserProfileService.disconnectGoogle();
+      
+      if (isSuccessResponse(response)) {
+        dispatch({ type: 'GOOGLE_CONNECTION_UPDATE', payload: { connectedAccounts: response.data.connectedAccounts } });
+      }
+      
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to disconnect Google account',
+        code: 'GOOGLE_DISCONNECTION_ERROR'
+      };
+    }
+  };
+
+  const refreshUserData = async (): Promise<GetProfileApiResponse> => {
+    try {
+      const response = await UserProfileService.getProfile();
+      
+      if (isSuccessResponse(response)) {
+        // Update user data with fresh profile information - convert UserProfile to User
+        const updatedUser: User = {
+          id: response.data.id,
+          email: response.data.email,
+          fullName: response.data.fullName,
+          mobileNumber: response.data.mobileNumber,
+          role: authState.user?.role || 'GUEST',
+          profilePicture: response.data.profilePicture,
+          googleId: response.data.googleId,
+          isEmailVerified: authState.user?.isEmailVerified || false,
+          lastLoginAt: authState.user?.lastLoginAt,
+          createdAt: authState.user?.createdAt || new Date().toISOString(),
+          isActive: authState.user?.isActive || true
+        };
+        
+        dispatch({ type: 'PROFILE_UPDATE', payload: { user: updatedUser } });
+      }
+      
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to refresh user data',
+        code: 'USER_DATA_REFRESH_ERROR'
+      };
+    }
+  };
+
+  // =====================================================
   // CONTEXT VALUE
   // =====================================================
 
@@ -625,7 +856,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Utilities
     isTokenExpired,
     clearAuthState,
-    updateLastActivity
+    updateLastActivity,
+    
+    // Profile Management Methods
+    updateProfile,
+    uploadProfilePicture,
+    syncGoogleProfilePicture,
+    updatePrivacySettings,
+    connectGoogleAccount,
+    disconnectGoogleAccount,
+    refreshUserData
   };
 
   return (
