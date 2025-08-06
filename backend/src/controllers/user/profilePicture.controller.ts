@@ -42,7 +42,7 @@ export class ProfilePictureController {
    */
   static async uploadPicture(req: Request, res: Response): Promise<Response | void> {
     try {
-      const userId = (req as any).user.id;
+      const userId = (req as any).user.userId;
       const file = req.file;
 
       if (!file) {
@@ -83,7 +83,7 @@ export class ProfilePictureController {
    */
   static async syncFromGoogle(req: Request, res: Response): Promise<Response | void> {
     try {
-      const userId = (req as any).user.id;
+      const userId = (req as any).user.userId;
 
       const result = await ProfilePictureService.syncFromGoogle(userId);
 
@@ -119,7 +119,7 @@ export class ProfilePictureController {
    */
   static async deletePicture(req: Request, res: Response): Promise<Response | void> {
     try {
-      const userId = (req as any).user.id;
+      const userId = (req as any).user.userId;
 
       const result = await ProfilePictureService.deletePicture(userId);
 
@@ -148,7 +148,7 @@ export class ProfilePictureController {
    */
   static async getPictureStatus(req: Request, res: Response): Promise<Response | void> {
     try {
-      const userId = (req as any).user.id;
+      const userId = (req as any).user.userId;
 
       // Get user profile to check picture status
       const profileResult = await ProfileService.getProfile(userId);

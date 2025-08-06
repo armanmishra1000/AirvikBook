@@ -502,7 +502,20 @@ export class AuthLoginService {
           lastLoginAt: true,
           createdAt: true,
           updatedAt: true,
-          isActive: true
+          isActive: true,
+          // Profile fields added in B1
+          bio: true,
+          dateOfBirth: true,
+          gender: true,
+          nationality: true,
+          occupation: true,
+          website: true,
+          location: true,
+          profileVisibility: true,
+          showEmail: true,
+          showPhone: true,
+          allowGoogleSync: true,
+          profilePictureSource: true
         }
       });
 

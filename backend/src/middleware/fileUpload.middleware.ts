@@ -41,13 +41,8 @@ export const profilePictureUpload = multer({
     fileSize: FILE_CONFIG.MAX_SIZE,
     files: 1 // Only allow one file at a time
   },
-  fileFilter: async (_req: Request, file: MulterFile, cb: multer.FileFilterCallback) => {
+  fileFilter: (_req: Request, file: MulterFile, cb: multer.FileFilterCallback) => {
     try {
-      // Check file size
-      if (file.size > FILE_CONFIG.MAX_SIZE) {
-        return cb(new Error(`File size exceeds maximum limit of ${FILE_CONFIG.MAX_SIZE / (1024 * 1024)}MB`));
-      }
-
       // Check MIME type
       if (!FILE_CONFIG.ALLOWED_MIME_TYPES.includes(file.mimetype)) {
         return cb(new Error(`File type not allowed. Allowed types: ${FILE_CONFIG.ALLOWED_MIME_TYPES.join(', ')}`));
@@ -59,26 +54,7 @@ export const profilePictureUpload = multer({
         return cb(new Error(`File extension not allowed. Allowed extensions: ${FILE_CONFIG.ALLOWED_EXTENSIONS.join(', ')}`));
       }
 
-      // Validate image format using Sharp
-      const isValidFormat = await ImageOptimization.validateImageFormat(file.buffer);
-      if (!isValidFormat) {
-        return cb(new Error('Invalid image format'));
-      }
-
-      // Validate image dimensions
-      const dimensions = await ImageOptimization.getImageDimensions(file.buffer);
-      if (!ImageOptimization.validateDimensions(
-        dimensions,
-        FILE_CONFIG.MIN_DIMENSIONS.width,
-        FILE_CONFIG.MIN_DIMENSIONS.height,
-        FILE_CONFIG.MAX_DIMENSIONS.width,
-        FILE_CONFIG.MAX_DIMENSIONS.height
-      )) {
-        return cb(new Error(
-          `Image dimensions must be between ${FILE_CONFIG.MIN_DIMENSIONS.width}x${FILE_CONFIG.MIN_DIMENSIONS.height} and ${FILE_CONFIG.MAX_DIMENSIONS.width}x${FILE_CONFIG.MAX_DIMENSIONS.height}`
-        ));
-      }
-
+      // Basic validation passed - buffer validation will happen in validateUploadedFile middleware
       cb(null, true);
     } catch (error) {
       cb(new Error('File validation failed'));
@@ -134,7 +110,36 @@ export const validateUploadedFile = async (req: Request, res: Response, next: Ne
 
     const file = req.file as MulterFile;
 
-    // Additional validation if needed
+    // Validate image format using Sharp (now that buffer is available)
+    const isValidFormat = await ImageOptimization.validateImageFormat(file.buffer);
+    if (!isValidFormat) {
+      return ResponseUtil.error(res, 'Invalid image format', 'INVALID_IMAGE_FORMAT', 400);
+    }
+
+    // Validate image dimensions
+    const dimensions = await ImageOptimization.getImageDimensions(file.buffer);
+    if (!ImageOptimization.validateDimensions(
+      dimensions,
+      FILE_CONFIG.MIN_DIMENSIONS.width,
+      FILE_CONFIG.MIN_DIMENSIONS.height,
+      FILE_CONFIG.MAX_DIMENSIONS.width,
+      FILE_CONFIG.MAX_DIMENSIONS.height
+    )) {
+      return ResponseUtil.error(res, 
+        `Image dimensions must be between ${FILE_CONFIG.MIN_DIMENSIONS.width}x${FILE_CONFIG.MIN_DIMENSIONS.height} and ${FILE_CONFIG.MAX_DIMENSIONS.width}x${FILE_CONFIG.MAX_DIMENSIONS.height}`,
+        'INVALID_IMAGE_DIMENSIONS', 
+        400,
+        { 
+          current: dimensions,
+          required: {
+            min: FILE_CONFIG.MIN_DIMENSIONS,
+            max: FILE_CONFIG.MAX_DIMENSIONS
+          }
+        }
+      );
+    }
+
+    // Get additional metadata
     const metadata = await ImageOptimization.getImageMetadata(file.buffer);
     
     // Store metadata in request for later use
@@ -142,6 +147,7 @@ export const validateUploadedFile = async (req: Request, res: Response, next: Ne
 
     return next();
   } catch (error) {
+    console.error('File validation error:', error);
     return ResponseUtil.error(res, 'File validation failed', 'FILE_VALIDATION_ERROR', 400);
   }
 };

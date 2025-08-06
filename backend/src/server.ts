@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import path from 'path';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import { Request, Response } from 'express';
@@ -19,14 +20,45 @@ const prisma = new PrismaClient();
 const app = express();
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin resources
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "http://localhost:3000", "http://localhost:5000"], // Allow images from both origins
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+    },
+  },
+}));
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:3000',
+    'http://localhost:3000',
+    'http://localhost:5000'
+  ],
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+
+// Static file serving for uploads
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads'), {
+  maxAge: '1h', // Cache for 1 hour (reduced for development)
+  etag: true,
+  setHeaders: (res, filePath) => {
+    // Set proper content type for images
+    if (filePath.match(/\.(jpg|jpeg|png|webp)$/i)) {
+      res.setHeader('Content-Disposition', 'inline');
+      const ext = path.extname(filePath).substring(1).toLowerCase();
+      const mimeType = ext === 'jpg' ? 'jpeg' : ext;
+      res.setHeader('Content-Type', `image/${mimeType}`);
+    }
+  }
+}));
 
 // API prefix
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';

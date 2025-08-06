@@ -119,7 +119,7 @@ export class ProfileController {
    */
   static async getProfile(req: Request, res: Response): Promise<Response | void> {
     try {
-      const userId = (req as any).user.id;
+      const userId = (req as any).user.userId;
 
       const result = await ProfileService.getProfile(userId);
 
@@ -155,7 +155,7 @@ export class ProfileController {
         });
       }
 
-      const userId = (req as any).user.id;
+      const userId = (req as any).user.userId;
       const profileData: ProfileData = req.body;
 
       const result = await ProfileService.updateProfile(userId, profileData);
@@ -193,7 +193,7 @@ export class ProfileController {
         });
       }
 
-      const userId = (req as any).user.id;
+      const userId = (req as any).user.userId;
       const privacySettings: PrivacySettings = req.body;
 
       const result = await ProfileService.updatePrivacySettings(userId, privacySettings);
@@ -231,7 +231,7 @@ export class ProfileController {
         });
       }
 
-      const userId = (req as any).user.id;
+      const userId = (req as any).user.userId;
       const { googleToken } = req.body;
 
       const result = await ProfileService.connectGoogle(userId, googleToken);
@@ -261,7 +261,7 @@ export class ProfileController {
    */
   static async disconnectGoogle(req: Request, res: Response): Promise<Response | void> {
     try {
-      const userId = (req as any).user.id;
+      const userId = (req as any).user.userId;
 
       const result = await ProfileService.disconnectGoogle(userId);
 

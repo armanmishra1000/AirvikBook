@@ -112,10 +112,13 @@ export class FileStorageService {
 
       // Update user profile
       const relativePath = `/uploads/profiles/${fileName}`;
+      const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
+      const fullUrl = `${baseUrl}${relativePath}`;
+      
       await prisma.user.update({
         where: { id: userId },
         data: {
-          profilePicture: relativePath,
+          profilePicture: fullUrl,
           profilePictureSource: 'UPLOAD'
         }
       });
@@ -128,7 +131,7 @@ export class FileStorageService {
           fileSize: optimizationResult.size,
           dimensions: optimizationResult.dimensions,
           format: optimizationResult.format,
-          url: relativePath
+          url: fullUrl
         }
       };
     } catch (error) {
