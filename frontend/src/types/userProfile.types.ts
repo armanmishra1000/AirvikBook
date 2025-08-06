@@ -230,6 +230,32 @@ export interface PrivacyFormState {
 }
 
 // =====================================================
+// VALIDATION TYPES
+// =====================================================
+
+export interface ProfileValidationErrors {
+  fullName?: string;
+  mobileNumber?: string;
+  bio?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  nationality?: string;
+  occupation?: string;
+  website?: string;
+  location?: string;
+}
+
+export interface FileValidationResult {
+  isValid: boolean;
+  error?: string;
+  code?: string;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+}
+
+// =====================================================
 // COMPONENT PROPS TYPES
 // =====================================================
 

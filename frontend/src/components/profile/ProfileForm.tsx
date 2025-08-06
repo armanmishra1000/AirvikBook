@@ -12,6 +12,8 @@ import {
   PROFILE_ERROR_CODES
 } from '../../types/userProfile.types';
 import { UserProfileService } from '../../services/userProfile.service';
+import useProfileValidation from '../../hooks/useProfileValidation';
+import { FieldValidation, ValidationSummary } from './ValidationMessage';
 
 // =====================================================
 // BRAND-COMPLIANT PROFILE FORM COMPONENT
@@ -49,6 +51,22 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const submitAttemptedRef = useRef(false);
+
+  // Enhanced validation hook
+  const {
+    errors: validationErrors,
+    isValid: isFormValid,
+    isValidating,
+    hasChanges,
+    validateField: validateFieldHook,
+    validateAllFields,
+    clearErrors: clearValidationErrors,
+    sanitizeData
+  } = useProfileValidation({
+    initialData: initialData as any,
+    enableRealTimeValidation: true,
+    debounceMs: 300
+  });
 
   // =====================================================
   // INITIAL DATA LOADING
@@ -149,7 +167,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     Object.keys(formData).forEach((key) => {
       const fieldName = key as keyof ProfileFormData;
       const error = validateField(fieldName, formData[fieldName]);
-      if (error) newErrors[fieldName] = error;
+      if (error && error.length > 0) newErrors[fieldName] = error;
     });
 
     setErrors(newErrors);
@@ -168,6 +186,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       [name]: value
     }));
 
+    // Real-time validation with the new hook
+    validateFieldHook(name as keyof ProfileUpdateRequest, value);
+
     // Clear field error on change if submit has been attempted
     if (submitAttemptedRef.current && errors[name as keyof ProfileFormErrors]) {
       setErrors(prev => ({
@@ -181,27 +202,34 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     e.preventDefault();
     submitAttemptedRef.current = true;
 
-    if (!validateForm()) {
+    // Create update data from form
+    const updateData: ProfileUpdateRequest = {
+      fullName: formData.fullName.trim(),
+      mobileNumber: formData.mobileNumber.trim() || undefined,
+      bio: formData.bio.trim() || undefined,
+      dateOfBirth: formData.dateOfBirth || undefined,
+      gender: formData.gender || undefined,
+      nationality: formData.nationality || undefined,
+      occupation: formData.occupation || undefined,
+      website: formData.website.trim() || undefined,
+      location: formData.location.trim() || undefined
+    };
+
+    // Validate with the enhanced hook
+    const currentErrors = validateAllFields(updateData);
+    if (Object.keys(currentErrors).length > 0) {
       showError('Please fix the errors in the form');
       return;
     }
 
+    // Sanitize data before submission
+    const sanitizedData = sanitizeData(updateData);
+
     setIsSubmitting(true);
 
     try {
-      const updateData: ProfileUpdateRequest = {
-        fullName: formData.fullName.trim(),
-        mobileNumber: formData.mobileNumber.trim() || undefined,
-        bio: formData.bio.trim() || undefined,
-        dateOfBirth: formData.dateOfBirth || undefined,
-        gender: formData.gender || undefined,
-        nationality: formData.nationality || undefined,
-        occupation: formData.occupation || undefined,
-        website: formData.website.trim() || undefined,
-        location: formData.location.trim() || undefined
-      };
 
-      const response = await UserProfileService.updateProfile(updateData);
+      const response = await UserProfileService.updateProfile(sanitizedData);
 
       if (isSuccessResponse(response)) {
         showSuccess('Profile updated successfully');
@@ -265,6 +293,15 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           </p>
         </div>
 
+        {/* Validation Summary */}
+        {submitAttemptedRef.current && Object.keys(validationErrors).length > 0 && (
+          <ValidationSummary 
+            errors={validationErrors as Record<string, string>}
+            title="Please fix the following errors before saving:"
+            maxErrorsToShow={3}
+          />
+        )}
+
         {/* Full Name */}
         <div>
           <label htmlFor="fullName" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
@@ -278,7 +315,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             onChange={handleInputChange}
             className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
               transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
-              ${errors.fullName 
+              ${(errors.fullName || validationErrors.fullName)
                 ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
                 : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
               }`}
@@ -286,11 +323,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             disabled={isSubmitting}
             required
           />
-          {errors.fullName && (
-            <p className="mt-space-1 text-caption text-error">
-              {errors.fullName}
-            </p>
-          )}
+          <FieldValidation 
+            fieldName="fullName"
+            error={errors.fullName || validationErrors.fullName}
+            isValidating={isValidating}
+            className="mt-space-1"
+          />
         </div>
 
         {/* Mobile Number */}
@@ -493,10 +531,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         <div className="flex justify-end pt-space-4 border-t border-gray-200 dark:border-gray-700">
           <button
             type="submit"
-            disabled={isSubmitting || authState.isLoading}
+            disabled={isSubmitting || authState.isLoading || (!isFormValid && submitAttemptedRef.current)}
             className={`px-space-6 py-space-3 rounded-radius-md font-sf-pro text-button
               transition-all duration-normal transform
-              ${isSubmitting || authState.isLoading
+              ${(isSubmitting || authState.isLoading || (!isFormValid && submitAttemptedRef.current))
                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                 : 'bg-airvik-blue text-airvik-white hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2'
               }`}

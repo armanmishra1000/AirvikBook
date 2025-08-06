@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth, useIsAuthenticated } from '../../context/AuthContext';
 import { useToastHelpers } from '../../components/common/Toast';
 import { ProfileCard } from '../../components/profile/ProfileCard';
+import { ProfileErrorBoundary } from '../../components/profile/ProfileErrorBoundary';
 import { UserProfile, isSuccessResponse } from '../../types/userProfile.types';
 import { UserProfileService } from '../../services/userProfile.service';
 
@@ -150,7 +151,13 @@ export default function ProfilePage() {
   // =====================================================
 
   return (
-    <div className="min-h-screen bg-airvik-white dark:bg-airvik-midnight">
+    <ProfileErrorBoundary
+      onError={(error, errorInfo) => {
+        console.error('Profile page error:', error, errorInfo);
+        showError('An unexpected error occurred. Please reload the page.');
+      }}
+    >
+      <div className="min-h-screen bg-airvik-white dark:bg-airvik-midnight">
       <div className="container mx-auto px-space-4 py-space-8">
         {/* Header */}
         <div className="mb-space-8">
@@ -315,5 +322,6 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+    </ProfileErrorBoundary>
   );
 }
