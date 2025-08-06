@@ -26,6 +26,22 @@ model User {
   updatedAt         DateTime  @updatedAt
   isActive          Boolean   @default(true)
 
+  // Profile fields (User Profiles feature)
+  bio               String?
+  dateOfBirth       DateTime?
+  gender            String?
+  nationality       String?
+  occupation        String?
+  website           String?
+  location          String?
+  profilePictureSource String? @default("DEFAULT")
+  
+  // Privacy settings
+  profileVisibility String    @default("PUBLIC")
+  showEmail         Boolean   @default(false)
+  showPhone         Boolean   @default(false)
+  allowGoogleSync   Boolean   @default(true)
+
   // Relations (to be added as features are developed)
   emailVerificationTokens EmailVerificationToken[]
   sessions                Session[]

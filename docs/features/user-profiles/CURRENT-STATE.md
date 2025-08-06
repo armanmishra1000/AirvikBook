@@ -29,7 +29,7 @@ Based on project analysis:
 
 ## What Exists Now
 <!-- AI will update this after each task -->
-- ❌ Backend: Not started
+- ✅ Backend B1: User model extended with profile fields
 - ❌ Frontend: Not started
 - ❌ Testing: Not started
 - ✅ Documentation: Created (FEATURE-ANALYSIS, INTEGRATION-POINTS, API-CONTRACT, FEATURE-SPEC, TASK-BREAKDOWN)
@@ -61,17 +61,18 @@ Based on project analysis:
 - Interactive states complete: ❌ (Not Started - will implement hover, focus, active, disabled states)
 
 ## Next Task
-**Current**: Backend B1 - Data Model Extension
-**File to create**: Update `backend/prisma/schema.prisma` with new User model fields
-**Dependencies**: None - extends existing User model
-**Estimated Time**: 30 minutes
+**Current**: Backend B2 - Profile Service Layer Creation
+**File to create**: `backend/src/services/user/profile.service.ts` and `backend/src/services/user/profilePicture.service.ts`
+**Dependencies**: B1 completed - User model extended successfully
+**Estimated Time**: 45 minutes
 
-**Specific Requirements for B1**:
-- Add profile fields: bio, dateOfBirth, gender, nationality, occupation, website, location
-- Add privacy settings: profileVisibility, showEmail, showPhone, allowGoogleSync
-- Add profilePictureSource enum: 'UPLOAD', 'GOOGLE', 'DEFAULT'
-- All new fields must be nullable/optional for existing users
-- Create migration script for database schema update
+**Specific Requirements for B2**:
+- Create ProfileService class with methods: getProfile, updateProfile, updatePrivacySettings, connectGoogle, disconnectGoogle
+- Create ProfilePictureService class with methods: uploadPicture, syncFromGoogle, deletePicture, validateImage
+- Integrate with existing GoogleOAuthService for data sync
+- Implement proper error handling and validation
+- Follow exact response format from API-CONTRACT.md
+- Add proper TypeScript interfaces for all methods
 
 ## Git Status
 **Branch**: feature/user-profiles (to be created)
