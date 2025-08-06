@@ -30,6 +30,7 @@ Based on project analysis:
 ## What Exists Now
 <!-- AI will update this after each task -->
 - ✅ Backend B1: User model extended with profile fields
+- ✅ Backend B2: Profile service layer created
 - ❌ Frontend: Not started
 - ❌ Testing: Not started
 - ✅ Documentation: Created (FEATURE-ANALYSIS, INTEGRATION-POINTS, API-CONTRACT, FEATURE-SPEC, TASK-BREAKDOWN)
@@ -61,18 +62,18 @@ Based on project analysis:
 - Interactive states complete: ❌ (Not Started - will implement hover, focus, active, disabled states)
 
 ## Next Task
-**Current**: Backend B2 - Profile Service Layer Creation
-**File to create**: `backend/src/services/user/profile.service.ts` and `backend/src/services/user/profilePicture.service.ts`
-**Dependencies**: B1 completed - User model extended successfully
-**Estimated Time**: 45 minutes
+**Current**: Backend B3 - File Storage Integration
+**File to create**: `backend/src/services/storage/fileStorage.service.ts`, `backend/src/middleware/fileUpload.middleware.ts`, `backend/src/utils/imageOptimization.ts`
+**Dependencies**: B2 completed - Profile service layer created successfully
+**Estimated Time**: 60 minutes
 
-**Specific Requirements for B2**:
-- Create ProfileService class with methods: getProfile, updateProfile, updatePrivacySettings, connectGoogle, disconnectGoogle
-- Create ProfilePictureService class with methods: uploadPicture, syncFromGoogle, deletePicture, validateImage
-- Integrate with existing GoogleOAuthService for data sync
-- Implement proper error handling and validation
-- Follow exact response format from API-CONTRACT.md
-- Add proper TypeScript interfaces for all methods
+**Specific Requirements for B3**:
+- Create FileStorageService with secure file upload, validation, and optimization
+- Implement Multer middleware for profile picture uploads
+- Add image optimization utilities
+- Validate file size (5MB max), format (jpg, jpeg, png, webp), dimensions (100x100 to 2000x2000)
+- Sanitize filenames and implement secure file storage
+- Clean up old files when replacing profile pictures
 
 ## Git Status
 **Branch**: feature/user-profiles (to be created)
