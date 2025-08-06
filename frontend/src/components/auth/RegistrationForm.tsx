@@ -214,14 +214,13 @@ export default function RegistrationForm({
   };
 
   return (
-    <div className={`registration-form ${className}`}>
-      <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-space-6 rounded-lg shadow-lg">
+    <div className={`w-full max-w-md mx-auto ${className}`}>
         {/* Header */}
         <div className="text-center mb-space-6">
-          <h1 className="text-h1 text-gray-900 dark:text-white mb-space-2">
+          <h2 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white">
             Create Account
-          </h1>
-          <p className="text-body text-gray-600 dark:text-gray-300">
+          </h2>
+          <p className="text-body text-gray-600 dark:text-gray-400 mt-space-2">
             Join AirVikBook to start booking amazing hotels
           </p>
         </div>
@@ -243,7 +242,7 @@ export default function RegistrationForm({
             <div className="w-full border-t border-gray-300 dark:border-gray-600" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-space-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+            <span className="px-space-2 bg-airvik-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
               Or continue with email
             </span>
           </div>
@@ -253,14 +252,14 @@ export default function RegistrationForm({
         <form onSubmit={handleSubmit} className="space-y-space-4">
           {/* General Error */}
           {errors.general && (
-            <div className="p-space-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-              <p className="text-sm text-red-600 dark:text-red-400">{errors.general}</p>
+            <div className="p-space-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-radius-md">
+              <p className="text-body text-error">{errors.general}</p>
             </div>
           )}
 
           {/* Email Field */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-space-1">
+            <label htmlFor="email" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
               Email Address *
             </label>
             <div className="relative">
@@ -269,16 +268,12 @@ export default function RegistrationForm({
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`
-                  w-full px-space-3 py-space-2 border rounded-md shadow-sm
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                  disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed
+                className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+                  transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
                   ${errors.email 
-                    ? 'border-red-300 dark:border-red-600' 
-                    : 'border-gray-300 dark:border-gray-600'
-                  }
-                `}
+                    ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
+                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                 placeholder="your.email@example.com"
                 disabled={isLoading}
                 autoComplete="email"
@@ -287,25 +282,25 @@ export default function RegistrationForm({
               {/* Email checking indicator */}
               {isCheckingEmail && (
                 <div className="absolute right-space-3 top-1/2 transform -translate-y-1/2">
-                  <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
+                  <div className="animate-spin h-4 w-4 border-2 border-airvik-blue border-t-transparent rounded-radius-full" />
                 </div>
               )}
               
               {/* Email availability indicator */}
               {emailAvailable === true && (
                 <div className="absolute right-space-3 top-1/2 transform -translate-y-1/2">
-                  <svg className="h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="h-4 w-4 text-success" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
               )}
             </div>
-            {errors.email && <p className="mt-space-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>}
+            {errors.email && <p className="mt-space-1 text-caption text-error">{errors.email}</p>}
           </div>
 
           {/* Full Name Field */}
           <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-space-1">
+            <label htmlFor="fullName" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
               Full Name *
             </label>
             <input
@@ -313,54 +308,46 @@ export default function RegistrationForm({
               type="text"
               value={formData.fullName}
               onChange={(e) => handleInputChange('fullName', e.target.value)}
-              className={`
-                w-full px-space-3 py-space-2 border rounded-md shadow-sm
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed
+              className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
                 ${errors.fullName 
-                  ? 'border-red-300 dark:border-red-600' 
-                  : 'border-gray-300 dark:border-gray-600'
-                }
-              `}
+                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                }`}
               placeholder="John Doe"
               disabled={isLoading}
               autoComplete="name"
             />
-            {errors.fullName && <p className="mt-space-1 text-sm text-red-600 dark:text-red-400">{errors.fullName}</p>}
+            {errors.fullName && <p className="mt-space-1 text-caption text-error">{errors.fullName}</p>}
           </div>
 
           {/* Mobile Number Field */}
           <div>
-            <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-space-1">
+            <label htmlFor="mobileNumber" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
               Mobile Number
-              <span className="text-gray-400 text-xs ml-space-1">(optional)</span>
+              <span className="text-gray-400 text-caption ml-space-1">(optional)</span>
             </label>
             <input
               id="mobileNumber"
               type="tel"
               value={formData.mobileNumber}
               onChange={(e) => handleInputChange('mobileNumber', e.target.value)}
-              className={`
-                w-full px-space-3 py-space-2 border rounded-md shadow-sm
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed
+              className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
                 ${errors.mobileNumber 
-                  ? 'border-red-300 dark:border-red-600' 
-                  : 'border-gray-300 dark:border-gray-600'
-                }
-              `}
+                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                }`}
               placeholder="+1234567890"
               disabled={isLoading}
               autoComplete="tel"
             />
-            {errors.mobileNumber && <p className="mt-space-1 text-sm text-red-600 dark:text-red-400">{errors.mobileNumber}</p>}
+            {errors.mobileNumber && <p className="mt-space-1 text-caption text-error">{errors.mobileNumber}</p>}
           </div>
 
           {/* Password Field */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-space-1">
+            <label htmlFor="password" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
               Password *
             </label>
             <div className="relative">
@@ -369,16 +356,12 @@ export default function RegistrationForm({
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
-                className={`
-                  w-full px-space-3 py-space-2 pr-10 border rounded-md shadow-sm
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                  disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed
+                className={`w-full px-space-4 py-space-3 pr-12 border rounded-radius-md font-sf-pro text-body
+                  transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
                   ${errors.password 
-                    ? 'border-red-300 dark:border-red-600' 
-                    : 'border-gray-300 dark:border-gray-600'
-                  }
-                `}
+                    ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
+                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                 placeholder="Enter a strong password"
                 disabled={isLoading}
                 autoComplete="new-password"
@@ -386,7 +369,7 @@ export default function RegistrationForm({
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-space-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="absolute inset-y-0 right-0 flex items-center pr-space-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-normal"
                 disabled={isLoading}
               >
                 {showPassword ? (
@@ -401,7 +384,7 @@ export default function RegistrationForm({
                 )}
               </button>
             </div>
-            {errors.password && <p className="mt-space-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>}
+            {errors.password && <p className="mt-space-1 text-caption text-error">{errors.password}</p>}
             
             {/* Password Strength Indicator */}
             <div className="mt-space-2">
@@ -411,7 +394,7 @@ export default function RegistrationForm({
 
           {/* Confirm Password Field */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-space-1">
+            <label htmlFor="confirmPassword" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
               Confirm Password *
             </label>
             <div className="relative">
@@ -420,16 +403,12 @@ export default function RegistrationForm({
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
                 onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                className={`
-                  w-full px-space-3 py-space-2 pr-10 border rounded-md shadow-sm
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                  disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed
+                className={`w-full px-space-4 py-space-3 pr-12 border rounded-radius-md font-sf-pro text-body
+                  transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
                   ${errors.confirmPassword 
-                    ? 'border-red-300 dark:border-red-600' 
-                    : 'border-gray-300 dark:border-gray-600'
-                  }
-                `}
+                    ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
+                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                 placeholder="Confirm your password"
                 disabled={isLoading}
                 autoComplete="new-password"
@@ -437,7 +416,7 @@ export default function RegistrationForm({
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-space-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="absolute inset-y-0 right-0 flex items-center pr-space-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-normal"
                 disabled={isLoading}
               >
                 {showConfirmPassword ? (
@@ -452,7 +431,7 @@ export default function RegistrationForm({
                 )}
               </button>
             </div>
-            {errors.confirmPassword && <p className="mt-space-1 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword}</p>}
+            {errors.confirmPassword && <p className="mt-space-1 text-caption text-error">{errors.confirmPassword}</p>}
           </div>
 
           {/* Terms and Conditions */}
@@ -462,20 +441,18 @@ export default function RegistrationForm({
                 type="checkbox"
                 checked={formData.acceptedTerms}
                 onChange={(e) => handleInputChange('acceptedTerms', e.target.checked)}
-                className={`
-                  mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded
+                className={`mt-1 h-4 w-4 text-airvik-blue focus:ring-airvik-blue border-gray-300 dark:border-gray-600 rounded
                   disabled:cursor-not-allowed
-                  ${errors.acceptedTerms ? 'border-red-300 dark:border-red-600' : ''}
-                `}
+                  ${errors.acceptedTerms ? 'border-error' : ''}`}
                 disabled={isLoading}
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="text-body text-gray-700 dark:text-gray-300">
                 I agree to the{' '}
                 <a
                   href="/terms"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
+                  className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
                 >
                   Terms and Conditions
                 </a>
@@ -484,31 +461,30 @@ export default function RegistrationForm({
                   href="/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
+                  className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
                 >
                   Privacy Policy
                 </a>
                 {' '}*
               </span>
             </label>
-            {errors.acceptedTerms && <p className="mt-space-1 text-sm text-red-600 dark:text-red-400">{errors.acceptedTerms}</p>}
+            {errors.acceptedTerms && <p className="mt-space-1 text-caption text-error">{errors.acceptedTerms}</p>}
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading || emailAvailable === false}
-            className={`
-              w-full flex justify-center py-space-2 px-space-4 border border-transparent rounded-md shadow-sm
-              text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-              disabled:opacity-50 disabled:cursor-not-allowed
-              transition-colors duration-200
-              ${isLoading ? 'cursor-wait' : ''}
-            `}
+            className={`w-full py-space-3 px-space-6 rounded-radius-md font-sf-pro text-button
+              transition-all duration-normal transform
+              ${isLoading || emailAvailable === false
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                : 'bg-airvik-blue text-airvik-white hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 active:translate-y-0'
+              }`}
           >
             {isLoading ? (
               <div className="flex items-center">
-                <div className="animate-spin -ml-1 mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                <div className="animate-spin -ml-1 mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-radius-full" />
                 Creating Account...
               </div>
             ) : (
@@ -519,17 +495,16 @@ export default function RegistrationForm({
 
         {/* Login Link */}
         <div className="mt-space-4 text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-body text-gray-600 dark:text-gray-300">
             Already have an account?{' '}
             <a
               href="/auth/login"
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
+              className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
             >
               Sign in here
             </a>
           </p>
         </div>
-      </div>
     </div>
   );
 }

@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
   // Don't render anything while checking authentication
   if (authState.isLoading) {
     return (
-      <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin h-8 w-8 mx-auto mb-space-4 border-4 border-airvik-blue border-t-transparent rounded-radius-full" />
           <p className="text-body text-gray-600 dark:text-gray-400 font-sf-pro">
@@ -54,7 +54,7 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-light-1 dark:bg-gradient-dark-1 flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
+    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo/Brand */}
         <div className="text-center mb-space-8">
@@ -67,7 +67,7 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* Login Card */}
-        <div className="bg-airvik-white dark:bg-gray-800 py-space-8 px-space-6 shadow-lg rounded-radius-lg">
+        <div className="card-auth py-space-8 px-space-6">
           {/* Login Form */}
           <LoginForm
             onSuccess={handleLoginSuccess}

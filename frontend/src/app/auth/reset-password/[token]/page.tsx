@@ -192,7 +192,7 @@ const ResetPasswordPage: React.FC = () => {
 
   if (isTokenVerifying) {
     return (
-      <div className="min-h-screen bg-gradient-light-1 dark:bg-gradient-dark-1 flex items-center justify-center">
+      <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin h-8 w-8 mx-auto mb-space-4 border-4 border-airvik-blue border-t-transparent rounded-radius-full" />
           <p className="text-body text-gray-600 dark:text-gray-400 font-sf-pro">
@@ -209,9 +209,9 @@ const ResetPasswordPage: React.FC = () => {
 
   if (isTokenValid === false) {
     return (
-      <div className="min-h-screen bg-gradient-light-1 dark:bg-gradient-dark-1 flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
+      <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-airvik-white dark:bg-gray-800 py-space-8 px-space-6 shadow-lg rounded-radius-lg text-center">
+          <div className="card-auth py-space-8 px-space-6 text-center">
             {/* Error Icon */}
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-radius-full bg-red-100 dark:bg-red-900/20 mb-space-6">
               <svg className="h-8 w-8 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -254,9 +254,9 @@ const ResetPasswordPage: React.FC = () => {
 
   if (isResetComplete) {
     return (
-      <div className="min-h-screen bg-gradient-light-1 dark:bg-gradient-dark-1 flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
+      <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-airvik-white dark:bg-gray-800 py-space-8 px-space-6 shadow-lg rounded-radius-lg text-center">
+          <div className="card-auth py-space-8 px-space-6 text-center">
             {/* Success Icon */}
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-radius-full bg-green-100 dark:bg-green-900/20 mb-space-6">
               <svg className="h-8 w-8 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -289,7 +289,7 @@ const ResetPasswordPage: React.FC = () => {
   // =====================================================
 
   return (
-    <div className="min-h-screen bg-gradient-light-1 dark:bg-gradient-dark-1 flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
+    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Header */}
         <div className="text-center mb-space-8">
@@ -302,7 +302,7 @@ const ResetPasswordPage: React.FC = () => {
         </div>
 
         {/* Form Card */}
-        <div className="bg-airvik-white dark:bg-gray-800 py-space-8 px-space-6 shadow-lg rounded-radius-lg">
+        <div className="card-auth py-space-8 px-space-6">
           <div className="mb-space-6">
             <h2 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white text-center">
               Reset Your Password

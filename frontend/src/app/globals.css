@@ -101,8 +101,11 @@
     --error: 177 42 42;
     --info: 209 216 250;
     
-    /* Shadow colors */
-    --shadow-color: 2 10 24
+      /* Shadow colors */
+  --shadow-color: 2 10 24;
+  
+  /* Border colors for cards */
+  --card-border: 209 216 250;
   }
   .dark {
     /* Adjusted brand colors for dark mode */
@@ -113,7 +116,10 @@
     --airvik-cyan: 123 220 252;
     
     /* Shadow adjustments */
-    --shadow-color: 248 249 254
+    --shadow-color: 248 249 254;
+    
+    /* Dark mode card border */
+    --card-border: 48 79 94;
   }
 }
 
@@ -206,5 +212,18 @@
   /* Brand gradient text */
   .text-gradient {
     @apply bg-gradient-mid bg-clip-text text-transparent;
+  }
+  
+  /* Card styling utilities */
+  .card-auth {
+    @apply bg-airvik-white dark:bg-gray-800 border border-[rgb(var(--card-border))] shadow-md rounded-lg;
+  }
+  
+  /* Background patterns */
+  .bg-pattern-subtle {
+    background-image: 
+      radial-gradient(circle at 20% 80%, rgb(var(--airvik-blue) / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgb(var(--airvik-purple) / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgb(var(--airvik-cyan) / 0.02) 0%, transparent 50%);
   }
 }

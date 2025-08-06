@@ -191,7 +191,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <div className={`w-full max-w-md mx-auto ${className}`}>
-      <form onSubmit={handleSubmit} className="space-y-space-6">
+      <form onSubmit={handleSubmit} className="space-y-space-4">
         {/* Form Title */}
         <div className="text-center">
           <h2 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white">

@@ -47,7 +47,7 @@ export default function SuccessPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center py-space-12 px-space-4 sm:px-space-6 lg:px-space-8">
+    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex items-center justify-center py-space-12 px-space-4 sm:px-space-6 lg:px-space-8">
       <div className="max-w-2xl w-full text-center">
         {/* Success Animation */}
         <div className="mb-space-8">
