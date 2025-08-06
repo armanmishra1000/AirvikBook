@@ -5,6 +5,7 @@ import {
   PasswordInputProps,
   PasswordValidationResult,
   PasswordStrength,
+  PasswordRequirement,
   PASSWORD_STRENGTH_LABELS,
   PASSWORD_STRENGTH_COLORS
 } from '../../types/passwordManagement.types';
@@ -69,20 +70,20 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     }
 
     let score = 0;
-    const requirements = [];
+    const requirements: PasswordRequirement[] = [];
 
     // Length check
     if (password.length >= 8) {
       score += 1;
       requirements.push({
-        type: 'length',
+        type: 'length' as const,
         label: 'At least 8 characters',
         met: true,
         required: true
       });
     } else {
       requirements.push({
-        type: 'length',
+        type: 'length' as const,
         label: 'At least 8 characters',
         met: false,
         required: true
@@ -93,14 +94,14 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (/[A-Z]/.test(password)) {
       score += 1;
       requirements.push({
-        type: 'uppercase',
+        type: 'uppercase' as const,
         label: 'Contains uppercase letter',
         met: true,
         required: true
       });
     } else {
       requirements.push({
-        type: 'uppercase',
+        type: 'uppercase' as const,
         label: 'Contains uppercase letter',
         met: false,
         required: true
@@ -111,14 +112,14 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (/[a-z]/.test(password)) {
       score += 1;
       requirements.push({
-        type: 'lowercase',
+        type: 'lowercase' as const,
         label: 'Contains lowercase letter',
         met: true,
         required: true
       });
     } else {
       requirements.push({
-        type: 'lowercase',
+        type: 'lowercase' as const,
         label: 'Contains lowercase letter',
         met: false,
         required: true
@@ -129,14 +130,14 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (/\d/.test(password)) {
       score += 1;
       requirements.push({
-        type: 'number',
+        type: 'number' as const,
         label: 'Contains number',
         met: true,
         required: true
       });
     } else {
       requirements.push({
-        type: 'number',
+        type: 'number' as const,
         label: 'Contains number',
         met: false,
         required: true
@@ -147,14 +148,14 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
       score += 1;
       requirements.push({
-        type: 'special',
+        type: 'special' as const,
         label: 'Contains special character',
         met: true,
         required: true
       });
     } else {
       requirements.push({
-        type: 'special',
+        type: 'special' as const,
         label: 'Contains special character',
         met: false,
         required: true

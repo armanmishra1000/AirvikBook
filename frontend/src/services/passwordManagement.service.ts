@@ -13,6 +13,13 @@ import {
   ChangePasswordRequest,
   SetPasswordRequest,
   RemovePasswordRequest,
+  ForgotPasswordResponse,
+  ResetPasswordResponse,
+  ChangePasswordResponse,
+  SetPasswordResponse,
+  RemovePasswordResponse,
+  PasswordStatusResponse,
+  ResetTokenValidationResponse,
   ForgotPasswordApiResponse,
   ResetPasswordApiResponse,
   ChangePasswordApiResponse,
@@ -344,12 +351,12 @@ export class PasswordManagementService {
   // =====================================================
 
   /**
-   * Initiate password reset process
+   * Request password reset email
    */
   static async forgotPassword(email: string): Promise<ForgotPasswordApiResponse> {
     const request: ForgotPasswordRequest = { email };
     
-    return ApiClient.request<ForgotPasswordRequest>(
+    return ApiClient.request<ForgotPasswordResponse>(
       'POST',
       '/auth/forgot-password',
       request,
@@ -367,7 +374,7 @@ export class PasswordManagementService {
       confirmPassword
     };
     
-    return ApiClient.request<ResetPasswordRequest>(
+    return ApiClient.request<ResetPasswordResponse>(
       'POST',
       '/auth/reset-password',
       request,
@@ -407,7 +414,7 @@ export class PasswordManagementService {
       invalidateOtherSessions
     };
     
-    return ApiClient.request<ChangePasswordRequest>(
+    return ApiClient.request<ChangePasswordResponse>(
       'PUT',
       '/auth/password',
       request,
@@ -424,7 +431,7 @@ export class PasswordManagementService {
       confirmPassword
     };
     
-    return ApiClient.request<SetPasswordRequest>(
+    return ApiClient.request<SetPasswordResponse>(
       'POST',
       '/auth/set-password',
       request,
@@ -441,7 +448,7 @@ export class PasswordManagementService {
       confirmGoogleOnly
     };
     
-    return ApiClient.request<RemovePasswordRequest>(
+    return ApiClient.request<RemovePasswordResponse>(
       'DELETE',
       '/auth/password',
       request,
@@ -450,7 +457,7 @@ export class PasswordManagementService {
   }
 
   /**
-   * Get current password and authentication status
+   * Get current password status and recommendations
    */
   static async getPasswordStatus(): Promise<PasswordStatusApiResponse> {
     return ApiClient.request<PasswordStatusResponse>(
