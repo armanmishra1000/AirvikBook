@@ -7,7 +7,7 @@ import { GoogleOAuthService } from '../services/googleOAuth.service';
 import { EmailVerificationTokenService } from '../services/emailVerificationToken.service';
 import { RegistrationEmailService } from '../services/email/registrationEmail.service';
 import { JwtService } from '../services/jwt.service';
-import { PasswordResetService } from '../services/auth/passwordReset.service';
+
 
 export class AuthController {
   /**
@@ -407,133 +407,7 @@ export class AuthController {
       .withMessage('Valid email address is required')
   ];
 
-  // ==================== PASSWORD RESET METHODS ====================
 
-  /**
-   * Validation rules for forgot password
-   */
-  static validateForgotPassword = [
-    body('email')
-      .isEmail()
-      .normalizeEmail()
-      .withMessage('Valid email address is required')
-  ];
-
-  /**
-   * Validation rules for reset password
-   */
-  static validateResetPassword = [
-    body('token')
-      .notEmpty()
-      .isString()
-      .withMessage('Reset token is required'),
-    body('newPassword')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters long')
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
-      .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
-  ];
-
-  /**
-   * Handle forgot password request
-   * POST /api/v1/auth/forgot-password
-   */
-  static async forgotPassword(req: Request, res: Response): Promise<Response> {
-    try {
-      // Check validation errors
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, {
-          errors: errors.array()
-        });
-      }
-
-      const { email } = req.body;
-      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
-
-      // Initiate password reset
-      const result = await PasswordResetService.initiatePasswordReset(email, clientIP);
-
-      if (!result.success) {
-        const statusCode = result.code === 'RATE_LIMIT_EXCEEDED' ? 429 : 500;
-        return ResponseUtil.error(res, result.error!, result.code!, statusCode, result.message);
-      }
-
-      return ResponseUtil.success(res, result.data, result.message);
-
-    } catch (error) {
-      console.error('Forgot password controller error:', error);
-      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
-    }
-  }
-
-  /**
-   * Handle reset password request
-   * POST /api/v1/auth/reset-password
-   */
-  static async resetPassword(req: Request, res: Response): Promise<Response> {
-    try {
-      // Check validation errors
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, {
-          errors: errors.array()
-        });
-      }
-
-      const { token, newPassword } = req.body;
-      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
-
-      // Reset password
-      const result = await PasswordResetService.resetPassword(token, newPassword, clientIP);
-
-      if (!result.success) {
-        let statusCode = 500;
-        if (result.code === 'INVALID_TOKEN') statusCode = 400;
-        if (result.code === 'USER_NOT_FOUND') statusCode = 404;
-        if (result.code === 'WEAK_PASSWORD') statusCode = 400;
-
-        return ResponseUtil.error(res, result.error!, result.code!, statusCode, result.data);
-      }
-
-      return ResponseUtil.success(res, result.data, result.message);
-
-    } catch (error) {
-      console.error('Reset password controller error:', error);
-      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
-    }
-  }
-
-  /**
-   * Verify reset token validity
-   * GET /api/v1/auth/verify-reset-token/:token
-   */
-  static async verifyResetToken(req: Request, res: Response): Promise<Response> {
-    try {
-      const { token } = req.params;
-
-      if (!token) {
-        return ResponseUtil.error(res, 'Reset token is required', 'VALIDATION_ERROR', 400);
-      }
-
-      // Verify token
-      const result = await PasswordResetService.verifyResetToken(token);
-
-      if (!result.success) {
-        let statusCode = 500;
-        if (result.code === 'INVALID_TOKEN') statusCode = 400;
-        if (result.code === 'USER_NOT_FOUND') statusCode = 404;
-
-        return ResponseUtil.error(res, result.error!, result.code!, statusCode);
-      }
-
-      return ResponseUtil.success(res, result.data, result.message);
-
-    } catch (error) {
-      console.error('Verify reset token controller error:', error);
-      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
-    }
-  }
 }
 
 export default AuthController;

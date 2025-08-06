@@ -1,59 +1,222 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, PasswordResetToken } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+import { EmailService } from '../email.service';
+import { ServiceResponse } from '../../utils/response.utils';
+import { SessionManagementService } from './sessionManagement.service';
 
 const prisma = new PrismaClient();
+const emailService = new EmailService();
 
-export interface PasswordResetRequest {
+export interface ForgotPasswordRequest {
   email: string;
 }
 
-export interface PasswordResetVerification {
+export interface ResetPasswordRequest {
   token: string;
   newPassword: string;
+  confirmPassword: string;
 }
 
-export interface PasswordResetResult {
-  success: boolean;
-  data?: any;
+export interface ResetTokenValidationResult {
+  isValid: boolean;
+  user?: {
+    id: string;
+    email: string;
+    fullName: string;
+    isActive: boolean;
+    isEmailVerified: boolean;
+  };
+  token?: PasswordResetToken;
   error?: string;
   code?: string;
-  message?: string;
+  timeRemaining?: number;
 }
 
-export interface PasswordResetToken {
-  id: string;
-  userId: string;
-  token: string;
-  email: string;
-  expiresAt: Date;
-  usedAt?: Date;
-  createdAt: Date;
+export interface ForgotPasswordResult {
+  emailSent: boolean;
+  message: string;
+  canResetPassword: boolean;
+  accountType?: 'EMAIL_ONLY' | 'GOOGLE_ONLY' | 'MIXED';
+  alternativeAuth?: {
+    method: 'GOOGLE_OAUTH';
+    suggestion: string;
+  };
+}
+
+export interface ResetPasswordResult {
+  passwordReset: boolean;
+  message: string;
+  user: {
+    email: string;
+    fullName: string;
+    passwordLastChanged: string;
+  };
+  sessionActions: {
+    allSessionsInvalidated: boolean;
+    newLoginRequired: boolean;
+  };
+  securityActions: {
+    passwordAddedToHistory: boolean;
+    securityEmailSent: boolean;
+  };
 }
 
 export class PasswordResetService {
   private static readonly TOKEN_EXPIRY_HOURS = 1; // 1 hour
-  private static readonly RATE_LIMIT_MINUTES = 5; // 5 minutes between requests
-  private static readonly MAX_ATTEMPTS_PER_DAY = 3; // Maximum 3 reset requests per day
+  private static readonly PASSWORD_HISTORY_LIMIT = 5;
+  private static readonly BCRYPT_ROUNDS = 12;
+  private static readonly MIN_PASSWORD_LENGTH = 8;
 
-  // In-memory rate limiting (in production, use Redis)
-  private static resetAttempts = new Map<string, Array<{ timestamp: number }>>();
+  // Rate limiting maps
+  private static forgotPasswordAttempts = new Map<string, { count: number; resetTime: number }>();
+  private static readonly FORGOT_PASSWORD_LIMIT = 1; // 1 request per 5 minutes per email
+  private static readonly FORGOT_PASSWORD_WINDOW = 5 * 60 * 1000; // 5 minutes
+
+  /**
+   * Generate a secure password reset token
+   */
+  private static generateSecureToken(): string {
+    return crypto.randomBytes(32).toString('hex');
+  }
+
+  /**
+   * Validate password strength
+   */
+  private static validatePasswordStrength(password: string): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    if (password.length < this.MIN_PASSWORD_LENGTH) {
+      errors.push(`Password must be at least ${this.MIN_PASSWORD_LENGTH} characters long`);
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Password must contain at least one uppercase letter');
+    }
+
+    if (!/[a-z]/.test(password)) {
+      errors.push('Password must contain at least one lowercase letter');
+    }
+
+    if (!/[0-9]/.test(password)) {
+      errors.push('Password must contain at least one number');
+    }
+
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      errors.push('Password must contain at least one special character');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  /**
+   * Check if password has been used recently
+   */
+  private static async checkPasswordHistory(userId: string, newPassword: string): Promise<boolean> {
+    try {
+      const passwordHistory = await prisma.passwordHistory.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: this.PASSWORD_HISTORY_LIMIT
+      });
+
+      for (const historyEntry of passwordHistory) {
+        const isMatch = await bcrypt.compare(newPassword, historyEntry.passwordHash);
+        if (isMatch) {
+          return true; // Password has been used recently
+        }
+      }
+
+      return false; // Password is new
+    } catch (error) {
+      console.error('Error checking password history:', error);
+      return false; // Allow password change if history check fails
+    }
+  }
+
+  /**
+   * Add password to history
+   */
+  private static async addPasswordToHistory(userId: string, passwordHash: string): Promise<void> {
+    try {
+      // Add new password to history
+      await prisma.passwordHistory.create({
+        data: {
+          userId,
+          passwordHash
+        }
+      });
+
+      // Keep only the last 5 passwords
+      const allHistory = await prisma.passwordHistory.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      if (allHistory.length > this.PASSWORD_HISTORY_LIMIT) {
+        const toDelete = allHistory.slice(this.PASSWORD_HISTORY_LIMIT);
+        await prisma.passwordHistory.deleteMany({
+          where: {
+            id: {
+              in: toDelete.map(h => h.id)
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error adding password to history:', error);
+      // Don't throw error, as this is not critical for password reset
+    }
+  }
+
+  /**
+   * Check rate limiting for forgot password requests
+   */
+  private static checkForgotPasswordRateLimit(email: string): { allowed: boolean; retryAfter?: number } {
+    const now = Date.now();
+    const windowStart = Math.floor(now / this.FORGOT_PASSWORD_WINDOW) * this.FORGOT_PASSWORD_WINDOW;
+    
+    let attempts = this.forgotPasswordAttempts.get(email);
+    
+    if (!attempts || attempts.resetTime <= now) {
+      attempts = { count: 1, resetTime: windowStart + this.FORGOT_PASSWORD_WINDOW };
+      this.forgotPasswordAttempts.set(email, attempts);
+      return { allowed: true };
+    }
+    
+    if (attempts.count >= this.FORGOT_PASSWORD_LIMIT) {
+      return {
+        allowed: false,
+        retryAfter: Math.ceil((attempts.resetTime - now) / 1000)
+      };
+    }
+    
+    attempts.count++;
+    return { allowed: true };
+  }
 
   /**
    * Initiate password reset process
    */
-  static async initiatePasswordReset(email: string, clientIP: string): Promise<PasswordResetResult> {
+  static async generateResetToken(request: ForgotPasswordRequest): Promise<ServiceResponse<ForgotPasswordResult>> {
     try {
+      const { email } = request;
       const normalizedEmail = email.toLowerCase().trim();
 
       // Check rate limiting
-      const rateLimitResult = await this.checkResetRateLimit(normalizedEmail);
+      const rateLimitResult = this.checkForgotPasswordRateLimit(normalizedEmail);
       if (!rateLimitResult.allowed) {
         return {
           success: false,
-          error: 'Too many password reset requests. Please try again later.',
+          error: 'Too many password reset requests. Please try again in 5 minutes.',
           code: 'RATE_LIMIT_EXCEEDED',
-          message: `Please wait ${rateLimitResult.waitTimeMinutes} minutes before requesting another password reset.`
+          details: {
+            retryAfter: rateLimitResult.retryAfter,
+            requestsRemaining: 0
+          }
         };
       }
 
@@ -67,467 +230,306 @@ export class PasswordResetService {
         }
       });
 
-      // Always return success for security (don't reveal if email exists)
-      // but only send email if user actually exists
-      if (user && user.isActive) {
-        // Generate secure reset token
-        const resetToken = await this.generateResetToken();
-        const expiresAt = new Date(Date.now() + (this.TOKEN_EXPIRY_HOURS * 60 * 60 * 1000));
-
-        // Store reset token in database
-        await this.storeResetToken(user.id, resetToken, normalizedEmail, expiresAt);
-
-        // Send password reset email
-        try {
-          const { emailService } = await import('../email.service');
-          
-          const emailResult = await emailService.sendPasswordResetEmail(
-            user.email,
-            user.fullName,
-            resetToken
-          );
-
-          if (!emailResult.success) {
-            console.error('Failed to send password reset email:', emailResult.error);
-            // Continue anyway - don't reveal email send failures
+      // Always return success response for security (no email enumeration)
+      if (!user) {
+        return {
+          success: true,
+          data: {
+            emailSent: true,
+            message: 'If an account with this email exists, you will receive password reset instructions',
+            canResetPassword: true
           }
-
-        } catch (emailError) {
-          console.error('Error sending password reset email:', emailError);
-          // Continue anyway - don't reveal email send failures
-        }
-
-        // Log the reset attempt
-        await this.logResetAttempt(normalizedEmail, clientIP, true);
-      } else {
-        // Log attempt even for non-existent users (for security monitoring)
-        await this.logResetAttempt(normalizedEmail, clientIP, false, 'USER_NOT_FOUND');
+        };
       }
 
-      // Update rate limiting
-      this.updateResetAttempts(normalizedEmail);
+      // Check account type
+      const hasPassword = !!user.password;
+      const hasGoogleAuth = !!user.googleId;
 
-      // Always return success for security
+      // Handle Google-only accounts
+      if (!hasPassword && hasGoogleAuth) {
+        return {
+          success: true,
+          data: {
+            emailSent: false,
+            message: 'This account uses Google sign-in. Please use \'Sign in with Google\' instead',
+            canResetPassword: false,
+            accountType: 'GOOGLE_ONLY',
+            alternativeAuth: {
+              method: 'GOOGLE_OAUTH',
+              suggestion: 'Use the \'Sign in with Google\' button on the login page'
+            }
+          }
+        };
+      }
+
+      // Generate reset token for email accounts (email-only or mixed)
+      const resetToken = this.generateSecureToken();
+      const expiresAt = new Date(Date.now() + this.TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
+
+      // Clean up any existing reset tokens for this user
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId: user.id }
+      });
+
+      // Create new reset token
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          token: resetToken,
+          email: normalizedEmail,
+          expiresAt
+        }
+      });
+
+      // Send password reset email
+      const emailResult = await emailService.sendPasswordResetEmail(
+        normalizedEmail,
+        user.fullName,
+        resetToken
+      );
+
+      if (!emailResult.success) {
+        console.error('Failed to send password reset email:', emailResult.error);
+        // Still return success to prevent email enumeration
+      }
+
       return {
         success: true,
         data: {
-          emailSent: true,
-          message: 'Password reset instructions sent to your email'
-        },
-        message: 'If an account with that email exists, we\'ve sent password reset instructions.'
+          emailSent: emailResult.success,
+          message: 'If an account with this email exists, you will receive password reset instructions',
+          canResetPassword: true
+        }
       };
 
     } catch (error) {
-      console.error('Error initiating password reset:', error);
+      console.error('Error generating reset token:', error);
       return {
         success: false,
-        error: 'Internal server error during password reset initiation',
-        code: 'INTERNAL_ERROR'
+        error: 'Failed to process password reset request',
+        code: 'RESET_TOKEN_GENERATION_FAILED'
       };
     }
   }
 
   /**
-   * Verify reset token and reset password
+   * Validate reset token
    */
-  static async resetPassword(
-    token: string,
-    newPassword: string,
-    clientIP: string
-  ): Promise<PasswordResetResult> {
+  static async validateResetToken(token: string): Promise<ServiceResponse<ResetTokenValidationResult>> {
     try {
-      // Find and validate reset token
-      const resetToken = await this.findValidResetToken(token);
+      const resetToken = await prisma.passwordResetToken.findFirst({
+        where: {
+          token,
+          usedAt: null, // Token hasn't been used
+          expiresAt: {
+            gt: new Date() // Token hasn't expired
+          }
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              fullName: true,
+              isActive: true,
+              isEmailVerified: true
+            }
+          }
+        }
+      });
+
       if (!resetToken) {
         return {
           success: false,
-          error: 'Invalid or expired reset token',
-          code: 'INVALID_TOKEN'
+          error: 'Reset token is invalid or expired',
+          code: 'INVALID_RESET_TOKEN',
+          details: {
+            tokenExpired: true,
+            requestNewReset: true
+          }
         };
       }
 
-      // Get user
-      const user = await prisma.user.findUnique({
-        where: { id: resetToken.userId }
-      });
-
-      if (!user || !user.isActive) {
-        // Mark token as used even if user not found (security)
-        await this.markTokenAsUsed(resetToken.id);
+      if (!resetToken.user.isActive) {
         return {
           success: false,
-          error: 'User account not found or inactive',
-          code: 'USER_NOT_FOUND'
+          error: 'User account is deactivated',
+          code: 'ACCOUNT_DEACTIVATED'
         };
       }
 
-      // Validate new password strength
+      const timeRemaining = Math.max(0, Math.floor((resetToken.expiresAt.getTime() - Date.now()) / 1000));
+
+      return {
+        success: true,
+        data: {
+          isValid: true,
+          user: resetToken.user,
+          token: resetToken,
+          timeRemaining
+        }
+      };
+
+    } catch (error) {
+      console.error('Error validating reset token:', error);
+      return {
+        success: false,
+        error: 'Failed to validate reset token',
+        code: 'TOKEN_VALIDATION_FAILED'
+      };
+    }
+  }
+
+  /**
+   * Complete password reset
+   */
+  static async resetPassword(request: ResetPasswordRequest): Promise<ServiceResponse<ResetPasswordResult>> {
+    try {
+      const { token, newPassword, confirmPassword } = request;
+
+      // Validate passwords match
+      if (newPassword !== confirmPassword) {
+        return {
+          success: false,
+          error: 'New password and confirmation do not match',
+          code: 'PASSWORD_MISMATCH',
+          details: {
+            field: 'confirmPassword'
+          }
+        };
+      }
+
+      // Validate password strength
       const passwordValidation = this.validatePasswordStrength(newPassword);
       if (!passwordValidation.isValid) {
         return {
           success: false,
-          error: 'Password does not meet security requirements',
-          code: 'WEAK_PASSWORD',
-          data: {
-            requirements: passwordValidation.requirements,
-            violations: passwordValidation.violations
+          error: 'Password does not meet strength requirements',
+          code: 'PASSWORD_TOO_WEAK',
+          details: {
+            requirements: passwordValidation.errors
+          }
+        };
+      }
+
+      // Validate reset token
+      const tokenValidation = await this.validateResetToken(token);
+      if (!tokenValidation.success || !tokenValidation.data || !tokenValidation.data.user || !tokenValidation.data.token) {
+        return {
+          success: false,
+          error: tokenValidation.error || 'Invalid reset token',
+          code: tokenValidation.code || 'INVALID_RESET_TOKEN'
+        };
+      }
+
+      const { user, token: resetToken } = tokenValidation.data;
+
+      // Check password history
+      const hasUsedPassword = await this.checkPasswordHistory(user.id, newPassword);
+      if (hasUsedPassword) {
+        return {
+          success: false,
+          error: 'Please choose a password you haven\'t used recently',
+          code: 'PASSWORD_REUSED',
+          details: {
+            historyLimit: this.PASSWORD_HISTORY_LIMIT
           }
         };
       }
 
       // Hash new password
-      const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
-      const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+      const passwordHash = await bcrypt.hash(newPassword, this.BCRYPT_ROUNDS);
 
-      // Update user password and invalidate all sessions
-      await prisma.user.update({
+      // Update user password
+      const updatedUser = await prisma.user.update({
         where: { id: user.id },
         data: {
-          password: hashedPassword,
+          password: passwordHash,
           updatedAt: new Date()
+        },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          updatedAt: true
         }
       });
 
-      // Invalidate all existing sessions for security
-      await prisma.session.updateMany({
-        where: { userId: user.id, isActive: true },
-        data: { isActive: false }
+      // Mark reset token as used
+      await prisma.passwordResetToken.update({
+        where: { id: resetToken!.id },
+        data: { usedAt: new Date() }
       });
 
-      // Mark reset token as used
-      await this.markTokenAsUsed(resetToken.id);
+      // Add password to history
+      await this.addPasswordToHistory(user.id, passwordHash);
 
-      // Clean up old reset tokens for this user
-      await this.cleanupOldResetTokens(user.id);
+      // Invalidate all user sessions (they need to log in again)
+      await SessionManagementService.invalidateAllUserSessions(user.id);
 
-      // Send password change confirmation email (TODO: Implement sendPasswordChangeConfirmation method)
-      try {
-        // For now, we'll log the successful password change
-        console.log(`Password successfully changed for user: ${user.email}`);
-        
-        // TODO: Implement sendPasswordChangeConfirmation method in EmailService
-        // const { emailService } = await import('../email.service');
-        // await emailService.sendPasswordChangeConfirmation(user.email, user.fullName);
-
-      } catch (emailError) {
-        console.error('Error sending password change confirmation:', emailError);
-        // Don't fail the operation if email fails
-      }
-
-      // Log successful password reset
-      console.log(`[SECURITY] Password reset successful for user ${user.email} from IP ${clientIP}`);
+      // Send security notification email
+      const securityEmailResult = await emailService.sendEmail({
+        to: user.email,
+        subject: 'Password Changed Successfully',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #2563eb;">Password Changed</h1>
+            <p>Hello ${user.fullName},</p>
+            <p>Your password has been successfully changed.</p>
+            <p><strong>When:</strong> ${new Date().toLocaleString()}</p>
+            <p>If you didn't make this change, please contact our support team immediately.</p>
+            <p>For your security, you'll need to log in again on all devices.</p>
+            <p>Best regards,<br>The AirVikBook Team</p>
+          </div>
+        `
+      });
 
       return {
         success: true,
         data: {
           passwordReset: true,
-          message: 'Password has been reset successfully'
-        },
-        message: 'Your password has been reset. Please log in with your new password.'
+          message: 'Password has been reset successfully',
+          user: {
+            email: updatedUser.email,
+            fullName: updatedUser.fullName,
+            passwordLastChanged: updatedUser.updatedAt.toISOString()
+          },
+          sessionActions: {
+            allSessionsInvalidated: true,
+            newLoginRequired: true
+          },
+          securityActions: {
+            passwordAddedToHistory: true,
+            securityEmailSent: securityEmailResult.success
+          }
+        }
       };
 
     } catch (error) {
       console.error('Error resetting password:', error);
       return {
         success: false,
-        error: 'Internal server error during password reset',
-        code: 'INTERNAL_ERROR'
+        error: 'Failed to reset password',
+        code: 'PASSWORD_RESET_FAILED'
       };
     }
   }
 
   /**
-   * Verify reset token validity (for UI validation)
-   */
-  static async verifyResetToken(token: string): Promise<PasswordResetResult> {
-    try {
-      const resetToken = await this.findValidResetToken(token);
-      
-      if (!resetToken) {
-        return {
-          success: false,
-          error: 'Invalid or expired reset token',
-          code: 'INVALID_TOKEN'
-        };
-      }
-
-      // Check if user still exists and is active
-      const user = await prisma.user.findUnique({
-        where: { id: resetToken.userId },
-        select: { id: true, email: true, isActive: true }
-      });
-
-      if (!user || !user.isActive) {
-        return {
-          success: false,
-          error: 'User account not found or inactive',
-          code: 'USER_NOT_FOUND'
-        };
-      }
-
-      return {
-        success: true,
-        data: {
-          tokenValid: true,
-          email: user.email
-        },
-        message: 'Reset token is valid'
-      };
-
-    } catch (error) {
-      console.error('Error verifying reset token:', error);
-      return {
-        success: false,
-        error: 'Internal server error during token verification',
-        code: 'INTERNAL_ERROR'
-      };
-    }
-  }
-
-  /**
-   * Generate cryptographically secure reset token
-   */
-  private static async generateResetToken(): Promise<string> {
-    return crypto.randomBytes(32).toString('hex');
-  }
-
-  /**
-   * Store reset token in database
-   */
-  private static async storeResetToken(
-    userId: string,
-    token: string,
-    email: string,
-    expiresAt: Date
-  ): Promise<void> {
-    // First, invalidate any existing reset tokens for this user
-    await prisma.emailVerificationToken.updateMany({
-      where: {
-        userId,
-        usedAt: null
-      },
-      data: {
-        usedAt: new Date() // Mark old tokens as used
-      }
-    });
-
-    // Create new reset token (reusing EmailVerificationToken model)
-    await prisma.emailVerificationToken.create({
-      data: {
-        userId,
-        token,
-        email,
-        expiresAt
-      }
-    });
-  }
-
-  /**
-   * Find and validate reset token
-   */
-  private static async findValidResetToken(token: string): Promise<any | null> {
-    try {
-      const resetToken = await prisma.emailVerificationToken.findUnique({
-        where: { token },
-        include: { user: true }
-      });
-
-      if (!resetToken) {
-        return null;
-      }
-
-      // Check if token is expired
-      if (resetToken.expiresAt < new Date()) {
-        return null;
-      }
-
-      // Check if token has already been used
-      if (resetToken.usedAt) {
-        return null;
-      }
-
-      return resetToken;
-
-    } catch (error) {
-      console.error('Error finding reset token:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Mark reset token as used
-   */
-  private static async markTokenAsUsed(tokenId: string): Promise<void> {
-    try {
-      await prisma.emailVerificationToken.update({
-        where: { id: tokenId },
-        data: { usedAt: new Date() }
-      });
-    } catch (error) {
-      console.error('Error marking token as used:', error);
-    }
-  }
-
-  /**
-   * Clean up old reset tokens for user
-   */
-  private static async cleanupOldResetTokens(userId: string): Promise<void> {
-    try {
-      await prisma.emailVerificationToken.deleteMany({
-        where: {
-          userId,
-          OR: [
-            { expiresAt: { lt: new Date() } },
-            { usedAt: { not: null } }
-          ]
-        }
-      });
-    } catch (error) {
-      console.error('Error cleaning up old reset tokens:', error);
-    }
-  }
-
-  /**
-   * Check rate limiting for password reset requests
-   */
-  private static async checkResetRateLimit(email: string): Promise<{
-    allowed: boolean;
-    waitTimeMinutes?: number;
-    attemptsToday?: number;
-  }> {
-    try {
-      const now = Date.now();
-      const rateLimitWindow = this.RATE_LIMIT_MINUTES * 60 * 1000;
-      const dailyWindow = 24 * 60 * 60 * 1000;
-
-      const attempts = this.resetAttempts.get(email) || [];
-      
-      // Clean old attempts
-      const validAttempts = attempts.filter(attempt => 
-        attempt.timestamp > (now - dailyWindow)
-      );
-      this.resetAttempts.set(email, validAttempts);
-
-      // Check daily limit
-      if (validAttempts.length >= this.MAX_ATTEMPTS_PER_DAY) {
-        return {
-          allowed: false,
-          attemptsToday: validAttempts.length
-        };
-      }
-
-      // Check rate limit (most recent attempt)
-      const recentAttempts = validAttempts.filter(attempt => 
-        attempt.timestamp > (now - rateLimitWindow)
-      );
-
-      if (recentAttempts.length > 0) {
-        const waitTime = Math.ceil((rateLimitWindow - (now - recentAttempts[0].timestamp)) / (60 * 1000));
-        return {
-          allowed: false,
-          waitTimeMinutes: waitTime,
-          attemptsToday: validAttempts.length
-        };
-      }
-
-      return {
-        allowed: true,
-        attemptsToday: validAttempts.length
-      };
-
-    } catch (error) {
-      console.error('Error checking reset rate limit:', error);
-      return { allowed: true }; // Allow on error
-    }
-  }
-
-  /**
-   * Update reset attempts tracking
-   */
-  private static updateResetAttempts(email: string): void {
-    const attempts = this.resetAttempts.get(email) || [];
-    attempts.unshift({ timestamp: Date.now() });
-    this.resetAttempts.set(email, attempts);
-  }
-
-  /**
-   * Log password reset attempt
-   */
-  private static async logResetAttempt(
-    email: string,
-    clientIP: string,
-    success: boolean,
-    reason?: string
-  ): Promise<void> {
-    try {
-      const logMessage = `Password reset attempt: ${email} from ${clientIP} - ${success ? 'SUCCESS' : 'FAILED'}`;
-      console.log(`[SECURITY] ${logMessage} ${reason ? `(${reason})` : ''}`);
-    } catch (error) {
-      console.error('Error logging reset attempt:', error);
-    }
-  }
-
-  /**
-   * Validate password strength
-   */
-  private static validatePasswordStrength(password: string): {
-    isValid: boolean;
-    requirements: string[];
-    violations: string[];
-  } {
-    const requirements = [
-      'At least 8 characters long',
-      'Contains at least one uppercase letter',
-      'Contains at least one lowercase letter',
-      'Contains at least one number',
-      'Contains at least one special character (!@#$%^&*)'
-    ];
-
-    const violations: string[] = [];
-
-    if (password.length < 8) {
-      violations.push('Password must be at least 8 characters long');
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      violations.push('Password must contain at least one uppercase letter');
-    }
-
-    if (!/[a-z]/.test(password)) {
-      violations.push('Password must contain at least one lowercase letter');
-    }
-
-    if (!/\d/.test(password)) {
-      violations.push('Password must contain at least one number');
-    }
-
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-      violations.push('Password must contain at least one special character');
-    }
-
-    return {
-      isValid: violations.length === 0,
-      requirements,
-      violations
-    };
-  }
-
-  /**
-   * Clean up expired reset tokens (should be run periodically)
+   * Clean up expired reset tokens
    */
   static async cleanupExpiredTokens(): Promise<{ deletedCount: number }> {
     try {
-      const result = await prisma.emailVerificationToken.deleteMany({
+      const result = await prisma.passwordResetToken.deleteMany({
         where: {
-          OR: [
-            { expiresAt: { lt: new Date() } },
-            { usedAt: { not: null } }
-          ]
+          expiresAt: {
+            lt: new Date()
+          }
         }
       });
 
-      console.log(`[SECURITY] Cleaned up ${result.count} expired/used password reset tokens`);
-      
+      console.log(`Cleaned up ${result.count} expired password reset tokens`);
       return { deletedCount: result.count };
 
     } catch (error) {
@@ -537,58 +539,56 @@ export class PasswordResetService {
   }
 
   /**
-   * Get password reset statistics
+   * Get password reset statistics (for monitoring)
    */
-  static async getResetStatistics(): Promise<{
-    pendingTokens: number;
+  static async getResetStatistics(timeframe: 'day' | 'week' | 'month' = 'day'): Promise<{
+    totalRequests: number;
+    successfulResets: number;
     expiredTokens: number;
-    usedTokens: number;
-    totalRequestsToday: number;
+    activeTokens: number;
   }> {
     try {
-      const now = new Date();
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const timeframeDays = timeframe === 'day' ? 1 : timeframe === 'week' ? 7 : 30;
+      const since = new Date(Date.now() - timeframeDays * 24 * 60 * 60 * 1000);
 
-      const pendingTokens = await prisma.emailVerificationToken.count({
-        where: {
-          expiresAt: { gt: now },
-          usedAt: null
-        }
-      });
-
-      const expiredTokens = await prisma.emailVerificationToken.count({
-        where: {
-          expiresAt: { lte: now },
-          usedAt: null
-        }
-      });
-
-      const usedTokens = await prisma.emailVerificationToken.count({
-        where: {
-          usedAt: { not: null }
-        }
-      });
-
-      const totalRequestsToday = await prisma.emailVerificationToken.count({
-        where: {
-          createdAt: { gte: todayStart }
-        }
-      });
+      const [totalRequests, successfulResets, expiredTokens, activeTokens] = await Promise.all([
+        prisma.passwordResetToken.count({
+          where: { createdAt: { gte: since } }
+        }),
+        prisma.passwordResetToken.count({
+          where: {
+            createdAt: { gte: since },
+            usedAt: { not: null }
+          }
+        }),
+        prisma.passwordResetToken.count({
+          where: {
+            expiresAt: { lt: new Date() },
+            usedAt: null
+          }
+        }),
+        prisma.passwordResetToken.count({
+          where: {
+            expiresAt: { gt: new Date() },
+            usedAt: null
+          }
+        })
+      ]);
 
       return {
-        pendingTokens,
+        totalRequests,
+        successfulResets,
         expiredTokens,
-        usedTokens,
-        totalRequestsToday
+        activeTokens
       };
 
     } catch (error) {
       console.error('Error getting reset statistics:', error);
       return {
-        pendingTokens: 0,
+        totalRequests: 0,
+        successfulResets: 0,
         expiredTokens: 0,
-        usedTokens: 0,
-        totalRequestsToday: 0
+        activeTokens: 0
       };
     }
   }

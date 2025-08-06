@@ -29,6 +29,8 @@ model User {
   // Relations (to be added as features are developed)
   emailVerificationTokens EmailVerificationToken[]
   sessions                Session[]
+  passwordResetTokens     PasswordResetToken[]
+  passwordHistory         PasswordHistory[]
   // bookings          Booking[]
   // reviews           Review[]
 
@@ -170,4 +172,35 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+// Password Reset Token Model for secure password reset functionality
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, email])
+  @@index([token, expiresAt])
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+// Password History Model for preventing password reuse
+model PasswordHistory {
+  id           String   @id @default(cuid())
+  userId       String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt])
+  @@map("password_history")
 }

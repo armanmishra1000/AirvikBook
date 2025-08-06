@@ -194,7 +194,7 @@ export class EmailService {
    * Send password reset email
    */
   async sendPasswordResetEmail(to: string, userName: string, resetToken: string): Promise<ServiceResponse<any>> {
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
     const subject = 'Reset Your AirVikBook Password';
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -277,6 +277,148 @@ export class EmailService {
     };
 
     return this.sendEmail(testEmail);
+  }
+
+  /**
+   * Send password changed notification email
+   */
+  async sendPasswordChangedEmail(to: string, userName: string, deviceInfo?: { deviceName?: string; location?: string }): Promise<ServiceResponse<any>> {
+    const subject = 'Your AirVikBook Password Was Changed';
+    const deviceName = deviceInfo?.deviceName || 'Unknown device';
+    const location = deviceInfo?.location || 'Unknown location';
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4E7638;">Password Changed Successfully</h1>
+        <p>Hello ${userName},</p>
+        <p>Your password has been successfully changed.</p>
+        
+        <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3>Change Details</h3>
+          <p><strong>When:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>Device:</strong> ${deviceName}</p>
+          <p><strong>Location:</strong> ${location}</p>
+        </div>
+        
+        <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0;">
+          <p><strong>Didn't make this change?</strong></p>
+          <p>If you didn't change your password, please contact our support team immediately.</p>
+        </div>
+        
+        <p>Best regards,<br>The AirVikBook Team</p>
+      </div>
+    `;
+
+    return this.sendEmail({ to, subject, html });
+  }
+
+  /**
+   * Send mixed authentication enabled email
+   */
+  async sendMixedAuthEnabledEmail(to: string, userName: string): Promise<ServiceResponse<any>> {
+    const subject = 'Password Set - Mixed Authentication Enabled';
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4322AA;">Password Set Successfully</h1>
+        <p>Hello ${userName},</p>
+        <p>You have successfully set a password for your account.</p>
+        
+        <div style="background: #f8f4ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3>Enhanced Security Enabled</h3>
+          <p>You can now sign in using either:</p>
+          <ul>
+            <li>Your email and password</li>
+            <li>Google sign-in</li>
+          </ul>
+          <p>This gives you more flexibility and backup options for accessing your account.</p>
+        </div>
+        
+        <p>You can manage your authentication methods anytime from your account security settings.</p>
+        
+        <p>Best regards,<br>The AirVikBook Team</p>
+      </div>
+    `;
+
+    return this.sendEmail({ to, subject, html });
+  }
+
+  /**
+   * Send Google-only account notification email
+   */
+  async sendGoogleOnlyAccountEmail(to: string, userName: string): Promise<ServiceResponse<any>> {
+    const subject = 'Password Removed - Google Sign-in Only';
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4322AA;">Password Removed</h1>
+        <p>Hello ${userName},</p>
+        <p>Your account password has been removed. Your account now uses Google sign-in only.</p>
+        
+        <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3>Sign-in Method</h3>
+          <p>You will now use Google sign-in exclusively to access your account.</p>
+          <p>For your security, you have been signed out of all devices and will need to sign in again using Google.</p>
+        </div>
+        
+        <p>You can set a new password at any time from your account security settings to enable mixed authentication again.</p>
+        
+        <p>Best regards,<br>The AirVikBook Team</p>
+      </div>
+    `;
+
+    return this.sendEmail({ to, subject, html });
+  }
+
+  /**
+   * Send security alert email for suspicious password activity
+   */
+  async sendPasswordSecurityAlert(to: string, userName: string, alertInfo: { 
+    activity: string; 
+    deviceName?: string; 
+    location?: string; 
+    timestamp?: Date;
+  }): Promise<ServiceResponse<any>> {
+    const subject = '🚨 Security Alert - Unusual Password Activity';
+    const { activity, deviceName = 'Unknown device', location = 'Unknown location', timestamp = new Date() } = alertInfo;
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #B12A2A;">🚨 Security Alert</h1>
+        <p>Hello ${userName},</p>
+        <p>We detected unusual password activity on your AirVikBook account.</p>
+        
+        <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0;">
+          <h3>Activity Details</h3>
+          <p><strong>Activity:</strong> ${activity}</p>
+          <p><strong>When:</strong> ${timestamp.toLocaleString()}</p>
+          <p><strong>Device:</strong> ${deviceName}</p>
+          <p><strong>Location:</strong> ${location}</p>
+        </div>
+        
+        <div style="background: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3>If this wasn't you:</h3>
+          <ol>
+            <li>Change your password immediately</li>
+            <li>Review your account activity</li>
+            <li>Enable two-factor authentication</li>
+            <li>Contact our support team at support@airvikbook.com</li>
+          </ol>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${process.env.FRONTEND_URL}/account/security" 
+             style="background: #B12A2A; color: white; padding: 12px 24px; 
+                    text-decoration: none; border-radius: 6px; display: inline-block;">
+            Secure My Account
+          </a>
+        </div>
+        
+        <p>Stay secure,<br>The AirVikBook Security Team</p>
+      </div>
+    `;
+
+    return this.sendEmail({ to, subject, html });
   }
 }
 

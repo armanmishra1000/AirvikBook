@@ -3,6 +3,7 @@ import { AuthController } from '../controllers/auth.controller';
 import { LoginController } from '../controllers/auth/login.controller';
 import { GoogleOAuthRedirectController } from '../controllers/auth/googleOAuthRedirect.controller';
 import { AuthMiddleware } from '../middleware/auth.middleware';
+import passwordManagementRoutes from './passwordManagement.routes';
 
 const router = Router();
 
@@ -123,27 +124,8 @@ router.post(
   LoginController.linkGoogleAccount
 );
 
-// ==================== PASSWORD RESET ROUTES ====================
-// POST /api/v1/auth/forgot-password
-router.post(
-  '/forgot-password',
-  LoginController.loginLimiter, // Reuse login rate limiter for password reset
-  AuthController.validateForgotPassword, // Will create this validator
-  AuthController.forgotPassword // Will create this controller method
-);
-
-// POST /api/v1/auth/reset-password
-router.post(
-  '/reset-password',
-  LoginController.loginLimiter,
-  AuthController.validateResetPassword, // Will create this validator
-  AuthController.resetPassword // Will create this controller method
-);
-
-// GET /api/v1/auth/verify-reset-token/:token
-router.get(
-  '/verify-reset-token/:token',
-  AuthController.verifyResetToken // Will create this controller method
-);
+// ==================== PASSWORD MANAGEMENT ====================
+// Include all password management routes (reset, change, set, remove, etc.)
+router.use('/', passwordManagementRoutes);
 
 export default router;
