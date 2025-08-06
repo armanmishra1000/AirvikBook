@@ -1,0 +1,289 @@
+import { Request, Response } from 'express';
+import { body, validationResult } from 'express-validator';
+import rateLimit from 'express-rate-limit';
+import { ResponseUtil } from '../../utils/response.utils';
+import ProfileService from '../../services/user/profile.service';
+import { ProfileData, PrivacySettings } from '../../services/user/profile.service';
+
+export class ProfileController {
+  /**
+   * Rate limiting middleware for profile updates
+   */
+  static profileUpdateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // Limit each IP to 10 profile updates per windowMs
+    message: {
+      success: false,
+      error: 'Too many profile update attempts. Please try again later.',
+      code: 'RATE_LIMIT_EXCEEDED'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  /**
+   * Rate limiting for Google account operations
+   */
+  static googleOperationLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit each IP to 5 Google operations per windowMs
+    message: {
+      success: false,
+      error: 'Too many Google account operations. Please try again later.',
+      code: 'RATE_LIMIT_EXCEEDED'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  /**
+   * Validation rules for profile updates
+   */
+  static validateProfileUpdate = [
+    body('fullName')
+      .optional()
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Full name must be between 2 and 100 characters')
+      .matches(/^[a-zA-Z\s]+$/)
+      .withMessage('Full name can only contain letters and spaces'),
+    body('mobileNumber')
+      .optional()
+      .matches(/^\+[1-9]\d{1,14}$/)
+      .withMessage('Mobile number must be in international format (+1234567890)'),
+    body('bio')
+      .optional()
+      .isLength({ max: 500 })
+      .withMessage('Bio must be less than 500 characters'),
+    body('dateOfBirth')
+      .optional()
+      .isISO8601()
+      .withMessage('Date of birth must be a valid date')
+      .custom((value) => {
+        if (value && new Date(value) >= new Date()) {
+          throw new Error('Date of birth must be in the past');
+        }
+        return true;
+      }),
+    body('gender')
+      .optional()
+      .isString()
+      .withMessage('Gender must be a string'),
+    body('nationality')
+      .optional()
+      .isString()
+      .withMessage('Nationality must be a string'),
+    body('occupation')
+      .optional()
+      .isString()
+      .withMessage('Occupation must be a string'),
+    body('website')
+      .optional()
+      .isURL()
+      .withMessage('Website must be a valid URL'),
+    body('location')
+      .optional()
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Location must be between 2 and 100 characters')
+  ];
+
+  /**
+   * Validation rules for privacy settings
+   */
+  static validatePrivacySettings = [
+    body('profileVisibility')
+      .isIn(['PUBLIC', 'PRIVATE', 'FRIENDS'])
+      .withMessage('Profile visibility must be PUBLIC, PRIVATE, or FRIENDS'),
+    body('showEmail')
+      .isBoolean()
+      .withMessage('showEmail must be a boolean value'),
+    body('showPhone')
+      .isBoolean()
+      .withMessage('showPhone must be a boolean value'),
+    body('allowGoogleSync')
+      .isBoolean()
+      .withMessage('allowGoogleSync must be a boolean value')
+  ];
+
+  /**
+   * Validation rules for Google connection
+   */
+  static validateGoogleConnection = [
+    body('googleToken')
+      .notEmpty()
+      .withMessage('Google token is required')
+  ];
+
+  /**
+   * GET /api/v1/user/profile
+   * Retrieve user profile information
+   */
+  static async getProfile(req: Request, res: Response): Promise<Response | void> {
+    try {
+      const userId = (req as any).user.id;
+
+      const result = await ProfileService.getProfile(userId);
+
+      if (!result.success) {
+        const statusCode = result.code === 'USER_NOT_FOUND' ? 404 : 500;
+        return ResponseUtil.error(
+          res,
+          result.error!,
+          result.code!,
+          statusCode
+        );
+      }
+
+      return ResponseUtil.success(res, result.data, 'Profile retrieved successfully');
+
+    } catch (error) {
+      console.error('Get profile error:', error);
+      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
+    }
+  }
+
+  /**
+   * PUT /api/v1/user/profile
+   * Update user profile information
+   */
+  static async updateProfile(req: Request, res: Response): Promise<Response | void> {
+    try {
+      // Check validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, {
+          validationErrors: errors.array()
+        });
+      }
+
+      const userId = (req as any).user.id;
+      const profileData: ProfileData = req.body;
+
+      const result = await ProfileService.updateProfile(userId, profileData);
+
+      if (!result.success) {
+        const statusCode = result.code === 'VALIDATION_ERROR' ? 400 : 500;
+        return ResponseUtil.error(
+          res,
+          result.error!,
+          result.code!,
+          statusCode,
+          result.details
+        );
+      }
+
+      return ResponseUtil.success(res, result.data, 'Profile updated successfully');
+
+    } catch (error) {
+      console.error('Update profile error:', error);
+      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
+    }
+  }
+
+  /**
+   * PUT /api/v1/user/profile/privacy
+   * Update privacy settings
+   */
+  static async updatePrivacySettings(req: Request, res: Response): Promise<Response | void> {
+    try {
+      // Check validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, {
+          validationErrors: errors.array()
+        });
+      }
+
+      const userId = (req as any).user.id;
+      const privacySettings: PrivacySettings = req.body;
+
+      const result = await ProfileService.updatePrivacySettings(userId, privacySettings);
+
+      if (!result.success) {
+        const statusCode = result.code === 'INVALID_PRIVACY_SETTING' ? 400 : 500;
+        return ResponseUtil.error(
+          res,
+          result.error!,
+          result.code!,
+          statusCode,
+          result.details
+        );
+      }
+
+      return ResponseUtil.success(res, result.data, 'Privacy settings updated successfully');
+
+    } catch (error) {
+      console.error('Update privacy settings error:', error);
+      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
+    }
+  }
+
+  /**
+   * POST /api/v1/user/profile/connect-google
+   * Connect Google account to user profile
+   */
+  static async connectGoogle(req: Request, res: Response): Promise<Response | void> {
+    try {
+      // Check validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, {
+          validationErrors: errors.array()
+        });
+      }
+
+      const userId = (req as any).user.id;
+      const { googleToken } = req.body;
+
+      const result = await ProfileService.connectGoogle(userId, googleToken);
+
+      if (!result.success) {
+        const statusCode = result.code === 'USER_NOT_FOUND' ? 404 : 
+                          result.code === 'GOOGLE_CONNECTION_ERROR' ? 400 : 500;
+        return ResponseUtil.error(
+          res,
+          result.error!,
+          result.code!,
+          statusCode
+        );
+      }
+
+      return ResponseUtil.success(res, result.data, 'Google account connected successfully');
+
+    } catch (error) {
+      console.error('Connect Google account error:', error);
+      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
+    }
+  }
+
+  /**
+   * DELETE /api/v1/user/profile/disconnect-google
+   * Disconnect Google account from user profile
+   */
+  static async disconnectGoogle(req: Request, res: Response): Promise<Response | void> {
+    try {
+      const userId = (req as any).user.id;
+
+      const result = await ProfileService.disconnectGoogle(userId);
+
+      if (!result.success) {
+        const statusCode = result.code === 'USER_NOT_FOUND' ? 404 :
+                          result.code === 'GOOGLE_NOT_CONNECTED' ? 400 :
+                          result.code === 'PASSWORD_REQUIRED' ? 400 : 500;
+        return ResponseUtil.error(
+          res,
+          result.error!,
+          result.code!,
+          statusCode
+        );
+      }
+
+      return ResponseUtil.success(res, result.data, 'Google account disconnected successfully');
+
+    } catch (error) {
+      console.error('Disconnect Google account error:', error);
+      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
+    }
+  }
+}
+
+export default ProfileController;

@@ -1,0 +1,223 @@
+{
+  "info": {
+    "name": "User Profiles API",
+    "description": "Collection for testing User Profiles feature endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Get User Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/profile",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "user", "profile"]
+        },
+        "description": "Retrieve current user's profile information"
+      },
+      "response": []
+    },
+    {
+      "name": "Update User Profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Smith\",\n  \"mobileNumber\": \"+1234567890\",\n  \"bio\": \"Software developer passionate about travel\",\n  \"dateOfBirth\": \"1990-05-15\",\n  \"gender\": \"male\",\n  \"nationality\": \"US\",\n  \"occupation\": \"Senior Software Engineer\",\n  \"website\": \"https://johnsmith.dev\",\n  \"location\": \"San Francisco, CA\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/profile",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "user", "profile"]
+        },
+        "description": "Update user profile information"
+      },
+      "response": []
+    },
+    {
+      "name": "Update Privacy Settings",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"profileVisibility\": \"PRIVATE\",\n  \"showEmail\": false,\n  \"showPhone\": true,\n  \"allowGoogleSync\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/profile/privacy",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "user", "profile", "privacy"]
+        },
+        "description": "Update profile privacy and visibility settings"
+      },
+      "response": []
+    },
+    {
+      "name": "Upload Profile Picture",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "picture",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/profile/picture",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "user", "profile", "picture"]
+        },
+        "description": "Upload and set custom profile picture"
+      },
+      "response": []
+    },
+    {
+      "name": "Sync Google Profile Picture",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/profile/picture/sync-google",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "user", "profile", "picture", "sync-google"]
+        },
+        "description": "Sync profile picture from connected Google account"
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Profile Picture",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/profile/picture",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "user", "profile", "picture"]
+        },
+        "description": "Delete current profile picture"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Profile Picture Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/profile/picture/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "user", "profile", "picture", "status"]
+        },
+        "description": "Get profile picture status and information"
+      },
+      "response": []
+    },
+    {
+      "name": "Connect Google Account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"googleToken\": \"eyJhbGciOiJSUzI1NiIs...\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/profile/connect-google",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "user", "profile", "connect-google"]
+        },
+        "description": "Connect Google account to existing user profile"
+      },
+      "response": []
+    },
+    {
+      "name": "Disconnect Google Account",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/user/profile/disconnect-google",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "user", "profile", "disconnect-google"]
+        },
+        "description": "Disconnect Google account from user profile"
+      },
+      "response": []
+    }
+  ]
+}

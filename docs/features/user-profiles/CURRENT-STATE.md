@@ -32,6 +32,7 @@ Based on project analysis:
 - ✅ Backend B1: User model extended with profile fields
 - ✅ Backend B2: Profile service layer created
 - ✅ Backend B3: File storage with security implemented
+- ✅ Backend B4: Profile controllers implemented
 - ❌ Frontend: Not started
 - ❌ Testing: Not started
 - ✅ Documentation: Created (FEATURE-ANALYSIS, INTEGRATION-POINTS, API-CONTRACT, FEATURE-SPEC, TASK-BREAKDOWN)
@@ -63,18 +64,18 @@ Based on project analysis:
 - Interactive states complete: ❌ (Not Started - will implement hover, focus, active, disabled states)
 
 ## Next Task
-**Current**: Backend B4 - Profile Controllers
-**File to create**: `backend/src/controllers/user/profile.controller.ts`, `backend/src/controllers/user/profilePicture.controller.ts`
-**Dependencies**: B3 completed - File storage with security implemented successfully
-**Estimated Time**: 45 minutes
+**Current**: Backend B5 - Route Configuration
+**File to create**: `backend/src/routes/user/profile.routes.ts`
+**Dependencies**: B4 completed - Profile controllers implemented successfully
+**Estimated Time**: 30 minutes
 
-**Specific Requirements for B4**:
-- Create profile controllers implementing exact API contract
-- Implement endpoints: GET/PUT /user/profile, POST /user/profile/picture, POST /user/profile/picture/sync-google, PUT /user/profile/privacy, POST /user/profile/connect-google, DELETE /user/profile/disconnect-google
-- Use ResponseUtil.success/error for all responses
-- Apply proper validation middleware
-- Handle all error cases from API-CONTRACT.md
-- Follow exact response format specifications
+**Specific Requirements for B5**:
+- Configure routes with complete middleware chains
+- ALL routes MUST be protected with authentication middleware
+- Implement rate limiting for all endpoints
+- Apply validation middleware for profile updates
+- Use file upload middleware for picture uploads
+- Follow exact patterns from auth.routes.ts
 
 ## Git Status
 **Branch**: feature/user-profiles (to be created)
