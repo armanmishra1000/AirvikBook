@@ -164,8 +164,8 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
 
     return {
       score: Math.min(score, 4),
-      label: PASSWORD_STRENGTH_LABELS[score as keyof typeof PASSWORD_STRENGTH_LABELS] || 'Very Weak',
-      color: PASSWORD_STRENGTH_COLORS[score as keyof typeof PASSWORD_STRENGTH_COLORS] || PASSWORD_STRENGTH_COLORS[0],
+      label: PASSWORD_STRENGTH_LABELS[Math.min(score, 4) as keyof typeof PASSWORD_STRENGTH_LABELS],
+      color: PASSWORD_STRENGTH_COLORS[Math.min(score, 4) as keyof typeof PASSWORD_STRENGTH_COLORS] || PASSWORD_STRENGTH_COLORS[0],
       requirements
     };
   };

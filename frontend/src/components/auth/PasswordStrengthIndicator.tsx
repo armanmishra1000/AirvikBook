@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { PASSWORD_STRENGTH_LABELS } from '../../types/passwordManagement.types';
 
 // =====================================================
 // PASSWORD STRENGTH INDICATOR COMPONENT
@@ -52,12 +53,12 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
   showRequirements = true,
   className = ''
 }) => {
-  // Calculate password strength
+  // Calculate password strength (consistent with PasswordInput)
   const fulfilledRequirements = PASSWORD_REQUIREMENTS.filter(req => req.test(password));
-  const strengthScore = fulfilledRequirements.length;
-  const strengthPercentage = (strengthScore / PASSWORD_REQUIREMENTS.length) * 100;
+  const strengthScore = Math.min(fulfilledRequirements.length, 4); // Cap at 4 like PasswordInput
+  const strengthPercentage = (strengthScore / 4) * 100; // Use 4 as max for percentage
 
-  // Get strength level and color
+  // Get strength level and color (consistent with PasswordInput)
   const getStrengthInfo = () => {
     if (strengthScore === 0) {
       return { level: 'No password', color: 'bg-gray-300', textColor: 'text-gray-500' };
@@ -66,7 +67,7 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
     } else if (strengthScore <= 3) {
       return { level: 'Fair', color: 'bg-warning', textColor: 'text-warning' };
     } else if (strengthScore <= 4) {
-      return { level: 'Good', color: 'bg-airvik-blue', textColor: 'text-airvik-blue' };
+      return { level: 'Strong', color: 'bg-success', textColor: 'text-success' };
     } else {
       return { level: 'Strong', color: 'bg-success', textColor: 'text-success' };
     }
