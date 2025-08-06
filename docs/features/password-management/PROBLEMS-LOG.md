@@ -19,6 +19,94 @@ This log helps AI learn from errors to prevent repeating them in future password
 
 ---
 
+## Recent Problems Resolved
+
+### Problem #1 - 2024-12-15 - F4 Password Management Pages
+**Problem**: Reset password page showing 404 error when accessed via email link
+**Error Message**: `404: page could not be found` for `/auth/reset-password?token=...`
+**Root Cause**: URL format mismatch between backend and frontend
+- Backend generates: `/auth/reset-password?token=...` (query parameter)
+- Frontend expects: `/auth/reset-password/[token]` (path parameter)
+
+**Solution Applied**:
+1. Created new page: `frontend/src/app/auth/reset-password/page.tsx` (query parameter version)
+2. Used `useSearchParams()` to get token from URL
+3. Removed conflicting `[token]` directory
+4. Updated email service to use correct URL format
+
+**Test Result**: ✅ PASSED
+**Prevention**: Always verify URL format consistency between backend email generation and frontend routing
+**Code Changes**: 
+- Created: `frontend/src/app/auth/reset-password/page.tsx`
+- Removed: `frontend/src/app/auth/reset-password/[token]/page.tsx`
+- Updated: Email service URL generation
+
+### Problem #2 - 2024-12-15 - F3 Password Strength Components
+**Problem**: Password strength showing "Very Weak" despite meeting all requirements
+**Error Message**: Visual discrepancy between strength bar ("Strong") and text label ("Very Weak")
+**Root Cause**: Type assertion issue in `PASSWORD_STRENGTH_LABELS` lookup causing fallback to "Very Weak"
+
+**Solution Applied**:
+1. Fixed type assertion in `PasswordInput.tsx`: `PASSWORD_STRENGTH_LABELS[Math.min(score, 4) as keyof typeof PASSWORD_STRENGTH_LABELS]`
+2. Updated `PasswordStrengthIndicator.tsx` to use consistent calculation logic
+3. Ensured both components use same score capping logic
+
+**Test Result**: ✅ PASSED
+**Prevention**: Always use consistent type assertions and verify label mapping works correctly
+**Code Changes**:
+- Updated: `frontend/src/components/auth/PasswordInput.tsx`
+- Updated: `frontend/src/components/auth/PasswordStrengthIndicator.tsx`
+
+### Problem #3 - 2024-12-15 - F6 State Management Integration
+**Problem**: TypeScript errors when extending AuthContext with new password management methods
+**Error Message**: `Object literal may only specify known properties, and 'changePassword' does not exist in type 'AuthContextValue'`
+**Root Cause**: Missing type definitions for new password management methods in AuthContextValue interface
+
+**Solution Applied**:
+1. Added imports for password management types in `userLogin.types.ts`
+2. Extended `AuthContextValue` interface with new methods
+3. Updated AuthContext implementation with proper error handling
+
+**Test Result**: ✅ PASSED
+**Prevention**: Always update type definitions when extending existing interfaces
+**Code Changes**:
+- Updated: `frontend/src/types/userLogin.types.ts`
+- Updated: `frontend/src/context/AuthContext.tsx`
+
+### Problem #4 - 2024-12-15 - Build Cache Issues
+**Problem**: Next.js build cache conflicts causing module loading errors
+**Error Message**: `Cannot find module './649.js'` and routing conflicts
+**Root Cause**: Cached build files out of sync with current code after routing changes
+
+**Solution Applied**:
+1. Cleared Next.js cache: `rm -rf .next`
+2. Removed duplicate routing files
+3. Rebuilt project successfully
+
+**Test Result**: ✅ PASSED
+**Prevention**: Clear build cache when making routing changes or encountering module loading issues
+**Code Changes**: 
+- Removed: Duplicate routing files
+- Cleared: Build cache
+
+### Problem #5 - 2024-12-15 - Component Duplication
+**Problem**: Created unnecessary `PasswordStrengthMeter.tsx` when `PasswordStrengthIndicator.tsx` already existed
+**Error Message**: User feedback about component duplication
+**Root Cause**: Not checking existing components before creating new ones
+
+**Solution Applied**:
+1. Deleted unnecessary `PasswordStrengthMeter.tsx`
+2. Updated types to remove associated interfaces
+3. Updated documentation to reflect reuse of existing component
+
+**Test Result**: ✅ PASSED
+**Prevention**: Always check existing components before creating new ones
+**Code Changes**:
+- Deleted: `frontend/src/components/auth/PasswordStrengthMeter.tsx`
+- Updated: `frontend/src/types/passwordManagement.types.ts`
+
+---
+
 ## Preventive Measures
 
 ### Known Error Patterns to Avoid
@@ -239,6 +327,35 @@ const handlePasswordChange = async (newPassword: string) => {
 };
 ```
 
+#### URL Routing Conflicts
+**Problem**: Duplicate routes or URL format mismatches between backend and frontend
+**Detection**: 404 errors or routing conflicts in Next.js
+**Prevention**: Always verify URL format consistency and avoid duplicate route definitions
+**Example Fix**:
+```typescript
+// ❌ WRONG: Duplicate route handling
+// /auth/reset-password/page.tsx (query params)
+// /auth/reset-password/[token]/page.tsx (path params)
+
+// ✅ CORRECT: Single route with consistent format
+// /auth/reset-password/page.tsx (handles query params)
+// Backend generates: /auth/reset-password?token=...
+```
+
+#### Component Duplication Issues
+**Problem**: Creating new components when existing ones already provide the same functionality
+**Detection**: User feedback about unnecessary components or duplicate functionality
+**Prevention**: Always check existing components before creating new ones
+**Example Fix**:
+```typescript
+// ❌ WRONG: Creating duplicate component
+// PasswordStrengthMeter.tsx (new)
+// PasswordStrengthIndicator.tsx (existing)
+
+// ✅ CORRECT: Reuse existing component
+// Use PasswordStrengthIndicator.tsx for all password strength display
+```
+
 ### Specific Password Management Risks
 
 #### Password History Implementation
@@ -266,6 +383,11 @@ const handlePasswordChange = async (newPassword: string) => {
 **Prevention**: Coordinate session invalidation with password changes
 **Test**: Verify password changes affect sessions correctly across devices
 
+#### Password Strength Display Issues
+**Risk**: Inconsistent password strength calculation between components
+**Prevention**: Use consistent calculation logic and type assertions
+**Test**: Verify all components show same strength for same password
+
 ---
 
 ## Implementation Checklist for Each Task
@@ -289,6 +411,8 @@ const handlePasswordChange = async (newPassword: string) => {
 - [ ] Handle offline scenarios gracefully
 - [ ] Update auth context state properly
 - [ ] Test with all user flows and edge cases
+- [ ] Check existing components before creating new ones
+- [ ] Verify URL format consistency between backend and frontend
 
 ### Integration Task Checklist
 - [ ] Verify email service integration works correctly
@@ -299,6 +423,8 @@ const handlePasswordChange = async (newPassword: string) => {
 - [ ] Verify security measures work as expected
 - [ ] Test account type transitions (Google-only to mixed)
 - [ ] Validate cleanup jobs for expired tokens
+- [ ] Clear build cache when making routing changes
+- [ ] Test password strength display consistency
 
 ---
 

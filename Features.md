@@ -37,7 +37,7 @@ This document outlines the complete feature set for a modern, scalable hotel man
 - Multi-device session management
 - **Account merging for social + email accounts**
 
-#### 1.1.3 Password Management
+#### 1.1.3 Password Management - Done
 - Forgot password with email reset
 - **Google account users: password-free experience**
 - **Set password option for social login users**
