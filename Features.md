@@ -14,7 +14,7 @@ This document outlines the complete feature set for a modern, scalable hotel man
 **Integration**: JWT + Database  
 **Development Readiness**: HIGH
 
-#### 1.1.1 User Registration
+#### 1.1.1 User Registration - Done
 - Guest account creation with email, password, full name, mobile number
 - **Google/Gmail social registration** (OAuth 2.0)
 - **Social account linking** with existing accounts
@@ -25,7 +25,7 @@ This document outlines the complete feature set for a modern, scalable hotel man
 - Welcome email automation
 - **Automatic profile picture from Google account**
 
-#### 1.1.2 User Login & Session Management
+#### 1.1.2 User Login & Session Management - Done
 - Email/password authentication
 - **Google/Gmail OAuth login** (one-click login)
 - **"Sign in with Google" button integration**
