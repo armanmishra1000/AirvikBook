@@ -17,8 +17,6 @@ export default function RegisterPage() {
   const [userEmail, setUserEmail] = useState('');
 
   const handleRegistrationSuccess = (user: any, tokens: any) => {
-    // Remove sensitive logging - don't log user data or tokens
-    console.log('Registration successful for user:', user.email ? `${user.email.substring(0, 2)}***@${user.email.split('@')[1]}` : 'unknown');
     setUserEmail(user.email);
     setRegistrationSuccess(true);
     
@@ -76,37 +74,6 @@ export default function RegisterPage() {
           )}
         </div>
 
-        {/* Footer Links */}
-        <div className="text-center mt-space-8">
-          <div className="space-y-space-2">
-            <p className="text-gray-600 text-body dark:text-gray-400 font-sf-pro">
-              Already have an account?{' '}
-              <a 
-                href="/auth/login" 
-                className="font-medium transition-colors text-airvik-blue hover:text-airvik-purple duration-normal"
-              >
-                Sign in here
-              </a>
-            </p>
-            
-            <p className="text-gray-500 text-caption dark:text-gray-500 font-sf-pro">
-              By signing up, you agree to our{' '}
-              <a 
-                href="/terms" 
-                className="transition-colors text-airvik-blue hover:text-airvik-purple duration-normal"
-              >
-                Terms of Service
-              </a>
-              {' '}and{' '}
-              <a 
-                href="/privacy" 
-                className="transition-colors text-airvik-blue hover:text-airvik-purple duration-normal"
-              >
-                Privacy Policy
-              </a>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

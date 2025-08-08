@@ -20,6 +20,7 @@ import { RegistrationFormData, FormErrors, isSuccessResponse } from '../../types
 import UserRegistrationService from '../../services/userRegistration.service';
 import GoogleOAuthRedirectButton from './GoogleOAuthRedirectButton';
 import PasswordStrengthIndicator from './PasswordStrengthIndicator';
+import { useToastHelpers } from '../common/Toast';
 
 interface RegistrationFormProps {
   onSuccess?: (user: any, tokens: any) => void;
@@ -49,6 +50,22 @@ export default function RegistrationForm({
   const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  // Toast helpers
+  const { showSuccess, showError } = useToastHelpers();
+
+  // Password requirements check
+  const areAllPasswordRequirementsMet = (password: string): boolean => {
+    const requirements = [
+      (pwd: string) => pwd.length >= 8,
+      (pwd: string) => /[A-Z]/.test(pwd),
+      (pwd: string) => /[a-z]/.test(pwd),
+      (pwd: string) => /\d/.test(pwd),
+      (pwd: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)
+    ];
+    return requirements.every(req => req(password));
+  };
 
   // Refs for one-time operations
   const emailCheckTimeoutRef = useRef<NodeJS.Timeout>();
@@ -198,15 +215,16 @@ export default function RegistrationForm({
       const response = await UserRegistrationService.register(registrationData);
 
       if (isSuccessResponse(response)) {
+        showSuccess('Account Created', 'Your account has been created successfully!');
         onSuccess?.(response.data.user, response.data.tokens);
       } else {
         const errorMessage = response.error || 'Registration failed. Please try again.';
-        setErrors({ general: errorMessage });
+        showError('Registration Failed', errorMessage);
         onError?.(errorMessage);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      setErrors({ general: errorMessage });
+      showError('Registration Error', errorMessage);
       onError?.(errorMessage);
     } finally {
       setIsLoading(false);
@@ -249,13 +267,7 @@ export default function RegistrationForm({
         </div>
 
         {/* Registration Form */}
-        <form onSubmit={handleSubmit} className="space-y-space-4">
-          {/* General Error */}
-          {errors.general && (
-            <div className="p-space-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-radius-md">
-              <p className="text-body text-error">{errors.general}</p>
-            </div>
-          )}
+        <form onSubmit={handleSubmit} className="space-y-space-4" noValidate>
 
           {/* Email Field */}
           <div>
@@ -268,12 +280,12 @@ export default function RegistrationForm({
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-                  transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
-                  ${errors.email 
-                    ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
-                  }`}
+                              className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+                transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
+                ${errors.email 
+                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
+                }`}
                 placeholder="your.email@example.com"
                 disabled={isLoading}
                 autoComplete="email"
@@ -309,10 +321,10 @@ export default function RegistrationForm({
               value={formData.fullName}
               onChange={(e) => handleInputChange('fullName', e.target.value)}
               className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+                transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
                 ${errors.fullName 
-                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
                 }`}
               placeholder="John Doe"
               disabled={isLoading}
@@ -333,10 +345,10 @@ export default function RegistrationForm({
               value={formData.mobileNumber}
               onChange={(e) => handleInputChange('mobileNumber', e.target.value)}
               className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+                transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
                 ${errors.mobileNumber 
-                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
                 }`}
               placeholder="+1234567890"
               disabled={isLoading}
@@ -356,11 +368,13 @@ export default function RegistrationForm({
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
+                onFocus={() => setIsPasswordFocused(true)}
+                onBlur={() => setIsPasswordFocused(false)}
                 className={`w-full px-space-4 py-space-3 pr-12 border rounded-radius-md font-sf-pro text-body
-                  transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+                  transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
                   ${errors.password 
-                    ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                    ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
                   }`}
                 placeholder="Enter a strong password"
                 disabled={isLoading}
@@ -369,18 +383,19 @@ export default function RegistrationForm({
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-space-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-normal"
+                className="absolute inset-y-0 right-0 flex items-center justify-center w-12 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-normal"
                 disabled={isLoading}
               >
                 {showPassword ? (
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                  </svg>
+                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                 <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                 <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+               </svg>
                 ) : (
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                </svg>
                 )}
               </button>
             </div>
@@ -388,7 +403,10 @@ export default function RegistrationForm({
             
             {/* Password Strength Indicator */}
             <div className="mt-space-2">
-              <PasswordStrengthIndicator password={formData.password} />
+              <PasswordStrengthIndicator 
+                password={formData.password} 
+                showRequirements={(isPasswordFocused || formData.password.length > 0) && !areAllPasswordRequirementsMet(formData.password)}
+              />
             </div>
           </div>
 
@@ -404,10 +422,10 @@ export default function RegistrationForm({
                 value={formData.confirmPassword}
                 onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                 className={`w-full px-space-4 py-space-3 pr-12 border rounded-radius-md font-sf-pro text-body
-                  transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+                  transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
                   ${errors.confirmPassword 
-                    ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                    ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
                   }`}
                 placeholder="Confirm your password"
                 disabled={isLoading}
@@ -416,18 +434,19 @@ export default function RegistrationForm({
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-space-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-normal"
+                className="absolute inset-y-0 right-0 flex items-center justify-center w-12 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-normal"
                 disabled={isLoading}
               >
                 {showConfirmPassword ? (
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                  </svg>
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                </svg>
                 ) : (
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                </svg>
                 )}
               </button>
             </div>
@@ -441,8 +460,8 @@ export default function RegistrationForm({
                 type="checkbox"
                 checked={formData.acceptedTerms}
                 onChange={(e) => handleInputChange('acceptedTerms', e.target.checked)}
-                className={`mt-1 h-4 w-4 text-airvik-blue focus:ring-airvik-blue border-gray-300 dark:border-gray-600 rounded
-                  disabled:cursor-not-allowed
+                className={`mt-1 h-4 w-4 text-airvik-blue border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-0 dark:focus:border-gray-600
+                  disabled:cursor-not-allowed appearance-none checked:bg-airvik-blue checked:border-airvik-blue
                   ${errors.acceptedTerms ? 'border-error' : ''}`}
                 disabled={isLoading}
               />
@@ -483,8 +502,8 @@ export default function RegistrationForm({
               }`}
           >
             {isLoading ? (
-              <div className="flex items-center">
-                <div className="animate-spin -ml-1 mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-radius-full" />
+              <div className="flex items-center justify-center">
+                <div className="animate-spin mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-radius-full" />
                 Creating Account...
               </div>
             ) : (
@@ -504,6 +523,27 @@ export default function RegistrationForm({
               Sign in here
             </a>
           </p>
+          
+          {/* <p className="mt-space-2 text-caption text-gray-500 dark:text-gray-500">
+            By signing up, you agree to our{' '}
+            <a
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
+            >
+              Terms of Service
+            </a>
+            {' '}and{' '}
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
+            >
+              Privacy Policy
+            </a>
+          </p> */}
         </div>
     </div>
   );

@@ -191,7 +191,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <div className={`w-full max-w-md mx-auto ${className}`}>
-      <form onSubmit={handleSubmit} className="space-y-space-4">
+      <form onSubmit={handleSubmit} className="space-y-space-4" noValidate>
         {/* Form Title */}
         <div className="text-center">
           <h2 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white">
@@ -204,20 +204,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         {/* General Error Message */}
         {errors.general && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-radius-md p-space-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-error" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-space-3">
-                <p className="text-body text-error">
-                  {errors.general}
-                </p>
-              </div>
-            </div>
-          </div>
+          <p className="text-caption text-error">{errors.general}</p>
         )}
 
         {/* Email Field */}
@@ -232,10 +219,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             value={formData.email}
             onChange={handleInputChange}
             className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-              transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+              transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
               ${errors.email 
-                ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
               }`}
             placeholder="Enter your email address"
             disabled={isSubmitting}
@@ -262,10 +249,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               value={formData.password}
               onChange={handleInputChange}
               className={`w-full px-space-4 py-space-3 pr-12 border rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+                transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
                 ${errors.password 
-                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
                 }`}
               placeholder="Enter your password"
               disabled={isSubmitting}
@@ -308,7 +295,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 name="rememberMe"
                 checked={formData.rememberMe}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-airvik-blue focus:ring-airvik-blue border-gray-300 rounded"
+                className="h-4 w-4 text-airvik-blue border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-0 focus:border-gray-300 dark:focus:border-gray-600 disabled:cursor-not-allowed appearance-none checked:bg-airvik-blue checked:border-airvik-blue"
                 disabled={isSubmitting}
               />
               <label htmlFor="rememberMe" className="ml-space-2 text-body text-gray-700 dark:text-gray-300">
@@ -372,6 +359,27 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal font-medium"
             >
               Sign up
+            </a>
+          </p>
+          
+          <p className="mt-space-2 text-caption text-gray-500 dark:text-gray-500">
+            By signing in, you agree to our{' '}
+            <a
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
+            >
+              Terms of Service
+            </a>
+            {' '}and{' '}
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
+            >
+              Privacy Policy
             </a>
           </p>
         </div>
