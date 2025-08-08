@@ -9,7 +9,8 @@ export interface ProfileData {
   fullName?: string;
   mobileNumber?: string;
   bio?: string;
-  dateOfBirth?: Date;
+  // Accept either a Date object or a date string (e.g., 'YYYY-MM-DD') from the client
+  dateOfBirth?: string | Date;
   gender?: string;
   nationality?: string;
   occupation?: string;
@@ -176,7 +177,21 @@ export class ProfileService {
         changesApplied.push('bio');
       }
       if (profileData.dateOfBirth !== undefined) {
-        updateData.dateOfBirth = profileData.dateOfBirth || null;
+        if (!profileData.dateOfBirth) {
+          updateData.dateOfBirth = null;
+        } else {
+          const dobInput = profileData.dateOfBirth;
+          const dob = typeof dobInput === 'string' ? new Date(dobInput) : dobInput;
+          if (isNaN(dob.getTime())) {
+            return {
+              success: false,
+              error: 'Validation failed',
+              code: 'VALIDATION_ERROR',
+              details: ['dateOfBirth: Invalid date format']
+            };
+          }
+          updateData.dateOfBirth = dob;
+        }
         changesApplied.push('dateOfBirth');
       }
       if (profileData.gender !== undefined) {

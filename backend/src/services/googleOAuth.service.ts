@@ -1,7 +1,6 @@
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { OAuth2Client } from 'google-auth-library';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 export interface GoogleProfile {
   googleId: string;

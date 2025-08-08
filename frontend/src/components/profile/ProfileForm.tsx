@@ -202,6 +202,11 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     e.preventDefault();
     submitAttemptedRef.current = true;
 
+    // Prevent duplicate submissions while a request is in flight
+    if (isSubmitting) {
+      return;
+    }
+
     // Create update data from form
     const updateData: ProfileUpdateRequest = {
       fullName: formData.fullName.trim(),
@@ -229,7 +234,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
     try {
 
-      const response = await UserProfileService.updateProfile(sanitizedData);
+      // Ensure dateOfBirth is sent as 'YYYY-MM-DD' (string) to align with backend parsing
+      const normalizedData = {
+        ...sanitizedData,
+        dateOfBirth: sanitizedData.dateOfBirth || undefined
+      };
+      const response = await UserProfileService.updateProfile(normalizedData);
 
       if (isSuccessResponse(response)) {
         showSuccess('Profile updated successfully');

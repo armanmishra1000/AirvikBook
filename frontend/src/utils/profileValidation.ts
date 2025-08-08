@@ -311,7 +311,7 @@ export function validateProfileData(data: ProfileUpdateRequest): ProfileValidati
   const errors: ProfileValidationErrors = {};
 
   // Validate required fields
-  const fullNameValidation = validateFullName(data.fullName);
+  const fullNameValidation = validateFullName(data.fullName ?? '');
   if (!fullNameValidation.isValid) {
     errors.fullName = fullNameValidation.error;
   }
@@ -379,7 +379,7 @@ export function validateProfileData(data: ProfileUpdateRequest): ProfileValidati
 /**
  * Validate file upload (profile picture)
  */
-export function validateProfilePictureFile(file: File): FileValidationResult {
+export async function validateProfilePictureFile(file: File): Promise<FileValidationResult> {
   const maxSize = 5 * 1024 * 1024; // 5MB
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   const maxDimension = 2000;
@@ -458,7 +458,7 @@ export function validateProfilePictureFile(file: File): FileValidationResult {
     };
 
     img.src = url;
-  }) as Promise<FileValidationResult>;
+  });
 }
 
 /**
@@ -466,7 +466,7 @@ export function validateProfilePictureFile(file: File): FileValidationResult {
  */
 export function sanitizeProfileData(data: ProfileUpdateRequest): ProfileUpdateRequest {
   return {
-    fullName: sanitizeText(data.fullName),
+    fullName: sanitizeText(data.fullName ?? ''),
     mobileNumber: data.mobileNumber ? sanitizeText(data.mobileNumber) : undefined,
     bio: data.bio ? sanitizeText(data.bio) : undefined,
     dateOfBirth: data.dateOfBirth || undefined,
