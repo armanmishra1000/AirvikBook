@@ -56,8 +56,8 @@ export class ProfileController {
       .withMessage('Bio must be less than 500 characters'),
     body('dateOfBirth')
       .optional()
-      .isISO8601()
-      .withMessage('Date of birth must be a valid date')
+      .isISO8601({ strict: false })
+      .withMessage('Date of birth must be a valid date (YYYY-MM-DD)')
       .custom((value) => {
         if (value && new Date(value) >= new Date()) {
           throw new Error('Date of birth must be in the past');

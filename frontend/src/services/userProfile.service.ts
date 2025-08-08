@@ -122,13 +122,24 @@ class ProfileApiClient {
         }
       }
 
-      // Handle network errors with retry logic
-      if (!response.ok && retryCount < this.MAX_RETRY_ATTEMPTS) {
-        await this.delay(this.RETRY_DELAY * (retryCount + 1));
-        return this.request<T>(method, endpoint, data, {
-          ...options,
-          retryCount: retryCount + 1
-        });
+      // Retry logic: only retry on transient errors (5xx or 408). Do NOT retry on 4xx (e.g., 400/401/429)
+      if (!response.ok) {
+        const status = response.status;
+
+        // Respect 429 by not retrying immediately; surface error to UI
+        if (status === 429) {
+          return responseData;
+        }
+
+        // Transient server/network errors eligible for retry
+        const isTransient = status >= 500 || status === 408;
+        if (isTransient && retryCount < this.MAX_RETRY_ATTEMPTS) {
+          await this.delay(this.RETRY_DELAY * (retryCount + 1));
+          return this.request<T>(method, endpoint, data, {
+            ...options,
+            retryCount: retryCount + 1
+          });
+        }
       }
 
       return responseData;
