@@ -202,6 +202,11 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     e.preventDefault();
     submitAttemptedRef.current = true;
 
+    // Prevent duplicate submissions while a request is in flight
+    if (isSubmitting) {
+      return;
+    }
+
     // Create update data from form
     const updateData: ProfileUpdateRequest = {
       fullName: formData.fullName.trim(),
@@ -229,7 +234,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
     try {
 
-      const response = await UserProfileService.updateProfile(sanitizedData);
+      // Ensure dateOfBirth is sent as 'YYYY-MM-DD' (string) to align with backend parsing
+      const normalizedData = {
+        ...sanitizedData,
+        dateOfBirth: sanitizedData.dateOfBirth || undefined
+      };
+      const response = await UserProfileService.updateProfile(normalizedData);
 
       if (isSuccessResponse(response)) {
         showSuccess('Profile updated successfully');
@@ -293,14 +303,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           </p>
         </div>
 
-        {/* Validation Summary */}
-        {submitAttemptedRef.current && Object.keys(validationErrors).length > 0 && (
-          <ValidationSummary 
-            errors={validationErrors as Record<string, string>}
-            title="Please fix the following errors before saving:"
-            maxErrorsToShow={3}
-          />
-        )}
+
 
         {/* Full Name */}
         <div>
@@ -314,21 +317,20 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             value={formData.fullName}
             onChange={handleInputChange}
             className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-              transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+              focus:outline-none
               ${(errors.fullName || validationErrors.fullName)
-                ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                ? 'border-error focus:outline-none focus:ring-0 focus:border-error'  
+                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
               }`}
             placeholder="Enter your full name"
             disabled={isSubmitting}
             required
           />
-          <FieldValidation 
-            fieldName="fullName"
-            error={errors.fullName || validationErrors.fullName}
-            isValidating={isValidating}
-            className="mt-space-1"
-          />
+          {(errors.fullName || validationErrors.fullName) && (
+            <p className="mt-space-1 text-caption text-error">
+              {errors.fullName || validationErrors.fullName}
+            </p>
+          )}
         </div>
 
         {/* Mobile Number */}
@@ -343,10 +345,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             value={formData.mobileNumber}
             onChange={handleInputChange}
             className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-              transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+              transition-colors duration-normal focus:outline-none
               ${errors.mobileNumber 
-                ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
+                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
               }`}
             placeholder="+1 (555) 123-4567"
             disabled={isSubmitting}
@@ -372,8 +374,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
               transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue resize-none
               ${errors.bio 
-                ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
+                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
               }`}
             placeholder="Tell us about yourself..."
             disabled={isSubmitting}
@@ -406,8 +408,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
                 transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
                 ${errors.dateOfBirth 
-                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                  ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
                 }`}
               disabled={isSubmitting}
             />
@@ -495,8 +497,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
                 transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
                 ${errors.website 
-                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                  ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
                 }`}
               placeholder="https://example.com"
               disabled={isSubmitting}

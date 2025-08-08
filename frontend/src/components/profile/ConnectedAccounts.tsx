@@ -8,6 +8,7 @@ import {
   PROFILE_ERROR_CODES
 } from '../../types/userProfile.types';
 import { UserProfileService } from '../../services/userProfile.service';
+import GoogleOAuthButton from '../auth/GoogleOAuthButton';
 
 // =====================================================
 // BRAND-COMPLIANT CONNECTED ACCOUNTS COMPONENT
@@ -31,7 +32,6 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
   const { showSuccess, showError } = useToastHelpers();
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   // =====================================================
@@ -62,45 +62,7 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
     }
   };
 
-  // =====================================================
-  // GOOGLE ACCOUNT HANDLERS
-  // =====================================================
 
-  const handleConnectGoogle = async () => {
-    // This would typically open a Google OAuth popup
-    // For now, we'll simulate the process
-    setIsConnecting(true);
-    
-    try {
-      // In a real implementation, this would:
-      // 1. Open Google OAuth popup
-      // 2. Get the authorization code
-      // 3. Exchange code for token
-      // 4. Call the connect API
-      
-      // Simulated Google token (in real app, this comes from OAuth flow)
-      const mockGoogleToken = 'mock_google_token_' + Date.now();
-      
-      const response = await UserProfileService.connectGoogle(mockGoogleToken);
-
-      if (isSuccessResponse(response)) {
-        showSuccess('Google account connected successfully');
-        onSuccess?.();
-        // Reload profile data to get updated connection status
-        await loadProfileData();
-      } else {
-        const errorMessage = UserProfileService.getErrorMessage(response.code || 'GOOGLE_CONNECTION_FAILED');
-        showError(errorMessage);
-        onError?.(errorMessage);
-      }
-    } catch (error) {
-      const errorMessage = 'Failed to connect Google account. Please try again.';
-      showError(errorMessage);
-      onError?.(errorMessage);
-    } finally {
-      setIsConnecting(false);
-    }
-  };
 
   const handleDisconnectGoogle = async () => {
     setIsDisconnecting(true);
@@ -273,38 +235,33 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
                 )}
               </button>
             ) : (
-              <button
-                onClick={handleConnectGoogle}
-                disabled={isConnecting}
+              <GoogleOAuthButton
+                onSuccess={async (user, tokens) => {
+                  try {
+                    const response = await UserProfileService.connectGoogle(tokens.accessToken);
+                    if (isSuccessResponse(response)) {
+                      showSuccess('Google account connected successfully');
+                      onSuccess?.();
+                      await loadProfileData();
+                    } else {
+                      const errorMessage = UserProfileService.getErrorMessage(response.code || 'GOOGLE_CONNECTION_FAILED');
+                      showError(errorMessage);
+                      onError?.(errorMessage);
+                    }
+                  } catch (error) {
+                    showError('Failed to connect Google account. Please try again.');
+                    onError?.('Failed to connect Google account. Please try again.');
+                  }
+                }}
+                onError={(error) => {
+                  showError(error);
+                  onError?.(error);
+                }}
+                linkToEmail={profileData?.email}
                 className="px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button
                   transition-all duration-normal hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 
-                  active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2
-                  disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {isConnecting ? (
-                  <div className="flex items-center">
-                    <svg className="animate-spin h-4 w-4 mr-space-2" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        fill="none"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Connecting...
-                  </div>
-                ) : (
-                  'Connect Google Account'
-                )}
-              </button>
+                  active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+              />
             )}
           </div>
         </div>

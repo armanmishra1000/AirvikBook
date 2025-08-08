@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   PasswordInputProps,
   PasswordValidationResult,
   PasswordStrength,
   PasswordRequirement,
   PASSWORD_STRENGTH_LABELS,
-  PASSWORD_STRENGTH_COLORS
-} from '../../types/passwordManagement.types';
+  PASSWORD_STRENGTH_COLORS,
+} from "../../types/passwordManagement.types";
+import { Eye, EyeOff } from "lucide-react";
 
 // =====================================================
 // PASSWORD INPUT COMPONENT
@@ -19,12 +20,12 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   value,
   onChange,
   onBlur,
-  placeholder = 'Enter your password',
-  label = 'Password',
+  placeholder = "Enter your password",
+  label = "Password",
   error,
   showToggle = true,
-  className = '',
-  disabled = false
+  className = "",
+  disabled = false,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -41,7 +42,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && showToggle) {
+    if (e.key === "Enter" && showToggle) {
       e.preventDefault();
       togglePasswordVisibility();
     }
@@ -63,9 +64,9 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (!password) {
       return {
         score: 0,
-        label: 'Very Weak',
+        label: "Very Weak",
         color: PASSWORD_STRENGTH_COLORS[0],
-        requirements: []
+        requirements: [],
       };
     }
 
@@ -76,17 +77,17 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (password.length >= 8) {
       score += 1;
       requirements.push({
-        type: 'length' as const,
-        label: 'At least 8 characters',
+        type: "length" as const,
+        label: "At least 8 characters",
         met: true,
-        required: true
+        required: true,
       });
     } else {
       requirements.push({
-        type: 'length' as const,
-        label: 'At least 8 characters',
+        type: "length" as const,
+        label: "At least 8 characters",
         met: false,
-        required: true
+        required: true,
       });
     }
 
@@ -94,17 +95,17 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (/[A-Z]/.test(password)) {
       score += 1;
       requirements.push({
-        type: 'uppercase' as const,
-        label: 'Contains uppercase letter',
+        type: "uppercase" as const,
+        label: "Contains uppercase letter",
         met: true,
-        required: true
+        required: true,
       });
     } else {
       requirements.push({
-        type: 'uppercase' as const,
-        label: 'Contains uppercase letter',
+        type: "uppercase" as const,
+        label: "Contains uppercase letter",
         met: false,
-        required: true
+        required: true,
       });
     }
 
@@ -112,17 +113,17 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (/[a-z]/.test(password)) {
       score += 1;
       requirements.push({
-        type: 'lowercase' as const,
-        label: 'Contains lowercase letter',
+        type: "lowercase" as const,
+        label: "Contains lowercase letter",
         met: true,
-        required: true
+        required: true,
       });
     } else {
       requirements.push({
-        type: 'lowercase' as const,
-        label: 'Contains lowercase letter',
+        type: "lowercase" as const,
+        label: "Contains lowercase letter",
         met: false,
-        required: true
+        required: true,
       });
     }
 
@@ -130,17 +131,17 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (/\d/.test(password)) {
       score += 1;
       requirements.push({
-        type: 'number' as const,
-        label: 'Contains number',
+        type: "number" as const,
+        label: "Contains number",
         met: true,
-        required: true
+        required: true,
       });
     } else {
       requirements.push({
-        type: 'number' as const,
-        label: 'Contains number',
+        type: "number" as const,
+        label: "Contains number",
         met: false,
-        required: true
+        required: true,
       });
     }
 
@@ -148,25 +149,31 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
       score += 1;
       requirements.push({
-        type: 'special' as const,
-        label: 'Contains special character',
+        type: "special" as const,
+        label: "Contains special character",
         met: true,
-        required: true
+        required: true,
       });
     } else {
       requirements.push({
-        type: 'special' as const,
-        label: 'Contains special character',
+        type: "special" as const,
+        label: "Contains special character",
         met: false,
-        required: true
+        required: true,
       });
     }
 
     return {
       score: Math.min(score, 4),
-      label: PASSWORD_STRENGTH_LABELS[Math.min(score, 4) as keyof typeof PASSWORD_STRENGTH_LABELS],
-      color: PASSWORD_STRENGTH_COLORS[Math.min(score, 4) as keyof typeof PASSWORD_STRENGTH_COLORS] || PASSWORD_STRENGTH_COLORS[0],
-      requirements
+      label:
+        PASSWORD_STRENGTH_LABELS[
+          Math.min(score, 4) as keyof typeof PASSWORD_STRENGTH_LABELS
+        ],
+      color:
+        PASSWORD_STRENGTH_COLORS[
+          Math.min(score, 4) as keyof typeof PASSWORD_STRENGTH_COLORS
+        ] || PASSWORD_STRENGTH_COLORS[0],
+      requirements,
     };
   };
 
@@ -176,7 +183,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     <div className={`w-full ${className}`}>
       {/* Label */}
       {label && (
-        <label 
+        <label
           htmlFor="password-input"
           className="block text-label font-sf-pro font-medium text-airvik-black dark:text-airvik-white mb-space-2"
         >
@@ -190,7 +197,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
         <input
           ref={inputRef}
           id="password-input"
-          type={showPassword ? 'text' : 'password'}
+          type={showPassword ? "text" : "password"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
@@ -202,23 +209,23 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
             w-full px-space-4 py-space-3 
             text-body font-sf-pro 
             bg-airvik-white dark:bg-gray-100 
-            border border-gray-300 dark:border-gray-600 
             rounded-radius-md 
             placeholder-gray-500 dark:placeholder-gray-400
             focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:border-transparent
             disabled:bg-gray-100 dark:disabled:bg-gray-200 
             disabled:text-gray-500 dark:disabled:text-gray-400
             disabled:cursor-not-allowed
-            transition-all duration-normal
-            ${error 
-              ? 'border-error focus:ring-error' 
-              : isFocused 
-                ? 'border-airvik-blue' 
-                : 'border-gray-300 dark:border-gray-600'
+
+            ${
+              error
+                ? "border-error focus:ring-error"
+                : isFocused
+                ? "border-gray-300"
+                : "border-gray-300 dark:border-gray-600"
             }
-            ${showToggle ? 'pr-12' : ''}
+            ${showToggle ? "pr-12" : ""}
           `}
-          aria-describedby={error ? 'password-error' : undefined}
+          aria-describedby={error ? "password-error" : undefined}
           aria-invalid={!!error}
         />
 
@@ -233,49 +240,26 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
               absolute right-space-3 top-1/2 transform -translate-y-1/2
               p-space-2 rounded-radius-sm
               text-gray-500 dark:text-gray-400
-              hover:text-airvik-blue dark:hover:text-airvik-blue
-              focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2
+              hover:text-gray-700 dark:hover:text-gray-200
+              focus:outline-none
               disabled:opacity-50 disabled:cursor-not-allowed
-              transition-all duration-normal
+              transition-colors duration-normal
             `}
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
-            title={showPassword ? 'Hide password' : 'Show password'}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            title={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-              </svg>
+              <Eye className="w-5 h-5" />
             ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
+              <EyeOff className="w-5 h-5" />
             )}
           </button>
-        )}
-
-        {/* Strength Indicator */}
-        {value && (
-          <div className="absolute -bottom-space-6 left-0 right-0">
-            <div className="flex items-center space-x-space-2">
-              <div 
-                className="w-2 h-2 rounded-radius-full"
-                style={{ backgroundColor: strength.color }}
-              />
-              <span 
-                className="text-caption font-sf-pro font-medium"
-                style={{ color: strength.color }}
-              >
-                {strength.label}
-              </span>
-            </div>
-          </div>
         )}
       </div>
 
       {/* Error Message */}
       {error && (
-        <div 
+        <div
           id="password-error"
           className="mt-space-2 text-caption font-sf-pro text-error"
           role="alert"
@@ -286,7 +270,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
 
       {/* Accessibility Info */}
       <div className="sr-only" aria-live="polite">
-        {value ? `Password strength: ${strength.label}` : 'No password entered'}
+        {value ? `Password strength: ${strength.label}` : "No password entered"}
       </div>
     </div>
   );

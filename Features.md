@@ -38,7 +38,7 @@ This document outlines the complete feature set for a modern, scalable hotel man
 - **Account merging for social + email accounts**
 
 #### 1.1.3 Password Management - Done
-- Forgot password with email reset
+- Forgot password with email res
 - **Google account users: password-free experience**
 - **Set password option for social login users**
 - Secure password reset tokens

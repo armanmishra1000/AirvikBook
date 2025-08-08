@@ -259,13 +259,13 @@ const ResetPasswordPage: React.FC = () => {
             <div className="space-y-space-3">
               <button
                 onClick={() => router.push('/auth/forgot-password')}
-                className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+                className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid transition-colors duration-normal focus:outline-none"
               >
                 Request New Reset Link
               </button>
               <button
                 onClick={() => router.push('/auth/login')}
-                className="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-normal focus:outline-none"
               >
                 Back to Login
               </button>
@@ -303,7 +303,7 @@ const ResetPasswordPage: React.FC = () => {
             {/* Action Button */}
             <button
               onClick={() => router.push('/auth/login')}
-              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid transition-colors duration-normal focus:outline-none"
             >
               Continue to Login
             </button>
@@ -379,7 +379,7 @@ const ResetPasswordPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-normal focus:outline-none"
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
@@ -396,7 +396,7 @@ const ResetPasswordPage: React.FC = () => {
           <div className="mt-space-6 text-center">
             <button
               onClick={() => router.push('/auth/login')}
-              className="text-body font-sf-pro text-airvik-blue hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 rounded-radius-sm"
+              className="text-body font-sf-pro text-airvik-blue hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login
             </button>

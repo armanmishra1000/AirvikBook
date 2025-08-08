@@ -1,9 +1,8 @@
-import { PrismaClient, User, Prisma } from '@prisma/client';
+import { User, Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { JwtService, TokenPair } from '../jwt.service';
 import { GoogleOAuthService } from '../googleOAuth.service';
-
-const prisma = new PrismaClient();
+import prisma from '../../lib/prisma';
 
 export interface LoginCredentials {
   email: string;
@@ -213,6 +212,7 @@ export class AuthLoginService {
 
     } catch (error) {
       console.error('Error in email authentication:', error);
+
       return {
         success: false,
         error: 'Internal server error during authentication',
