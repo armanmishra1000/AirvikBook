@@ -1,6 +1,7 @@
 // Mock dependencies first
-jest.mock('@prisma/client', () => ({
-  PrismaClient: jest.fn().mockImplementation(() => ({
+jest.mock('../lib/prisma', () => ({
+  __esModule: true,
+  default: {
     user: {
       findFirst: jest.fn(),
       findUnique: jest.fn(),
@@ -24,7 +25,7 @@ jest.mock('@prisma/client', () => ({
       updateMany: jest.fn(),
       update: jest.fn()
     }
-  }))
+  }
 }));
 jest.mock('bcrypt');
 
@@ -46,10 +47,10 @@ jest.mock('../services/auth/sessionManagement.service', () => ({
 }));
 
 import { PasswordManagementService } from '../services/auth/passwordManagement.service';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import prisma from '../lib/prisma';
 
-const mockPrisma = new PrismaClient() as jest.Mocked<PrismaClient>;
+const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
 describe('PasswordManagementService', () => {
@@ -79,7 +80,7 @@ describe('PasswordManagementService', () => {
       expect(result.data?.hasGoogleAuth).toBe(false);
       expect(result.data?.accountType).toBe('EMAIL_ONLY');
       expect(result.data?.authMethods).toEqual(['EMAIL']);
-    });
+    }  );
 
     it('should return status for Google-only account', async () => {
       const mockUser = {

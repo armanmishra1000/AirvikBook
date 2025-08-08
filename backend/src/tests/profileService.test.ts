@@ -207,7 +207,7 @@ describe('ProfilePictureService', () => {
       const result = await ProfilePictureService.validateImageFile(mockFile);
       
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('File format not supported');
+      expect(result.errors).toContain('File format not supported. Allowed formats: jpg, jpeg, png, webp');
     });
   });
 

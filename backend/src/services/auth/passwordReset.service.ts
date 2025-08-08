@@ -1,11 +1,11 @@
-import { PrismaClient, PasswordResetToken } from '@prisma/client';
+import { PasswordResetToken } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { EmailService } from '../email.service';
 import { ServiceResponse } from '../../utils/response.utils';
 import { SessionManagementService } from './sessionManagement.service';
+import prisma from '../../lib/prisma';
 
-const prisma = new PrismaClient();
 const emailService = new EmailService();
 
 export interface ForgotPasswordRequest {

@@ -848,7 +848,7 @@ className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro te
 className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
   transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
   ${(errors.fullName || validationErrors.fullName)
-    ? 'border-error' // ✅ Only red border, no text or background color change
+    ? 'border-error' // ✅ Only red border, no text color change or focus ring
     : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
   }`}
 
@@ -1236,3 +1236,478 @@ const handleSubmit = async (e: React.FormEvent) => {
 **Priority:** Medium
 **Status:** Open
 
+#### 16. Profile Edit Page - Profile Not Updating After Save Changes
+
+**Issue Description:**
+On the profile/edit page, under Profile Information, when a user updates any field and clicks the "Save Changes" button, no changes are reflected in the profile. 
+
+For example: In the Location input field under profile/edit, when a user removes the previously entered location and chooses not to enter any new location, then clicks the "Save Changes" button, the profile does not get updated — the removed location was not cleared. It should have updated the profile and removed the location value.
+
+**Location:**
+- File: `frontend/src/app/profile/edit/page.tsx`
+- Component: EditProfilePage handleSuccess function (line 67)
+- File: `frontend/src/app/profile/page.tsx`
+- Component: ProfilePage data loading and caching
+- File: `frontend/src/components/profile/ProfileForm.tsx`
+- Component: ProfileForm handleSubmit function (lines 201-250)
+
+**Root Cause:**
+The issue occurs due to a data synchronization problem between the edit page and the main profile page:
+
+1. **Successful Update**: The ProfileForm successfully submits the data to the backend, and the backend correctly updates the database (setting empty fields to `null`)
+2. **Redirect Issue**: After successful submission, the `handleSuccess` function redirects the user to `/profile` page
+3. **Cached Data**: The profile page uses cached data and doesn't automatically refresh to show the updated information
+4. **No Data Refresh**: There's no mechanism to invalidate or refresh the cached profile data after a successful update
+
+**Current Implementation:**
+```tsx
+// In EditProfilePage - handleSuccess function
+const handleSuccess = () => {
+  router.push('/profile'); // ❌ Problem: Redirects without refreshing data
+};
+
+// In ProfilePage - uses cached data without refresh mechanism
+const loadProfile = async () => {
+  // ... loads profile data but doesn't refresh after updates
+};
+```
+
+**Expected Implementation:**
+The profile page should automatically refresh its data after a successful profile update, or the edit page should pass updated data to the profile page.
+
+**Option 1: Refresh Profile Data After Redirect (Recommended)**
+```tsx
+// In EditProfilePage - handleSuccess function
+const handleSuccess = () => {
+  // Add a query parameter to indicate data should be refreshed
+  router.push('/profile?refresh=true');
+};
+
+// In ProfilePage - check for refresh parameter
+useEffect(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const shouldRefresh = urlParams.get('refresh') === 'true';
+  
+  if (shouldRefresh) {
+    // Force refresh of profile data
+    loadProfile();
+    // Clean up the URL
+    router.replace('/profile');
+  } else {
+    loadProfile();
+  }
+}, []);
+```
+
+**Option 2: Use React Context for Profile Data Management**
+```tsx
+// Create a ProfileContext to manage profile data globally
+const ProfileContext = createContext<{
+  profile: UserProfile | null;
+  refreshProfile: () => Promise<void>;
+}>({
+  profile: null,
+  refreshProfile: async () => {}
+});
+
+// In EditProfilePage - refresh profile data before redirect
+const handleSuccess = async () => {
+  // Refresh profile data in context
+  await refreshProfile();
+  router.push('/profile');
+};
+```
+
+**Option 3: Use SWR or React Query for Automatic Cache Invalidation**
+```tsx
+// Use SWR for automatic cache management
+const { data: profile, mutate } = useSWR('/api/user/profile', fetcher);
+
+// In EditProfilePage - invalidate cache after update
+const handleSuccess = async () => {
+  // Invalidate and refetch profile data
+  await mutate();
+  router.push('/profile');
+};
+```
+
+**Detailed Changes Required:**
+
+1. **EditProfilePage Changes:**
+   - Modify `handleSuccess` function to trigger data refresh
+   - Add mechanism to pass refresh signal to profile page
+   - Ensure profile data is updated before redirect
+
+2. **ProfilePage Changes:**
+   - Add logic to detect when data should be refreshed
+   - Implement automatic data refresh mechanism
+   - Handle URL parameters for refresh signals
+
+3. **Data Synchronization:**
+   - Implement proper cache invalidation
+   - Ensure consistent data across pages
+   - Add loading states during data refresh
+
+**Impact:**
+- Poor user experience when saved changes don't appear
+- Confusion about whether the save operation was successful
+- Users may think the application is broken or not working
+- Inconsistent data display across different pages
+- Reduced trust in the application's data persistence
+- Potential support requests about "lost" updates
+- Users may attempt to save the same data multiple times
+
+**Priority:** High
+**Status:** Open
+
+#### 17. Profile Connections Page - Google OAuth Connection Not Working
+
+**Issue Description:**
+When users go to profile/connections under Connected Accounts and click on "Connect Google Account", it should allow them to log in using Google. If the user does not want to log in using email or password and directly clicks on Connect Google Account, they should be able to log in via their Gmail account using Google authentication.
+
+Currently, the "Connect Google Account" button uses a mock implementation that doesn't actually implement Google OAuth authentication.
+
+**Location:**
+- File: `frontend/src/components/profile/ConnectedAccounts.tsx`
+- Component: ConnectedAccounts handleConnectGoogle function (lines 67-95)
+- File: `frontend/src/components/auth/GoogleOAuthButton.tsx`
+- Component: GoogleOAuthButton (complete implementation)
+
+**Root Cause:**
+The `ConnectedAccounts` component has a mock implementation for Google OAuth that doesn't actually implement real Google authentication:
+
+1. **Mock Implementation**: The `handleConnectGoogle` function uses a mock token instead of real Google OAuth
+2. **Missing OAuth Flow**: No actual Google OAuth popup or authentication flow is implemented
+3. **Existing Component**: There's already a proper `GoogleOAuthButton` component with real Google OAuth implementation that's not being used
+
+**Current Implementation:**
+```tsx
+// In ConnectedAccounts.tsx - Mock implementation
+const handleConnectGoogle = async () => {
+  // This would typically open a Google OAuth popup
+  // For now, we'll simulate the process
+  setIsConnecting(true);
+  
+  try {
+    // In a real implementation, this would:
+    // 1. Open Google OAuth popup
+    // 2. Get the authorization code
+    // 3. Exchange code for token
+    // 4. Call the connect API
+    
+    // ❌ Problem: Using mock token instead of real OAuth
+    const mockGoogleToken = 'mock_google_token_' + Date.now();
+    
+    const response = await UserProfileService.connectGoogle(mockGoogleToken);
+    // ... rest of the function
+  } catch (error) {
+    // ... error handling
+  }
+};
+```
+
+**Expected Implementation:**
+The "Connect Google Account" button should use the existing `GoogleOAuthButton` component or implement proper Google OAuth flow.
+
+**Option 1: Use Existing GoogleOAuthButton Component (Recommended)**
+```tsx
+// In ConnectedAccounts.tsx - Replace button with GoogleOAuthButton
+import GoogleOAuthButton from '../auth/GoogleOAuthButton';
+
+// Replace the existing button with:
+<GoogleOAuthButton
+  onSuccess={async (user, tokens) => {
+    try {
+      const response = await UserProfileService.connectGoogle(tokens.accessToken);
+      if (isSuccessResponse(response)) {
+        showSuccess('Google account connected successfully');
+        onSuccess?.();
+        await loadProfileData();
+      } else {
+        const errorMessage = UserProfileService.getErrorMessage(response.code || 'GOOGLE_CONNECTION_FAILED');
+        showError(errorMessage);
+        onError?.(errorMessage);
+      }
+    } catch (error) {
+      showError('Failed to connect Google account. Please try again.');
+      onError?.('Failed to connect Google account. Please try again.');
+    }
+  }}
+  onError={(error) => {
+    showError(error);
+    onError?.(error);
+  }}
+  linkToEmail={profileData?.email} // For account linking
+  className="px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button
+    transition-all duration-normal hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 
+    active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+/>
+```
+
+**Option 2: Implement Custom Google OAuth Flow**
+```tsx
+// In ConnectedAccounts.tsx - Implement real OAuth flow
+const handleConnectGoogle = async () => {
+  setIsConnecting(true);
+  
+  try {
+    // Check if Google client ID is configured
+    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!googleClientId || googleClientId === 'your-google-client-id') {
+      throw new Error('Google OAuth is not configured');
+    }
+
+    // Initialize Google OAuth client
+    window.google.accounts.id.initialize({
+      client_id: googleClientId,
+      callback: async (response: any) => {
+        try {
+          const googleToken = response.credential;
+          const authResponse = await UserProfileService.connectGoogle(googleToken);
+          
+          if (isSuccessResponse(authResponse)) {
+            showSuccess('Google account connected successfully');
+            onSuccess?.();
+            await loadProfileData();
+          } else {
+            const errorMessage = UserProfileService.getErrorMessage(authResponse.code || 'GOOGLE_CONNECTION_FAILED');
+            showError(errorMessage);
+            onError?.(errorMessage);
+          }
+        } catch (error) {
+          showError('Failed to connect Google account. Please try again.');
+          onError?.('Failed to connect Google account. Please try again.');
+        } finally {
+          setIsConnecting(false);
+        }
+      },
+      auto_select: false,
+      cancel_on_tap_outside: true,
+    });
+
+    // Show Google sign-in prompt
+    window.google.accounts.id.prompt((notification: any) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        setIsConnecting(false);
+        showError('Google sign-in prompt could not be displayed. Please try again.');
+      }
+    });
+  } catch (error) {
+    setIsConnecting(false);
+    showError('Failed to initialize Google authentication. Please try again.');
+    onError?.('Failed to initialize Google authentication. Please try again.');
+  }
+};
+```
+
+**Detailed Changes Required:**
+
+1. **Replace Mock Implementation:**
+   - Remove the mock Google token generation
+   - Implement real Google OAuth flow
+   - Use the existing `GoogleOAuthButton` component or implement custom OAuth
+
+2. **Environment Configuration:**
+   - Ensure `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is properly configured
+   - Add Google OAuth script loading if not using existing component
+
+3. **Error Handling:**
+   - Handle OAuth initialization failures
+   - Handle user cancellation of OAuth flow
+   - Provide clear error messages for different failure scenarios
+
+4. **User Experience:**
+   - Show proper loading states during OAuth flow
+   - Handle OAuth popup blocking scenarios
+   - Provide fallback options if OAuth fails
+
+**Impact:**
+- Users cannot actually connect their Google accounts
+- The feature appears to work but doesn't function properly
+- Poor user experience with misleading functionality
+- Users may think the application is broken
+- Reduced trust in the application's capabilities
+- Potential support requests about non-working features
+
+**Priority:** High
+**Status:** Open
+
+#### 18. Forgot Password Page - Unwanted Focus Ring and Red Text Color on Error State
+
+**Issue Description:**
+When the user clicks on the Send Reset Link button on the forgot-password page without filling the Email Address input field, a red border is shown on the input field — which is correct. However, when an error exists, a ring appears on focus or click, which should not happen. Also, when there is an error, the text color turns red, which should not happen either.
+
+**Location:**
+- File: `frontend/src/app/auth/forgot-password/page.tsx`
+- Component: Email input field (lines 195-205)
+
+**Root Cause:**
+The email input field has focus ring styling (`focus:ring-2 focus:ring-airvik-blue`) that appears even when there's an error, and the error state includes red text color (`text-error`) which should not be applied to input text.
+
+**Current Implementation:**
+```tsx
+className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+  transition-colors duration-normal focus:outline-none
+  ${errors.email 
+    ? 'border-error' // ❌ Red text and focus ring
+    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+  }`}
+```
+
+**Expected Implementation:**
+```tsx
+className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+  transition-colors duration-normal focus:outline-none
+  ${errors.email 
+    ? 'border-error' // ✅ Only red border, no text color change or focus ring
+    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+  }`}
+```
+
+**Impact:**
+- Poor user experience with unwanted focus rings during error states
+- Inconsistent visual feedback with red text color
+- Confusion about input field state and validation
+- Reduced accessibility and visual clarity
+- Non-compliance with design system guidelines for error states
+
+**Priority:** Medium
+**Status:** Complete
+
+#### 19. Forgot Password Page - Focus Ring Appears on Error State When Field is Focused
+
+**Issue Description:**
+When the Email Address input field already has an error (meaning a red border and an error message are shown below the field), if the field is clicked or focused while the error is present, the `focus:ring-airvik-blue` should not be shown on the input field.
+
+**Location:**
+- File: `frontend/src/app/auth/forgot-password/page.tsx`
+- Component: Email input field (lines 195-205)
+
+**Root Cause:**
+The current implementation applies `focus:ring-2 focus:ring-airvik-blue` in the non-error state, but when the field is focused while in an error state, the focus ring still appears because the focus styles are not properly conditional.
+
+**Current Implementation:**
+```tsx
+className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+  transition-colors duration-normal focus:outline-none
+  ${errors.email 
+    ? 'border-error' 
+    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:ring-2 focus:ring-airvik-blue'
+  }`}
+```
+
+**Expected Implementation:**
+```tsx
+className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+  transition-colors duration-normal focus:outline-none
+  ${errors.email 
+    ? 'border-error focus:ring-0' // ✅ Explicitly disable focus ring in error state
+    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:ring-2 focus:ring-airvik-blue'
+  }`}
+```
+
+**Impact:**
+- Poor user experience with conflicting visual feedback (red border + blue focus ring)
+- Confusion about field state and validation status
+- Inconsistent focus behavior during error states
+- Reduced visual clarity and accessibility
+- Non-compliance with design system guidelines for error states
+
+**Priority:** Medium
+**Status:** Complete
+
+#### 20. Profile Page - Loading State Not Centered on Screen
+
+**Issue Description:**
+On the /profile page, the loading state currently appears at the top of the page. However, it should be centered both vertically and horizontally on the screen, to provide a better user experience during loading.
+
+**Location:**
+- File: `frontend/src/app/profile/page.tsx`
+- Component: Loading state section (lines 50-60)
+
+**Root Cause:**
+The current loading state implementation shows the header first, then the loading indicator below it, which positions the loading state at the top of the page instead of centering it on the entire screen.
+
+**Current Implementation:**
+```tsx
+{isLoading && (
+  <div className="mt-space-8">
+    <div className="flex items-center justify-center">
+      <div className="animate-spin h-8 w-8 border-2 border-airvik-blue border-t-transparent rounded-radius-full mr-space-3" />
+      <span className="text-body font-sf-pro text-gray-600 dark:text-gray-400">
+        Loading your profile...
+      </span>
+    </div>
+  </div>
+)}
+```
+
+**Expected Implementation:**
+```tsx
+{isLoading && (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="flex items-center justify-center">
+      <div className="animate-spin h-8 w-8 border-2 border-airvik-blue border-t-transparent rounded-radius-full mr-space-3" />
+      <span className="text-body font-sf-pro text-gray-600 dark:text-gray-400">
+        Loading your profile...
+      </span>
+    </div>
+  </div>
+)}
+```
+
+**Fix Required:**
+- Add `min-h-[60vh]` to create vertical space for centering
+- Keep `flex items-center justify-center` for proper centering
+- Remove the `mt-space-8` class that pushes content to the top
+
+**Priority:** Medium
+**Status:** Complete
+
+#### 21. Profile Edit Page - Loading State Not Centered on Screen
+
+**Issue Description:**
+When refreshing the /profile/edit page, the loading state currently appears at the top of the screen. However, it should appear centered on the screen—both vertically and horizontally.
+
+**Location:**
+- File: `frontend/src/app/profile/edit/page.tsx`
+- Component: Loading state section
+
+**Root Cause:**
+The current loading state implementation shows the header first, then the loading indicator below it, which positions the loading state at the top of the page instead of centering it on the entire screen.
+
+**Current Implementation:**
+```tsx
+{isLoading && (
+  <div className="mt-space-8">
+    <div className="flex items-center justify-center">
+      <div className="animate-spin h-8 w-8 border-2 border-airvik-blue border-t-transparent rounded-radius-full mr-space-3" />
+      <span className="text-body font-sf-pro text-gray-600 dark:text-gray-400">
+        Loading your profile...
+      </span>
+    </div>
+  </div>
+)}
+```
+
+**Expected Implementation:**
+```tsx
+{isLoading && (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="flex items-center justify-center">
+      <div className="animate-spin h-8 w-8 border-2 border-airvik-blue border-t-transparent rounded-radius-full mr-space-3" />
+      <span className="text-body font-sf-pro text-gray-600 dark:text-gray-400">
+        Loading your profile...
+      </span>
+    </div>
+  </div>
+)}
+```
+
+**Fix Required:**
+- Add `min-h-[60vh]` to create vertical space for centering
+- Keep `flex items-center justify-center` for proper centering
+- Remove the `mt-space-8` class that pushes content to the top
+
+**Priority:** Medium
+**Status:** Open

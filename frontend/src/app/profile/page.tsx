@@ -35,7 +35,17 @@ export default function ProfilePage() {
     }
 
     if (isAuthenticated) {
-      loadProfile();
+      const urlParams = new URLSearchParams(window.location.search);
+      const shouldRefresh = urlParams.get('refresh') === 'true';
+      
+      if (shouldRefresh) {
+        // Force refresh of profile data
+        loadProfile();
+        // Clean up the URL
+        router.replace('/profile');
+      } else {
+        loadProfile();
+      }
     }
   }, [authState.isLoading, isAuthenticated, router]);
 
@@ -82,31 +92,27 @@ export default function ProfilePage() {
 
   if (authState.isLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-airvik-white dark:bg-airvik-midnight">
-        <div className="container mx-auto px-space-4 py-space-8">
-          <div className="flex items-center justify-center py-space-12">
-            <div className="text-center">
-              <svg className="animate-spin h-8 w-8 mx-auto mb-space-4 text-airvik-blue" viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="none"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              <p className="text-body text-airvik-black dark:text-airvik-white font-sf-pro">
-                Loading your profile...
-              </p>
-            </div>
-          </div>
+      <div className="min-h-screen bg-airvik-white dark:bg-airvik-midnight flex items-center justify-center">
+        <div className="text-center">
+          <svg className="animate-spin h-8 w-8 mx-auto mb-space-4 text-airvik-blue" viewBox="0 0 24 24">
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <p className="text-body text-airvik-black dark:text-airvik-white font-sf-pro">
+            Loading your profile...
+          </p>
         </div>
       </div>
     );

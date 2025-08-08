@@ -1,10 +1,9 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { ServiceResponse } from '../../utils/response.utils';
 import { SessionManagementService } from './sessionManagement.service';
 import { EmailService } from '../email.service';
+import prisma from '../../lib/prisma';
 
-const prisma = new PrismaClient();
 const emailService = new EmailService();
 
 export interface ChangePasswordRequest {

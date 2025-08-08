@@ -1,8 +1,7 @@
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { EmailVerificationTokenService } from './emailVerificationToken.service';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 export interface UserRegistrationData {
   email: string;

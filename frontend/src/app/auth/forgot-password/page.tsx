@@ -192,7 +192,7 @@ const ForgotPasswordPage: React.FC = () => {
 
         {/* Form Card */}
         <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-lg p-space-8">
-          <form onSubmit={handleSubmit} className="space-y-space-6">
+          <form onSubmit={handleSubmit} className="space-y-space-6" noValidate>
             {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-label font-sf-pro font-medium text-airvik-black dark:text-airvik-white mb-space-2">
@@ -205,15 +205,15 @@ const ForgotPasswordPage: React.FC = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="Enter your email address"
-                className={`w-full px-space-4 py-space-3 text-body font-sf-pro bg-airvik-white dark:bg-gray-700 border rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:border-transparent transition-all duration-normal ${
-                  errors.email 
-                    ? 'border-error focus:ring-error' 
-                    : 'border-gray-300 dark:border-gray-600'
-                }`}
+                className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+                  ${errors.email 
+                    ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
+                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue transition-colors duration-normal'
+                  }`}
                 disabled={isSubmitting}
               />
               {errors.email && (
-                <p className="mt-space-2 text-caption font-sf-pro text-error">
+                <p className="mt-space-1 text-caption text-error">
                   {errors.email}
                 </p>
               )}
@@ -232,7 +232,7 @@ const ForgotPasswordPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-normal focus:outline-none"
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
@@ -249,7 +249,7 @@ const ForgotPasswordPage: React.FC = () => {
           <div className="mt-space-6 text-center">
             <button
               onClick={() => router.push('/auth/login')}
-              className="text-body font-sf-pro text-airvik-blue hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 rounded-radius-sm"
+              className="text-body font-sf-pro text-airvik-blue hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login
             </button>
