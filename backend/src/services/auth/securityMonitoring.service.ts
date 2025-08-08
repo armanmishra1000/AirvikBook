@@ -242,12 +242,18 @@ export class SecurityMonitoringService {
         // const { emailService } = await import('../email.service');
         
         // TODO: Implement sendSecurityAlert method in EmailService
-        console.log('Security alert triggered for:', user.email, {
+        // Sanitize email for logging
+        const maskEmail = (email: string) => {
+          const [local, domain] = email.split('@');
+          return `${local.substring(0, 2)}***@${domain}`;
+        };
+
+        console.log('Security alert triggered for:', maskEmail(user.email), {
           alertType: 'New Device Login',
           deviceName: deviceInfo.deviceName,
           location: this.getLocationFromIP(ipAddress) || 'Unknown Location',
           timestamp: new Date().toISOString(),
-          ipAddress
+          ipAddress: ipAddress.substring(0, 8) + '***' // Mask IP for privacy
         });
         
         /*
@@ -373,7 +379,12 @@ export class SecurityMonitoringService {
           // const { emailService } = await import('../email.service');
           
           // TODO: Implement sendSecurityAlert method in EmailService
-          console.log('Account lockout alert for:', user.email, {
+          const maskEmail = (email: string) => {
+            const [local, domain] = email.split('@');
+            return `${local.substring(0, 2)}***@${domain}`;
+          };
+
+          console.log('Account lockout alert for:', maskEmail(user.email), {
             alertType: 'Account Lockout',
             deviceName: 'Multiple devices',
             location: this.getLocationFromIP(ipAddress) || 'Unknown Location',

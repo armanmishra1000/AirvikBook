@@ -7,7 +7,12 @@ const nextConfig = {
     NEXT_PUBLIC_API_PREFIX: process.env.NEXT_PUBLIC_API_PREFIX || '/api/v1',
   },
   images: {
-    domains: ['localhost', 'lh3.googleusercontent.com'], // For Google profile pictures
+    domains: [
+      'localhost',
+      'lh3.googleusercontent.com',
+      // Allow S3 bucket domain to render profile pictures
+      'airvikbook-uploads-web.s3.eu-north-1.amazonaws.com',
+    ],
   },
   // Font optimization - removed as it's not a valid option in Next.js 14
   async rewrites() {

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import { ResponseUtil } from '../../utils/response.utils';
 import ProfilePictureService from '../../services/user/profilePicture.service';
-import FileStorageService from '../../services/storage/fileStorage.service';
+import StorageFactoryService from '../../services/storage/storageFactory.service';
 import ProfileService from '../../services/user/profile.service';
 
 export class ProfilePictureController {
@@ -43,20 +43,52 @@ export class ProfilePictureController {
   static async uploadPicture(req: Request, res: Response): Promise<Response | void> {
     try {
       const userId = (req as any).user.userId;
-      const file = req.file;
+      const file = req.file as Express.Multer.File | undefined;
 
       if (!file) {
         return ResponseUtil.error(res, 'No file uploaded', 'NO_FILE_UPLOADED', 400);
       }
 
-      // Use FileStorageService for secure upload
-      const result = await FileStorageService.uploadProfilePicture(file, userId);
+      // Upload to S3 via storage factory (S3-only under the hood)
+      const result = await StorageFactoryService.uploadProfilePicture(file as any, userId);
 
       if (!result.success) {
-        const statusCode = result.code === 'INVALID_IMAGE' ? 400 : 500;
+        let statusCode = 500;
+        let errorMessage = result.error!;
+        
+        // Handle specific error codes
+        switch (result.code) {
+          case 'INVALID_IMAGE':
+            statusCode = 400;
+            break;
+          case 'S3_NOT_CONFIGURED':
+            statusCode = 500;
+            errorMessage = 'File storage is not properly configured. Please contact support.';
+            break;
+          case 'S3_ACCESS_DENIED':
+            statusCode = 500;
+            errorMessage = 'Unable to upload file due to storage permissions. Please try again later or contact support.';
+            break;
+          case 'S3_BUCKET_NOT_FOUND':
+            statusCode = 500;
+            errorMessage = 'File storage is not available. Please try again later.';
+            break;
+          case 'S3_INVALID_CREDENTIALS':
+            statusCode = 500;
+            errorMessage = 'File storage authentication failed. Please try again later.';
+            break;
+          case 'S3_UPLOAD_ERROR':
+            statusCode = 500;
+            errorMessage = 'File upload failed. Please try again later.';
+            break;
+          default:
+            statusCode = 500;
+            errorMessage = 'An unexpected error occurred. Please try again later.';
+        }
+
         return ResponseUtil.error(
           res,
-          result.error!,
+          errorMessage,
           result.code!,
           statusCode,
           result.details
@@ -64,11 +96,11 @@ export class ProfilePictureController {
       }
 
       return ResponseUtil.success(res, {
-        profilePicture: result.data!.url,
-        profilePictureSource: 'UPLOAD',
+        profilePicture: (result.data as any).url,
+        profilePictureSource: 'S3',
         uploadedAt: new Date(),
-        fileSize: result.data!.fileSize,
-        dimensions: result.data!.dimensions
+        fileSize: (result.data as any).fileSize,
+        dimensions: (result.data as any).dimensions
       }, 'Profile picture uploaded successfully');
 
     } catch (error) {
@@ -171,13 +203,14 @@ export class ProfilePictureController {
         lastUpdated: profile.lastUpdated
       };
 
-      // If picture exists and is uploaded, get file info
-      if (profile.profilePicture && profile.profilePictureSource === 'UPLOAD') {
-        const fileInfo = await FileStorageService.getFileInfo(profile.profilePicture);
-        if (fileInfo) {
-          pictureInfo.fileSize = fileInfo.size;
-          pictureInfo.created = fileInfo.created;
-          pictureInfo.modified = fileInfo.modified;
+      // If picture exists and is stored remotely, get metadata from S3
+      if (profile.profilePicture && (profile.profilePictureSource === 'S3' || profile.profilePictureSource === 'UPLOAD')) {
+        const metadata = await StorageFactoryService.getFileMetadata(profile.profilePicture);
+        if (metadata) {
+          pictureInfo.fileSize = metadata.size;
+          pictureInfo.created = metadata.lastModified;
+          pictureInfo.modified = metadata.lastModified;
+          pictureInfo.contentType = metadata.contentType;
         }
       }
 

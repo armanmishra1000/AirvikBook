@@ -23,7 +23,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^2.30.0",
     "lucide-react": "^0.536.0",
-    "next": "14.0.3",
+    "next": "^14.2.31",
     "next-auth": "^4.24.5",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",

@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ServiceResponse } from '../../utils/response.utils';
-import * as fs from 'fs';
-import * as path from 'path';
+import StorageFactoryService from '../storage/storageFactory.service';
 
 // Type definition for Multer file
 interface MulterFile {
@@ -54,23 +53,11 @@ export interface ImageInfo {
 }
 
 export class ProfilePictureService {
-  private static readonly UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'profiles');
   private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
   private static readonly ALLOWED_FORMATS = ['jpg', 'jpeg', 'png', 'webp'];
-  private static readonly MIN_DIMENSIONS = { width: 100, height: 100 };
-  private static readonly MAX_DIMENSIONS = { width: 2000, height: 2000 };
 
   /**
-   * Initialize upload directory
-   */
-  private static ensureUploadDirectory(): void {
-    if (!fs.existsSync(this.UPLOAD_DIR)) {
-      fs.mkdirSync(this.UPLOAD_DIR, { recursive: true });
-    }
-  }
-
-  /**
-   * Upload profile picture
+   * Upload profile picture to S3
    */
   static async uploadPicture(file: MulterFile, userId: string): Promise<ServiceResponse<UploadResult>> {
     try {
@@ -85,41 +72,33 @@ export class ProfilePictureService {
         };
       }
 
-      // Ensure upload directory exists
-      this.ensureUploadDirectory();
+      // Upload via storage factory (S3 only under the hood)
+      const upload = await StorageFactoryService.uploadProfilePicture(file as any, userId);
+      if (!upload.success || !upload.data) {
+        return {
+          success: false,
+          error: upload.error || 'Upload failed',
+          code: upload.code || 'UPLOAD_FAILED'
+        };
+      }
 
-      // Generate unique filename
-      const timestamp = Date.now();
-      const extension = path.extname(file.originalname).toLowerCase();
-      const filename = `${userId}_${timestamp}${extension}`;
-      const filePath = path.join(this.UPLOAD_DIR, filename);
-
-      // Clean up old uploaded picture
-      await this.cleanupOldUploadedPicture(userId);
-
-      // Save file
-      fs.writeFileSync(filePath, file.buffer);
-
-      // Get image dimensions
-      const dimensions = validation.dimensions!;
-
-      // Update user profile
-      const updatedUser = await prisma.user.update({
+      // Update user profile with S3 URL
+      await prisma.user.update({
         where: { id: userId },
         data: {
-          profilePicture: `/uploads/profiles/${filename}`,
-          profilePictureSource: 'UPLOAD'
+          profilePicture: (upload.data as any).url,
+          profilePictureSource: 'S3'
         }
       });
 
       return {
         success: true,
         data: {
-          profilePicture: updatedUser.profilePicture!,
-          profilePictureSource: updatedUser.profilePictureSource!,
+          profilePicture: (upload.data as any).url,
+          profilePictureSource: 'S3',
           uploadedAt: new Date(),
-          fileSize: file.size,
-          dimensions
+          fileSize: (upload.data as any).fileSize,
+          dimensions: (upload.data as any).dimensions
         }
       };
     } catch (error) {
@@ -133,7 +112,7 @@ export class ProfilePictureService {
   }
 
   /**
-   * Sync profile picture from Google
+   * Sync profile picture from Google (unchanged)
    */
   static async syncFromGoogle(userId: string): Promise<ServiceResponse<SyncResult>> {
     try {
@@ -143,231 +122,95 @@ export class ProfilePictureService {
       });
 
       if (!user) {
-        return {
-          success: false,
-          error: 'User not found',
-          code: 'USER_NOT_FOUND'
-        };
+        return { success: false, error: 'User not found', code: 'USER_NOT_FOUND' };
       }
 
       if (!user.googleId) {
-        return {
-          success: false,
-          error: 'No Google account connected',
-          code: 'GOOGLE_NOT_CONNECTED'
-        };
+        return { success: false, error: 'No Google account connected', code: 'GOOGLE_NOT_CONNECTED' };
       }
 
       if (!user.allowGoogleSync) {
-        return {
-          success: false,
-          error: 'Google sync is disabled',
-          code: 'GOOGLE_SYNC_DISABLED'
-        };
+        return { success: false, error: 'Google sync is disabled', code: 'GOOGLE_SYNC_DISABLED' };
       }
 
-      // Get Google profile data (this would typically come from a stored token or re-authentication)
-      // For now, we'll use the existing profile picture if it's from Google
       if (!user.profilePicture || user.profilePictureSource !== 'GOOGLE') {
-        return {
-          success: false,
-          error: 'No Google profile picture available',
-          code: 'NO_GOOGLE_PICTURE'
-        };
+        return { success: false, error: 'No Google profile picture available', code: 'NO_GOOGLE_PICTURE' };
       }
 
-      // Clean up old uploaded picture
-      await this.cleanupOldUploadedPicture(userId);
-
-      // Update user profile
-      const updatedUser = await prisma.user.update({
+      await prisma.user.update({
         where: { id: userId },
-        data: {
-          profilePictureSource: 'GOOGLE'
-        }
+        data: { profilePictureSource: 'GOOGLE' }
       });
 
       return {
         success: true,
         data: {
-          profilePicture: updatedUser.profilePicture!,
-          profilePictureSource: updatedUser.profilePictureSource!,
+          profilePicture: user.profilePicture,
+          profilePictureSource: 'GOOGLE',
           syncedAt: new Date(),
-          googlePictureUrl: updatedUser.profilePicture!
+          googlePictureUrl: user.profilePicture
         }
       };
     } catch (error) {
       console.error('Error syncing Google profile picture:', error);
-      return {
-        success: false,
-        error: 'Internal server error',
-        code: 'INTERNAL_ERROR'
-      };
+      return { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' };
     }
   }
 
   /**
-   * Delete profile picture
+   * Delete profile picture (supports S3)
    */
   static async deletePicture(userId: string): Promise<ServiceResponse<{ deleted: boolean }>> {
     try {
-      // Get user to check current picture
-      const user = await prisma.user.findUnique({
-        where: { id: userId }
-      });
-
+      const user = await prisma.user.findUnique({ where: { id: userId } });
       if (!user) {
-        return {
-          success: false,
-          error: 'User not found',
-          code: 'USER_NOT_FOUND'
-        };
+        return { success: false, error: 'User not found', code: 'USER_NOT_FOUND' };
       }
-
       if (!user.profilePicture) {
-        return {
-          success: false,
-          error: 'No profile picture to delete',
-          code: 'NO_PICTURE'
-        };
+        return { success: false, error: 'No profile picture to delete', code: 'NO_PICTURE' };
       }
 
-      // Delete uploaded file if it exists
-      if (user.profilePictureSource === 'UPLOAD') {
-        const filePath = path.join(process.cwd(), 'public', user.profilePicture);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
+      if (user.profilePictureSource === 'S3') {
+        await StorageFactoryService.deleteFile(user.profilePicture);
       }
 
-      // Update user profile
       await prisma.user.update({
         where: { id: userId },
-        data: {
-          profilePicture: null,
-          profilePictureSource: 'DEFAULT'
-        }
+        data: { profilePicture: null, profilePictureSource: 'DEFAULT' }
       });
 
-      return {
-        success: true,
-        data: { deleted: true }
-      };
+      return { success: true, data: { deleted: true } };
     } catch (error) {
       console.error('Error deleting profile picture:', error);
-      return {
-        success: false,
-        error: 'Internal server error',
-        code: 'INTERNAL_ERROR'
-      };
+      return { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' };
     }
   }
 
   /**
-   * Validate image file
+   * Basic image validation (kept minimal)
    */
   static async validateImageFile(file: MulterFile): Promise<ValidationResult> {
     const errors: string[] = [];
 
-    // Check file size
     if (file.size > this.MAX_FILE_SIZE) {
       errors.push(`File size exceeds maximum limit of ${this.MAX_FILE_SIZE / (1024 * 1024)}MB`);
     }
 
-    // Check file format
-    const extension = path.extname(file.originalname).toLowerCase().substring(1);
-    if (!this.ALLOWED_FORMATS.includes(extension)) {
+    const extension = file.originalname.split('.').pop()?.toLowerCase();
+    if (!extension || !this.ALLOWED_FORMATS.includes(extension)) {
       errors.push(`File format not supported. Allowed formats: ${this.ALLOWED_FORMATS.join(', ')}`);
     }
 
-    // Check file content type
-    const allowedMimeTypes = [
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/webp'
-    ];
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedMimeTypes.includes(file.mimetype)) {
       errors.push('Invalid file content type');
     }
 
-    // Basic dimension check (this is a simplified version)
-    // In production, you'd want to use a library like sharp or jimp to get actual dimensions
-    let dimensions: { width: number; height: number } | undefined;
+    // Placeholder dimensions
+    const dimensions = { width: 400, height: 400 };
 
-    try {
-      // For now, we'll assume the image is valid if it passes other checks
-      // In a real implementation, you'd extract actual dimensions
-      dimensions = { width: 400, height: 400 }; // Placeholder
-    } catch (error) {
-      errors.push('Unable to read image dimensions');
-    }
-
-    if (dimensions) {
-      if (dimensions.width < this.MIN_DIMENSIONS.width || dimensions.height < this.MIN_DIMENSIONS.height) {
-        errors.push(`Image dimensions too small. Minimum: ${this.MIN_DIMENSIONS.width}x${this.MIN_DIMENSIONS.height}`);
-      }
-      if (dimensions.width > this.MAX_DIMENSIONS.width || dimensions.height > this.MAX_DIMENSIONS.height) {
-        errors.push(`Image dimensions too large. Maximum: ${this.MAX_DIMENSIONS.width}x${this.MAX_DIMENSIONS.height}`);
-      }
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-      dimensions
-    };
+    return { isValid: errors.length === 0, errors, dimensions };
   }
-
-  /**
-   * Clean up old uploaded picture
-   */
-  private static async cleanupOldUploadedPicture(userId: string): Promise<void> {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { profilePicture: true, profilePictureSource: true }
-      });
-
-      if (user && user.profilePicture && user.profilePictureSource === 'UPLOAD') {
-        const filePath = path.join(process.cwd(), 'public', user.profilePicture);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-      }
-    } catch (error) {
-      console.error('Error cleaning up old profile picture:', error);
-    }
-  }
-
-  /**
-   * Get image information
-   */
-  static async getImageInfo(file: MulterFile): Promise<ImageInfo | null> {
-    try {
-      // This is a simplified version
-      // In production, you'd use a library like sharp or jimp to get actual image info
-      return {
-        width: 400, // Placeholder
-        height: 400, // Placeholder
-        size: file.size,
-        format: path.extname(file.originalname).toLowerCase().substring(1)
-      };
-    } catch (error) {
-      console.error('Error getting image info:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Optimize image (placeholder for future implementation)
-   */
-  static async optimizeImage(buffer: Buffer): Promise<Buffer> {
-    // This is a placeholder for image optimization
-    // In production, you'd use a library like sharp to resize and optimize images
-    return buffer;
-  }
-
 }
 
 export default ProfilePictureService;

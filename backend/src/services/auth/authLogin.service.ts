@@ -449,7 +449,14 @@ export class AuthLoginService {
     try {
       // In a production system, this would log to a security audit table
       // For now, we'll just log to console and implement full logging in security service
-      console.log(`Login attempt: ${_email} from ${_ipAddress} - ${_success ? 'SUCCESS' : 'FAILED'} ${_failureReason || ''}`);
+      
+      // Mask email for security
+      const maskEmail = (email: string) => {
+        const [local, domain] = email.split('@');
+        return `${local.substring(0, 2)}***@${domain}`;
+      };
+      
+      console.log(`Login attempt: ${maskEmail(_email)} from ${_ipAddress} - ${_success ? 'SUCCESS' : 'FAILED'} ${_failureReason || ''}`);
     } catch (error) {
       console.error('Error logging login attempt:', error);
     }

@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import Redis from 'ioredis';
 
 const prisma = new PrismaClient();
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 export interface TokenPayload {
   userId: string;
@@ -25,7 +27,7 @@ export interface TokenValidationResult {
 
 export class JwtService {
   private static readonly ACCESS_TOKEN_EXPIRY = '15m'; // 15 minutes
-  private static readonly REFRESH_TOKEN_EXPIRY = '7d'; // 7 days
+  private static readonly REFRESH_TOKEN_EXPIRY = '1d'; // 1 day (reduced from 7d for security)
   private static readonly ISSUER = 'airvikbook';
   private static readonly AUDIENCE = 'airvikbook-users';
 
@@ -412,6 +414,182 @@ export class JwtService {
       isValid: errors.length === 0,
       errors
     };
+  }
+
+  /**
+   * Blacklist a token until it expires
+   */
+  static async blacklistToken(token: string, userId: string): Promise<boolean> {
+    try {
+      const decoded = jwt.decode(token) as any;
+      if (!decoded || !decoded.exp) {
+        return false;
+      }
+
+      const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+      if (ttl <= 0) {
+        return true; // Token already expired
+      }
+
+      // Store in Redis with TTL
+      await redis.setex(`blacklist:${token}`, ttl, userId);
+      
+      // Log blacklisting event for audit (using existing audit service)
+      console.log(`Token blacklisted for user ${userId}, expires in ${ttl} seconds`);
+
+      return true;
+    } catch (error) {
+      console.error('Error blacklisting token:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Check if token is blacklisted
+   */
+  static async isTokenBlacklisted(token: string): Promise<boolean> {
+    try {
+      const blacklisted = await redis.exists(`blacklist:${token}`);
+      return blacklisted === 1;
+    } catch (error) {
+      console.error('Error checking token blacklist:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Rotate tokens (generate new access token with refresh token)
+   */
+  static async rotateTokens(refreshToken: string): Promise<{
+    success: boolean;
+    accessToken?: string;
+    newRefreshToken?: string;
+    error?: string;
+  }> {
+    try {
+      // Validate refresh token
+      const validation = this.validateRefreshToken(refreshToken);
+      if (!validation.isValid) {
+        return {
+          success: false,
+          error: validation.error,
+        };
+      }
+
+      // Check if refresh token is blacklisted
+      if (await this.isTokenBlacklisted(refreshToken)) {
+        return {
+          success: false,
+          error: 'Refresh token has been revoked',
+        };
+      }
+
+      const userId = validation.payload!.userId;
+
+      // Generate new token pair
+      const newAccessToken = this.generateAccessToken({
+        userId: validation.payload!.userId,
+        email: validation.payload!.email,
+        role: validation.payload!.role,
+      });
+
+      const newRefreshToken = this.generateRefreshToken({
+        userId: validation.payload!.userId,
+        email: validation.payload!.email,
+        role: validation.payload!.role,
+      });
+
+      // Blacklist old refresh token
+      await this.blacklistToken(refreshToken, userId);
+
+      // Store new refresh token
+      await this.storeRefreshToken(userId, newRefreshToken);
+
+      return {
+        success: true,
+        accessToken: newAccessToken,
+        newRefreshToken: newRefreshToken,
+      };
+    } catch (error) {
+      console.error('Error rotating tokens:', error);
+      return {
+        success: false,
+        error: 'Token rotation failed',
+      };
+    }
+  }
+
+  /**
+   * Enhanced token validation with blacklist check
+   */
+  static async validateAccessTokenWithBlacklist(token: string): Promise<TokenValidationResult> {
+    // First check if token is blacklisted
+    if (await this.isTokenBlacklisted(token)) {
+      return {
+        isValid: false,
+        error: 'Token has been revoked',
+        code: 'TOKEN_REVOKED',
+      };
+    }
+
+    // Then validate normally
+    return this.validateAccessToken(token);
+  }
+
+  /**
+   * Enhanced refresh token validation with blacklist check
+   */
+  static async validateRefreshTokenWithBlacklist(token: string): Promise<TokenValidationResult> {
+    // First check if token is blacklisted
+    if (await this.isTokenBlacklisted(token)) {
+      return {
+        isValid: false,
+        error: 'Refresh token has been revoked',
+        code: 'TOKEN_REVOKED',
+      };
+    }
+
+    // Then validate normally
+    return this.validateRefreshToken(token);
+  }
+
+  /**
+   * Logout user by blacklisting all their tokens
+   */
+  static async logoutUser(userId: string): Promise<boolean> {
+    try {
+      // Get all active sessions for the user
+      const sessions = await prisma.session.findMany({
+        where: {
+          userId,
+          isActive: true,
+          expiresAt: {
+            gt: new Date()
+          }
+        }
+      });
+
+      // Blacklist all refresh tokens
+      for (const session of sessions) {
+        await this.blacklistToken(session.refreshToken, userId);
+      }
+
+      // Deactivate all sessions
+      await prisma.session.updateMany({
+        where: {
+          userId,
+          isActive: true
+        },
+        data: {
+          isActive: false
+        }
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error logging out user:', error);
+      return false;
+    }
   }
 }
 

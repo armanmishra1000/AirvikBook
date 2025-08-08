@@ -3,6 +3,12 @@ import { OAuth2Client } from 'google-auth-library';
 import { JwtService } from '../../services/jwt.service';
 import { EmailService } from '../../services/email.service';
 
+// Helper function to mask email addresses for security
+const maskEmail = (email: string) => {
+  const [local, domain] = email.split('@');
+  return `${local.substring(0, 2)}***@${domain}`;
+};
+
 export class GoogleOAuthRedirectController {
   private static oAuth2Client: OAuth2Client;
 
@@ -138,7 +144,7 @@ export class GoogleOAuthRedirectController {
               result.user.email,
               result.user.fullName
             );
-            console.log(`📧 Welcome email sent to ${result.user.email}`);
+            console.log(`📧 Welcome email sent to ${maskEmail(result.user.email)}`);
           } catch (emailError) {
             console.error('Failed to send welcome email:', emailError);
             // Don't fail the authentication for email issues
@@ -269,7 +275,7 @@ export class GoogleOAuthRedirectController {
           }
         });
         isNewUser = true;
-        console.log(`✅ New user created via Google OAuth: ${user.email}`);
+        console.log(`✅ New user created via Google OAuth: ${maskEmail(user.email)}`);
       } else {
         // Update existing user with Google ID if missing
         if (!user.googleId) {
@@ -290,7 +296,7 @@ export class GoogleOAuthRedirectController {
             data: { lastLoginAt: new Date() }
           });
         }
-        console.log(`✅ Existing user authenticated via Google OAuth: ${user.email}`);
+        console.log(`✅ Existing user authenticated via Google OAuth: ${maskEmail(user.email)}`);
       }
 
       return {
