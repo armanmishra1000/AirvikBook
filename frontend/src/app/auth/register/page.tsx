@@ -17,7 +17,6 @@ export default function RegisterPage() {
   const [userEmail, setUserEmail] = useState('');
 
   const handleRegistrationSuccess = (user: any, tokens: any) => {
-    console.log('Registration successful:', { user, tokens });
     setUserEmail(user.email);
     setRegistrationSuccess(true);
     
@@ -75,37 +74,7 @@ export default function RegisterPage() {
           )}
         </div>
 
-        {/* Footer Links */}
-        <div className="mt-space-8 text-center">
-          <div className="space-y-space-2">
-            <p className="text-body text-gray-600 dark:text-gray-400 font-sf-pro">
-              Already have an account?{' '}
-              <a 
-                href="/auth/login" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal font-medium"
-              >
-                Sign in here
-              </a>
-            </p>
-            
-            <p className="text-caption text-gray-500 dark:text-gray-500 font-sf-pro">
-              By signing up, you agree to our{' '}
-              <a 
-                href="/terms" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal"
-              >
-                Terms of Service
-              </a>
-              {' '}and{' '}
-              <a 
-                href="/privacy" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal"
-              >
-                Privacy Policy
-              </a>
-            </p>
-          </div>
-        </div>
+
       </div>
     </div>
   );

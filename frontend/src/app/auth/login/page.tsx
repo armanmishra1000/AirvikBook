@@ -96,37 +96,7 @@ const LoginPage: React.FC = () => {
           </GoogleOAuthRedirectButton>
         </div>
 
-        {/* Footer Links */}
-        <div className="mt-space-8 text-center">
-          <div className="space-y-space-2">
-            <p className="text-body text-gray-600 dark:text-gray-400 font-sf-pro">
-              Don't have an account?{' '}
-              <a 
-                href="/auth/register" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal font-medium"
-              >
-                Sign up for free
-              </a>
-            </p>
-            
-            <p className="text-caption text-gray-500 dark:text-gray-500 font-sf-pro">
-              By signing in, you agree to our{' '}
-              <a 
-                href="/terms" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal"
-              >
-                Terms of Service
-              </a>
-              {' '}and{' '}
-              <a 
-                href="/privacy" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal"
-              >
-                Privacy Policy
-              </a>
-            </p>
-          </div>
-        </div>
+
       </div>
     </div>
   );

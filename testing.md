@@ -181,3 +181,11 @@ This document contains visual testing documentation for the Hotel Management Sys
 **Issue**: In the text "By signing in, you agree to our Terms of Service", clicking on "Terms of Service" currently opens a 404 Page Not Found error. In the same line, clicking on "Privacy Policy" also results in a 404 Page Not Found error. This indicates that the routes for these links are either missing or incorrectly configured.
 
 **Expected Behavior**: Clicking "Terms of Service" should navigate to the Terms of Service page. Clicking "Privacy Policy" should navigate to the Privacy Policy page. Both links must be connected to their respective valid routes so that the correct content is displayed.
+
+5. Login Form Validation Error Message Styling Inconsistency
+
+**Location**: `AirvikBook/frontend/src/components/auth/LoginForm.tsx` (validation error rendering around lines 180-200)
+
+**Issue**: When the login form is submitted without filling required fields, validation error messages are displayed in an inconsistent style. Currently, error messages appear in orange speech bubble-like boxes with rounded corners, featuring a circular orange icon containing a white exclamation mark, followed by the error text. This styling is inconsistent with the registration form's error message format and creates visual inconsistency across the authentication system.
+
+**Expected Behavior**: Login form validation error messages should match the registration form's error message styling. Error messages should appear as simple red text directly below the corresponding input field, accompanied by a red border around the input field itself. The error messages should not use speech bubble containers, icons, or colored backgrounds, but should maintain the clean, inline red text format consistent with the registration form validation errors.
