@@ -66,10 +66,10 @@ export default function GoogleOAuthRedirectButton({
       `}
       type="button"
     >
-      <FcGoogle className="w-5 h-5 mr-space-3" />
+      <FcGoogle className="w-7 h-7 mr-space-3" />
       {children || (
         <>
-          {type === 'register' ? 'Sign up' : 'Sign in'} with Google
+          {type === 'register' ? 'SIGN UP' : 'SIGN IN'} WITH GOOGLE
         </>
       )}
     </button>

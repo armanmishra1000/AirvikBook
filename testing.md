@@ -60,7 +60,8 @@ This document contains visual testing documentation for the Hotel Management Sys
 
 - **Action Required**: Remove the password tips message box entirely from the registration form. The password strength indicator and password requirements list should remain, but the additional tip message should be eliminated to maintain a cleaner, less cluttered user interface.
 
-### Password Requirements Visibility Behavior Issue
+### 
+
 
 **File Location**: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx`
 
@@ -167,9 +168,43 @@ This document contains visual testing documentation for the Hotel Management Sys
 
 - **Action Required**: Remove the hover transition styling from the Create Account button by removing transition-related CSS classes or properties that cause the hover animation effect.
 
+### Google OAuth Button Text and Icon Styling Issues
+
+**File Location**: `AirvikBook/frontend/src/components/auth/GoogleOAuthRedirectButton.tsx`
+
+**Issue Description**: Google OAuth Button Text Not Capitalized and Icon Size Too Small
+
+- **Current State**: The Google OAuth buttons on both login and register pages display text that is not fully capitalized (e.g., "Sign up with Google" instead of "SIGN UP WITH GOOGLE"). Additionally, the Google icon size is too small and not properly proportioned to the button text.
+
+- **Expected State**: The Google OAuth button text should be fully capitalized (e.g., "SIGN UP WITH GOOGLE", "SIGN IN WITH GOOGLE") to match the design system. The Google icon should be larger and properly sized relative to the button text for better visual balance and readability.
+
+- **Action Required**: Update the GoogleOAuthRedirectButton component to use uppercase text styling and increase the Google icon size from the current small size to a more appropriate size that matches the button design.
+
+### Password Matching Validation Issue
+
+**File Location**: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx`
+
+**Issue Description**: Password Matching Error Persists After Fields Match
+
+- **Current State**: When a user enters a value only in the Confirm Password field (without entering anything in the Password field), the "Passwords do not match" error is displayed. However, after the user enters a matching password in the Password field, the error message remains visible even though the passwords now match.
+
+- **Expected State**: The "Passwords do not match" error should disappear immediately when the Password and Confirm Password fields contain matching values. The error should only be visible when the passwords actually do not match, and should clear as soon as they become matching.
+
+- **Action Required**: Fix the password matching validation logic to properly clear the error when passwords match. The validation should be triggered on both password field changes and should immediately remove the error when the passwords are identical.
+
+### Password Strength Indicator Visibility Issue
+
+**File Location**: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx`
+
+**Issue Description**: Password Strength Indicator Remains Visible After Requirements Are Met
+
+- **Current State**: When the user starts typing in the Password field, both the "Password Requirements" section and "Password Strength" indicator are displayed. Once all password requirements are fulfilled, the "Password Requirements" section correctly hides, but the "Password Strength" indicator remains visible even though the password is now valid.
+
+- **Expected State**: Both the "Password Requirements" section and the "Password Strength" indicator should hide together when all password requirements are fulfilled and the password is valid. The user should see a clean password field without any additional indicators once the password meets all criteria.
+
+- **Action Required**: Modify the password strength indicator visibility logic to hide the strength indicator when all password requirements are met, ensuring both the requirements and strength sections disappear together for a cleaner user experience.
+
 *Additional testing content will be added as provided.*
-
-
 
  
 ## Login Page Testing
@@ -231,6 +266,14 @@ This document contains visual testing documentation for the Hotel Management Sys
 **Issue**: The "Sign In" button displays a hover transition effect when users hover over it. This transition creates unwanted visual feedback that is not consistent with the design system.
 
 **Expected Behavior**: The "Sign In" button should not display any hover transition effects. The button should maintain a static appearance without any transition animations when hovered, maintaining consistency with the overall design.
+
+8. Google OAuth Button Text and Icon Styling Issues
+
+**Location**: `AirvikBook/frontend/src/components/auth/GoogleOAuthRedirectButton.tsx`
+
+**Issue**: The Google OAuth button text is not fully capitalized (e.g., "Sign in with Google" instead of "SIGN IN WITH GOOGLE") and the Google icon size is too small, not properly proportioned to the button text.
+
+**Expected Behavior**: The Google OAuth button text should be fully capitalized (e.g., "SIGN IN WITH GOOGLE") to match the design system. The Google icon should be larger and properly sized relative to the button text for better visual balance and readability.
 
 ## Email Verification Page Testing
 
