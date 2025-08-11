@@ -15,6 +15,14 @@ const LoginPage: React.FC = () => {
   const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
   const { authState } = useAuth();
+  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+
+  // Track initial loading completion
+  useEffect(() => {
+    if (!authState.isLoading) {
+      setIsInitialLoad(false);
+    }
+  }, [authState.isLoading]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -34,8 +42,8 @@ const LoginPage: React.FC = () => {
     // Error is already handled in the LoginForm component
   };
 
-  // Don't render anything while checking authentication
-  if (authState.isLoading) {
+  // Don't render anything while checking authentication (but not during login submission)
+  if (isInitialLoad && authState.isLoading) {
     return (
       <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex items-center justify-center">
         <div className="text-center">

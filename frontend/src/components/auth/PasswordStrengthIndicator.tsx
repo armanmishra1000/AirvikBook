@@ -74,6 +74,7 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
   };
 
   const strengthInfo = getStrengthInfo();
+  const allRequirementsMet = password && fulfilledRequirements.length === PASSWORD_REQUIREMENTS.length;
 
   if (!password && !showRequirements) {
     return null;
@@ -103,8 +104,8 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
         </div>
       )}
 
-      {/* Requirements List */}
-      {showRequirements && (
+      {/* Requirements List - Only show if not all requirements are met */}
+      {showRequirements && !allRequirementsMet && (
         <div className="space-y-space-2">
           <p className="text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-3">
             Password Requirements:

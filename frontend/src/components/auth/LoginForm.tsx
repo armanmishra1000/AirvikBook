@@ -1,17 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState, useRef } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { useToastHelpers } from '../common/Toast';
+import React, { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/AuthContext";
+import { useToastHelpers } from "../common/Toast";
 import {
   LoginFormData,
   LoginFormErrors,
   LoginRequest,
   isSuccessResponse,
-  LOGIN_ERROR_CODES
-} from '../../types/userLogin.types';
-import { UserLoginService } from '../../services/userLogin.service';
-import { Eye, EyeOff } from 'lucide-react';
+  LOGIN_ERROR_CODES,
+} from "../../types/userLogin.types";
+import { UserLoginService } from "../../services/userLogin.service";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 // =====================================================
 // BRAND-COMPLIANT LOGIN FORM COMPONENT
@@ -30,16 +31,17 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({
   onSuccess,
   onError,
-  className = '',
+  className = "",
   showRememberMe = true,
-  showForgotPassword = true
+  showForgotPassword = true,
 }) => {
+  const router = useRouter();
   const { login, authState } = useAuth();
   const { showSuccess, showError } = useToastHelpers();
   const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
@@ -50,16 +52,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   // FORM VALIDATION
   // =====================================================
 
-  const validateField = (name: keyof LoginFormData, value: any): string | undefined => {
+  const validateField = (
+    name: keyof LoginFormData,
+    value: any
+  ): string | undefined => {
     switch (name) {
-      case 'email':
-        if (!value) return 'Email is required';
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Please enter a valid email address';
+      case "email":
+        if (!value) return "Email is required";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+          return "Please enter a valid email address";
         return undefined;
 
-      case 'password':
-        if (!value) return 'Password is required';
-        if (value.length < 8) return 'Password must be at least 8 characters long';
+      case "password":
+        if (!value) return "Password is required";
+        if (value.length < 8)
+          return "Password must be at least 8 characters long";
         return undefined;
 
       default:
@@ -69,13 +76,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   const validateForm = (): boolean => {
     const newErrors: LoginFormErrors = {};
-    
+
     // Validate email
-    const emailError = validateField('email', formData.email);
+    const emailError = validateField("email", formData.email);
     if (emailError) newErrors.email = emailError;
 
     // Validate password
-    const passwordError = validateField('password', formData.password);
+    const passwordError = validateField("password", formData.password);
     if (passwordError) newErrors.password = passwordError;
 
     setErrors(newErrors);
@@ -88,27 +95,27 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    const newValue = type === 'checkbox' ? checked : value;
-    
-    setFormData(prev => ({
+    const newValue = type === "checkbox" ? checked : value;
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: newValue
+      [name]: newValue,
     }));
 
     // Clear field error on change if submit has been attempted
     if (submitAttemptedRef.current && errors[name as keyof LoginFormErrors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: undefined
+        [name]: undefined,
       }));
     }
 
     // Real-time validation for better UX (only after first submit attempt)
-    if (submitAttemptedRef.current && name !== 'rememberMe') {
+    if (submitAttemptedRef.current && name !== "rememberMe") {
       const fieldError = validateField(name as keyof LoginFormData, newValue);
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: fieldError
+        [name]: fieldError,
       }));
     }
   };
@@ -123,7 +130,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     }
 
     setIsSubmitting(true);
-    setErrors(prev => ({ ...prev, general: undefined }));
+    setErrors((prev) => ({ ...prev, general: undefined }));
 
     try {
       // Get device info for security tracking
@@ -133,49 +140,58 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
         rememberMe: formData.rememberMe,
-        deviceInfo
+        deviceInfo,
       };
 
       const result = await login(loginRequest);
 
       if (isSuccessResponse(result)) {
         // Show success toast
-        showSuccess('Welcome back!', `Successfully signed in as ${result.data.user.fullName}`);
-        
+        showSuccess(
+          "Welcome back!",
+          `Successfully signed in as ${result.data.user.fullName}`
+        );
+
         // Success callback
         onSuccess?.();
       } else {
         // Handle specific error cases
-        let errorMessage = result.error || 'Login failed. Please try again.';
-        
+        let errorMessage = result.error || "Login failed. Please try again.";
+
         switch (result.code) {
           case LOGIN_ERROR_CODES.INVALID_CREDENTIALS:
-            errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+            errorMessage =
+              "Invalid email or password. Please check your credentials and try again.";
             break;
           case LOGIN_ERROR_CODES.EMAIL_NOT_VERIFIED:
-            errorMessage = 'Please verify your email address before logging in.';
+            errorMessage =
+              "Please verify your email address before logging in.";
             break;
           case LOGIN_ERROR_CODES.ACCOUNT_DISABLED:
-            errorMessage = 'Your account has been disabled. Please contact support.';
+            errorMessage =
+              "Your account has been disabled. Please contact support.";
             break;
           case LOGIN_ERROR_CODES.ACCOUNT_LOCKED:
-            errorMessage = 'Your account has been temporarily locked due to multiple failed login attempts. Please try again later.';
+            errorMessage =
+              "Your account has been temporarily locked due to multiple failed login attempts. Please try again later.";
             break;
           case LOGIN_ERROR_CODES.RATE_LIMIT_EXCEEDED:
-            errorMessage = 'Too many login attempts. Please wait a few minutes before trying again.';
+            errorMessage =
+              "Too many login attempts. Please wait a few minutes before trying again.";
             break;
           default:
             break;
         }
 
-        setErrors(prev => ({ ...prev, general: errorMessage }));
-        showError('Login failed', errorMessage);
+        setErrors((prev) => ({ ...prev, general: errorMessage }));
+        showError("Login failed", errorMessage);
         onError?.(errorMessage);
       }
     } catch (error) {
-      const errorMessage = 'Network error. Please check your connection and try again.';
-      setErrors(prev => ({ ...prev, general: errorMessage }));
-      showError('Connection error', errorMessage);
+      const errorMessage =
+        "Network error. Please check your connection and try again.";
+      setErrors((prev) => ({ ...prev, general: errorMessage }));
+      showError("Connection error", errorMessage);
       onError?.(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -183,7 +199,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(prev => !prev);
+    setShowPassword((prev) => !prev);
+  };
+
+  const handleBackClick = () => {
+    router.push("/");
   };
 
   // =====================================================
@@ -191,7 +211,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   // =====================================================
 
   return (
-    <div className={`w-full max-w-md mx-auto ${className}`}>
+    <div className={`w-full max-w-md mx-auto relative ${className}`}>
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={handleBackClick}
+        className="absolute top-0 -left-10 p-space-1 border border-gray-300 dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+        aria-label="Go back to homepage"
+      >
+        <ArrowLeft className="size-4" />
+      </button>
+
       <form onSubmit={handleSubmit} className="space-y-space-4" noValidate>
         {/* Form Title */}
         <div className="text-center">
@@ -210,7 +240,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         {/* Email Field */}
         <div>
-          <label htmlFor="email" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
+          <label
+            htmlFor="email"
+            className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2"
+          >
             Email Address
           </label>
           <input
@@ -219,11 +252,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-              transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
-              ${errors.email 
-                ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
+            className={`w-full px-space-4 py-space-3  shadow-none
+            text-body font-sf-pro 
+            bg-airvik-white dark:bg-gray-100 
+            rounded-radius-md 
+            placeholder-gray-500 dark:placeholder-gray-400
+            focus:outline-none focus:border-transparent
+            disabled:bg-gray-100 dark:disabled:bg-gray-200 
+            disabled:text-gray-500 dark:disabled:text-gray-400
+            disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
+              ${
+                errors.email
+                  ? "border-error focus:ring-1 focus:ring-error"
+                  : "border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
               }`}
             placeholder="Enter your email address"
             disabled={isSubmitting}
@@ -231,29 +272,38 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             required
           />
           {errors.email && (
-            <p className="mt-space-1 text-caption text-error">
-              {errors.email}
-            </p>
+            <p className="mt-space-1 text-caption text-error">{errors.email}</p>
           )}
         </div>
 
         {/* Password Field */}
         <div>
-          <label htmlFor="password" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
+          <label
+            htmlFor="password"
+            className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2"
+          >
             Password
           </label>
           <div className="relative">
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className={`w-full px-space-4 py-space-3 pr-12 border rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
-                ${errors.password 
-                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
-                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
+              className={`w-full px-space-4 py-space-3  shadow-none
+            text-body font-sf-pro 
+            bg-airvik-white dark:bg-gray-100 
+            rounded-radius-md 
+            placeholder-gray-500 dark:placeholder-gray-400
+            focus:outline-none focus:border-transparent
+            disabled:bg-gray-100 dark:disabled:bg-gray-200 
+            disabled:text-gray-500 dark:disabled:text-gray-400
+            disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
+                ${
+                  errors.password
+                    ? "border-error focus:ring-1 focus:ring-error"
+                    : "border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
                 }`}
               placeholder="Enter your password"
               disabled={isSubmitting}
@@ -263,7 +313,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="absolute inset-y-0 right-0 flex items-center pr-space-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-normal"
+              className="absolute right-space-3 top-1/2 transform -translate-y-1/2
+              p-space-2 rounded-radius-sm
+              text-gray-500 dark:text-gray-400
+              hover:text-gray-700 dark:hover:text-gray-200
+              focus:outline-none
+              disabled:opacity-50 disabled:cursor-not-allowed
+              transition-colors duration-normal"
               disabled={isSubmitting}
             >
               {showPassword ? (
@@ -293,15 +349,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 className="h-4 w-4 text-airvik-blue border-gray-300 rounded focus:outline-none focus:ring-0 disabled:cursor-not-allowed appearance-none checked:bg-airvik-blue checked:border-airvik-blue"
                 disabled={isSubmitting}
               />
-              <label htmlFor="rememberMe" className="ml-space-2 text-body text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="rememberMe"
+                className="ml-space-2 text-body text-gray-700 dark:text-gray-300"
+              >
                 Remember me
               </label>
             </div>
           )}
 
           {showForgotPassword && (
-            <a 
-              href="/auth/forgot-password" 
+            <a
+              href="/auth/forgot-password"
               className="text-body text-airvik-blue transition-colors duration-normal"
             >
               Forgot password?
@@ -314,50 +373,36 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           type="submit"
           disabled={isSubmitting || authState.isLoading}
           className={`w-full py-space-3 px-space-6 rounded-radius-md font-sf-pro text-button transition-all ease-linear duration-100
-            ${isSubmitting || authState.isLoading
-              ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              : 'bg-airvik-blue text-airvik-white hover:bg-airvik-bluehover'
+            ${
+              isSubmitting || authState.isLoading
+                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                : "bg-airvik-blue text-airvik-white hover:bg-airvik-bluehover"
             }`}
         >
           {isSubmitting || authState.isLoading ? (
             <div className="flex items-center justify-center">
-              <svg className="animate-spin h-5 w-5 mr-space-2" viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="none"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
+              <div className="animate-spin mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-radius-full" />
               Signing In...
             </div>
           ) : (
-            'Sign In'
+            "Sign In"
           )}
         </button>
 
         {/* Sign Up Link */}
         <div className="text-center">
           <p className="text-body text-gray-600 dark:text-gray-400">
-            Don't have an account?{' '}
-            <a 
-              href="/auth/register" 
+            Don't have an account?{" "}
+            <a
+              href="/auth/register"
               className="text-airvik-blue transition-colors duration-normal font-medium"
             >
               Sign up
             </a>
           </p>
-          
-          <p className="mt-space-2 text-caption text-gray-500 dark:text-gray-500">
-            By signing in, you agree to our{' '}
+
+          <h1 className="mt-space-2 text-sm text-gray-500">
+            By signing in, you agree to our{" "}
             <a
               href="/terms"
               target="_blank"
@@ -365,8 +410,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               className="text-airvik-blue dark:text-airvik-blue underline transition-colors duration-normal"
             >
               Terms of Service
-            </a>
-            {' '}and{' '}
+            </a>{" "}
+            and{" "}
             <a
               href="/privacy"
               target="_blank"
@@ -375,7 +420,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             >
               Privacy Policy
             </a>
-          </p>
+          </h1>
         </div>
       </form>
     </div>

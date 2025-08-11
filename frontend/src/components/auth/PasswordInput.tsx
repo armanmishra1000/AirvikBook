@@ -206,22 +206,22 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           placeholder={placeholder}
           disabled={disabled}
           className={`
-            w-full px-space-4 py-space-3 
+            w-full px-space-4 py-space-3  shadow-none
             text-body font-sf-pro 
             bg-airvik-white dark:bg-gray-100 
             rounded-radius-md 
             placeholder-gray-500 dark:placeholder-gray-400
-            focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:border-transparent
+            focus:outline-none focus:border-transparent
             disabled:bg-gray-100 dark:disabled:bg-gray-200 
             disabled:text-gray-500 dark:disabled:text-gray-400
-            disabled:cursor-not-allowed
+            disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
 
             ${
               error
-                ? "border-error focus:ring-error"
+                ? "border-error focus:ring-1 focus:ring-error"
                 : isFocused
                 ? "border-gray-300"
-                : "border-gray-300 dark:border-gray-600"
+                : "border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
             }
             ${showToggle ? "pr-12" : ""}
           `}
