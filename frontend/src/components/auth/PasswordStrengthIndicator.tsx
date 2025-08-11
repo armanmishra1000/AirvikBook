@@ -74,6 +74,7 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
   };
 
   const strengthInfo = getStrengthInfo();
+  const allRequirementsMet = password && fulfilledRequirements.length === PASSWORD_REQUIREMENTS.length;
 
   if (!password && !showRequirements) {
     return null;
@@ -103,14 +104,14 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
         </div>
       )}
 
-      {/* Requirements List */}
-      {showRequirements && (
+      {/* Requirements List - Only show if not all requirements are met */}
+      {showRequirements && !allRequirementsMet && (
         <div className="space-y-space-2">
           <p className="text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-3">
             Password Requirements:
           </p>
           
-          <ul className="space-y-space-2">
+          <ul className="space-y-space-0">
             {PASSWORD_REQUIREMENTS.map((requirement) => {
               const isMetOrNoPassword = !password || requirement.test(password);
               const isMet = password && requirement.test(password);
@@ -118,7 +119,7 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
               return (
                 <li
                   key={requirement.id}
-                  className="flex items-center space-x-space-3"
+                  className="flex items-center space-x-space-2"
                 >
                   {/* Requirement Icon */}
                   <div className={`flex-shrink-0 w-4 h-4 rounded-radius-full flex items-center justify-center transition-all duration-normal

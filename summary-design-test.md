@@ -19,8 +19,71 @@ This document summarizes all the visual testing issues that were identified and 
 
 ### 4. Password Requirements Visibility Behavior Issue
 **Issue**: Password requirements were visible by default even when user hadn't started typing, and remained visible even after all requirements were met.
-**Fix**: Implemented conditional rendering logic to show requirements only when password field is focused or contains text, and automatically hide them when all password requirements are satisfied.
+**Fix**: Implemented conditional rendering logic to show requirements only when password field contains at least one character, and automatically hide them when all password requirements are satisfied.
 
+### 5. Terms and Conditions and Privacy Policy Links 404 Error
+**Issue**: Links to Terms of Service and Privacy Policy resulted in 404 errors.
+**Fix**: Created new pages at `/terms` and `/privacy` routes with proper content and styling.
+
+### 6. Create Account Button Text Alignment During Loading
+**Issue**: Button text shifted left during loading state instead of remaining centered.
+**Fix**: Updated CSS to use `justify-center` and removed negative margin from spinner for proper centering.
+
+### 7. Password Visibility Toggle Icon Display Issue
+**Issue**: Eye icon appeared cropped or cut off when toggling password visibility.
+**Fix**: Updated button styling to use fixed width and proper centering to prevent icon cropping.
+
+### 8. Terms Consent Checkbox Extra Border Issue
+**Issue**: Extra border appeared around checkbox when selected, creating double-border effect.
+**Fix**: Enhanced checkbox styling with `focus:outline-none`, `focus:ring-0`, `appearance-none`, and explicit focus border states to completely eliminate any extra borders or focus rings.
+
+### 9. Toast Notifications for Registration Messages
+**Issue**: Inconsistent use of inline error messages and success states.
+**Fix**: Implemented consistent toast notifications for all success and error messages, removing inline general error display.
+
+### 10. Post-Registration Sensitive Data Logging Issue
+**Issue**: User email and tokens were being logged to console after successful registration.
+**Fix**: Removed console.log statement that exposed sensitive user information.
+
+### 11. Google Sign-up Button Focus Border Issue
+**Issue**: The "Sign up with Google" button displayed an unwanted focus border/ring when focused, creating visual inconsistency with the design system.
+**Fix**: Removed the focus ring styling (`focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2`) from the GoogleOAuthRedirectButton component and replaced it with `focus:ring-0` to eliminate any focus indicators while maintaining accessibility.
+
+### 12. Create Account Button Hover Transition Issue
+**Issue**: The "Create Account" button displayed unwanted hover transition effects including shadow, transform, and animation when users hovered over it, creating visual inconsistency with the design system.
+**Fix**: Removed all transition-related CSS classes including `transition-all`, `duration-normal`, `transform`, `hover:shadow-lg`, `hover:-translate-y-1`, and `active:translate-y-0` from the button, leaving only the essential hover color change (`hover:bg-airvik-purple`) for basic interactivity feedback.
+
+## Login Page Issues Fixed
+
+### 13. Duplicate "Don't have an account? Sign up for free" Text
+**Issue**: Text appeared both inside the form and in the page footer, creating duplication.
+**Fix**: Removed the duplicate text from the footer, keeping only the version inside the LoginForm component.
+
+### 14. "By signing in, you agree..." Text Positioned Incorrectly
+**Issue**: Terms agreement text was displayed outside the form in the footer.
+**Fix**: Moved the text inside the LoginForm component, placing it below the sign-up link.
+
+### 15. Extra Border Around "Remember me" Checkbox
+**Issue**: Extra border appeared around checkbox when checked or unchecked, creating visual inconsistency.
+**Fix**: Enhanced checkbox styling with `focus:outline-none`, `focus:ring-0`, `appearance-none`, and explicit focus border states to completely eliminate any extra borders or focus rings, matching the registration form checkbox styling.
+
+### 16. Broken Terms of Service and Privacy Policy Links
+**Issue**: Links resulted in 404 errors (same as registration page).
+**Fix**: Links now work correctly since the pages were created for the registration page fixes.
+
+### 17. Login Form Validation Error Message Styling Inconsistency
+**Issue**: General error messages used speech bubble styling with background, border, and padding, inconsistent with field errors. Input field text was also turning red during errors.
+**Fix**: Replaced speech bubble styling with simple red text format (`text-caption text-error`), removed background, border, and padding, added `noValidate` to form for consistent validation handling, and ensured input field text remains black (`text-airvik-black dark:text-airvik-white`) while only borders and error messages are red.
+
+### 18. Google Sign-in Button Focus Border Issue
+**Issue**: The "Sign in with Google" button displayed an unwanted focus border/ring when focused, creating visual inconsistency with the design system.
+**Fix**: Removed the focus ring styling from the GoogleOAuthRedirectButton component (same component as registration form) to eliminate any focus indicators while maintaining accessibility.
+
+### 19. Sign In Button Hover Transition Issue
+**Issue**: The "Sign In" button displayed unwanted hover transition effects including shadow, transform, and animation when users hovered over it, creating visual inconsistency with the design system.
+**Fix**: Removed all transition-related CSS classes including `transition-all`, `duration-normal`, `transform`, `hover:shadow-lg`, `hover:-translate-y-1`, and `active:translate-y-0` from the button, leaving only the essential hover color change (`hover:bg-airvik-purple`) for basic interactivity feedback.
+
+### 20. Error State Focus Border Consistency
 ### 5. Password Strength Indicator Visibility Issue
 **Issue**: The password strength indicator was appearing when the user focused on the password field, even before typing anything. This created unnecessary visual clutter and showed information prematurely.
 **Fix**: Modified the `showRequirements` logic to only display the password strength indicator and requirements when the user has actually started typing (password length > 0), removing the focus-based trigger. Also removed the unused `isPasswordFocused` state and related focus/blur handlers.
@@ -109,6 +172,11 @@ This document summarizes all the visual testing issues that were identified and 
 
 ## Email Verification Page Issues Fixed
 
+### 21. Broken "Contact support" link on Check Your Email page
+**Issue**: The "Contact support" link on the Check Your Email page was pointing to `/contact` which resulted in a 404 error, preventing users from accessing help when experiencing email verification issues.
+**Fix**: Created a comprehensive support page at `/contact` route with multiple contact methods (email and phone), categorized FAQ section with expandable questions, and additional help resources, providing users with multiple ways to get assistance for email verification and other issues.
+
+### 22. Sensitive Data Logging on Check Your Email Page
 ### 26. Broken "Contact support" link on Check Your Email page
 **Issue**: The "Contact support" link on the Check Your Email page was pointing to `/contact` which resulted in a 404 error, preventing users from accessing help when experiencing email verification issues.
 **Fix**: Created a comprehensive support page at `/contact` route with multiple contact methods (email and phone), categorized FAQ section with expandable questions, and additional help resources, providing users with multiple ways to get assistance for email verification and other issues.
@@ -117,11 +185,25 @@ This document summarizes all the visual testing issues that were identified and 
 **Issue**: The Check Your Email page was logging sensitive user information to the browser console, including user email addresses, verification tokens, and API response details. These logs were visible to anyone with access to the browser's developer tools, creating a significant privacy and security risk.
 **Fix**: Removed all console.log statements that exposed sensitive user data, including URL parameters logging, decoded email logging, verification token logging, API response logging, and other debugging information that contained personally identifiable information. The page now functions properly without exposing any user data in the console.
 
+### 23. Forgot Password Page Layout Inconsistency
+**Issue**: The forgot password page had inconsistent styling and layout compared to the login form, including different spacing, error message styling, input field styling, and button styling.
+**Fix**: Updated the forgot password page to match the login form's design system, including consistent spacing (`space-y-space-4`), error message styling (simple red text instead of speech bubble), input field styling with proper focus states and transitions, and button styling with consistent hover effects and loading states.
+
+### 24. Reset Password Page Password Requirements Display Issue
+**Issue**: The reset password page was showing both the password strength bar and the requirements list even when all password requirements were met, creating visual clutter and redundancy.
+**Fix**: Updated the PasswordStrengthIndicator component to automatically hide the requirements list when all password requirements are satisfied, showing only the strength bar for strong passwords. This provides a cleaner user experience by removing redundant information when the password meets all criteria.
+
+### 25. Registration Form Password Strength Indicator Display Issue
+**Issue**: The registration form was not showing the password strength indicator when all password requirements were met, providing no feedback to users about their strong password.
+**Fix**: Updated the registration form to always show the PasswordStrengthIndicator when a password is entered, allowing the component to intelligently display either the requirements list (for weak passwords) or just the strength bar (for strong passwords), providing consistent feedback across all password fields.
+
 ## Technical Implementation Details
 
 ### Files Modified
 - `AirvikBook/frontend/src/app/auth/register/page.tsx`
 - `AirvikBook/frontend/src/app/auth/login/page.tsx`
+- `AirvikBook/frontend/src/app/auth/forgot-password/page.tsx`
+- `AirvikBook/frontend/src/app/auth/reset-password/page.tsx`
 - `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx`
 - `AirvikBook/frontend/src/components/auth/LoginForm.tsx`
 - `AirvikBook/frontend/src/components/auth/PasswordStrengthIndicator.tsx`
@@ -154,7 +236,27 @@ This document summarizes all the visual testing issues that were identified and 
 - Google OAuth buttons maintain clean appearance without focus borders
 - No sensitive user data exposed in browser console
 
+2. **Profile Management Flow:**
+   - Test profile editing and saving
+   - Verify data refreshes after save
+   - Test Google OAuth connection (requires proper environment setup)
+
+3. **Visual Consistency:**
+   - Verify all form inputs have consistent styling
+   - Check error states across all forms
+   - Ensure loading states appear in appropriate locations
+
+---
+
+## Notes
+- All fixes maintain brand compliance using airvik-* design tokens
+- Focus accessibility is preserved while removing visual distractions
+- Security features are maintained where appropriate
+- Performance is improved by removing unnecessary animations and transitions
+
+
 ## Testing Results
+All 27 identified issues have been successfully resolved, resulting in:
 All 29 identified issues have been successfully resolved, resulting in:
 - Improved user experience with cleaner form layouts
 - Consistent visual design across registration and login pages
@@ -162,6 +264,9 @@ All 29 identified issues have been successfully resolved, resulting in:
 - Proper error handling and user feedback
 - Accessible and functional legal pages
 - Comprehensive support system for user assistance
+- Clean and professional Google OAuth button styling
+- Enhanced privacy protection across all authentication pages
+- Static button interactions without unwanted hover transitions
 - Clean and professional Google OAuth button styling with proper capitalization and icon sizing
 - Enhanced privacy protection across all authentication pages
 - Static button interactions without unwanted hover transitions

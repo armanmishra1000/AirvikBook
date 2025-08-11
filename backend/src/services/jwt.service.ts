@@ -2,7 +2,36 @@ import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma';
 import Redis from 'ioredis';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+// Create Redis connection with error handling
+let redis: Redis | null = null;
+let redisConnected = false;
+
+try {
+  redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+    maxRetriesPerRequest: 3,
+    lazyConnect: true, // Don't connect immediately
+    enableReadyCheck: false,
+  });
+
+  redis.on('connect', () => {
+    console.log('✅ Redis connected successfully');
+    redisConnected = true;
+  });
+
+  redis.on('error', (error) => {
+    console.warn('⚠️ Redis connection failed:', error.message);
+    redisConnected = false;
+  });
+
+  redis.on('close', () => {
+    console.warn('⚠️ Redis connection closed');
+    redisConnected = false;
+  });
+
+} catch (error) {
+  console.warn('⚠️ Redis initialization failed:', error);
+  redisConnected = false;
+}
 
 export interface TokenPayload {
   userId: string;
@@ -430,11 +459,13 @@ export class JwtService {
         return true; // Token already expired
       }
 
-      // Store in Redis with TTL
-      await redis.setex(`blacklist:${token}`, ttl, userId);
-      
-      // Log blacklisting event for audit (using existing audit service)
-      console.log(`Token blacklisted for user ${userId}, expires in ${ttl} seconds`);
+      // Store in Redis with TTL if available
+      if (redisConnected && redis) {
+        await redis.setex(`blacklist:${token}`, ttl, userId);
+        console.log(`Token blacklisted for user ${userId}, expires in ${ttl} seconds`);
+      } else {
+        console.warn('Redis not available - token blacklisting disabled');
+      }
 
       return true;
     } catch (error) {
@@ -448,6 +479,10 @@ export class JwtService {
    */
   static async isTokenBlacklisted(token: string): Promise<boolean> {
     try {
+      if (!redisConnected || !redis) {
+        console.warn('Redis is not connected. Cannot check blacklist.');
+        return false;
+      }
       const blacklisted = await redis.exists(`blacklist:${token}`);
       return blacklisted === 1;
     } catch (error) {

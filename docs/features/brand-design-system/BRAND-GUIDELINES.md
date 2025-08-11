@@ -34,7 +34,7 @@
   /* Supporting Colors */
   --airvik-blue-mid: #006CFF;       /* Secondary buttons */
   --airvik-blue-light: #D1D8FA;     /* Light backgrounds */
-  --airvik-cyan-light: #B2ECFF;     /* Info states */
+  --airvik-cyan-light:rgb(21, 23, 24);     /* Info states */
   --airvik-purple-light: #C58FFF;   /* Hover states */
   --airvik-pink-light: #DECFFF;     /* Subtle backgrounds */
 }

@@ -18,6 +18,7 @@ module.exports = {
   			'airvik-cyan': '#68D8FC',
   			'airvik-violet': '#B688FF',
   			'airvik-white': '#F8F9FE',
+  			'airvik-bluehover': '#002bcd',
   			
   			// Secondary Colors
   			'blue-mid': '#006CFF',

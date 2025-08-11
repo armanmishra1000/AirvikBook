@@ -315,11 +315,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             name="fullName"
             value={formData.fullName}
             onChange={handleInputChange}
-            className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-              focus:outline-none
+            className={`w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
               ${(errors.fullName || validationErrors.fullName)
-                ? 'border-error focus:outline-none focus:ring-0 focus:border-error'  
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
+                ? 'border-error focus:ring-1 focus:ring-error'  
+                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400'
               }`}
             placeholder="Enter your full name"
             disabled={isSubmitting}
@@ -343,11 +342,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             name="mobileNumber"
             value={formData.mobileNumber}
             onChange={handleInputChange}
-            className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-              transition-colors duration-normal focus:outline-none
+            className={`w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
               ${errors.mobileNumber 
-                ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
+                ? 'border-error focus:ring-1 focus:ring-error' 
+                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400'
               }`}
             placeholder="+1 (555) 123-4567"
             disabled={isSubmitting}
@@ -370,11 +368,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             value={formData.bio}
             onChange={handleInputChange}
             rows={4}
-            className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-              transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue resize-none
+            className={`w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue resize-none
               ${errors.bio 
-                ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
+                ? 'border-error focus:ring-1 focus:ring-error' 
+                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400'
               }`}
             placeholder="Tell us about yourself..."
             disabled={isSubmitting}
@@ -404,11 +401,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               name="dateOfBirth"
               value={formData.dateOfBirth}
               onChange={handleInputChange}
-              className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+              className={`w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
                 ${errors.dateOfBirth 
-                  ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
-                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
+                  ? 'border-error focus:ring-1 focus:ring-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400'
                 }`}
               disabled={isSubmitting}
             />
@@ -428,9 +424,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               name="gender"
               value={formData.gender}
               onChange={handleInputChange}
-              className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
-                border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500`}
+              className={`w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
+                border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400`}
               disabled={isSubmitting}
             >
               <option value="">Select gender</option>
@@ -454,7 +449,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               name="nationality"
               value={formData.nationality}
               onChange={handleInputChange}
-              className="w-full transition-colors border border-gray-300 px-space-4 py-space-3 dark:border-gray-600 rounded-radius-md font-sf-pro text-body duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500"
+              className="w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
               placeholder="e.g., United States"
               disabled={isSubmitting}
             />
@@ -470,7 +465,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               name="occupation"
               value={formData.occupation}
               onChange={handleInputChange}
-              className="w-full transition-colors border border-gray-300 px-space-4 py-space-3 dark:border-gray-600 rounded-radius-md font-sf-pro text-body duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500"
+              className="w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
               placeholder="e.g., Software Engineer"
               disabled={isSubmitting}
             />
@@ -489,11 +484,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               name="website"
               value={formData.website}
               onChange={handleInputChange}
-              className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+              className={`w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
                 ${errors.website 
-                  ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
-                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue'
+                  ? 'border-error focus:ring-1 focus:ring-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400'
                 }`}
               placeholder="https://example.com"
               disabled={isSubmitting}
@@ -515,7 +509,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               name="location"
               value={formData.location}
               onChange={handleInputChange}
-              className="w-full transition-colors border border-gray-300 px-space-4 py-space-3 dark:border-gray-600 rounded-radius-md font-sf-pro text-body duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500"
+              className="w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
               placeholder="e.g., San Francisco, CA"
               disabled={isSubmitting}
             />
@@ -528,10 +522,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             type="submit"
             disabled={isSubmitting || authState.isLoading || (!isFormValid && submitAttemptedRef.current)}
             className={`px-space-6 py-space-3 rounded-radius-md font-sf-pro text-button
-              transition-all duration-normal transform
               ${(isSubmitting || authState.isLoading || (!isFormValid && submitAttemptedRef.current))
                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                : 'bg-airvik-blue text-airvik-white hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2'
+                : 'bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white  focus:outline-none  focus:ring-airvik-blue focus:ring-offset-2'
               }`}
           >
             {isSubmitting || authState.isLoading ? (

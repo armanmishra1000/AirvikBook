@@ -15,6 +15,14 @@ const LoginPage: React.FC = () => {
   const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
   const { authState } = useAuth();
+  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+
+  // Track initial loading completion
+  useEffect(() => {
+    if (!authState.isLoading) {
+      setIsInitialLoad(false);
+    }
+  }, [authState.isLoading]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -34,8 +42,8 @@ const LoginPage: React.FC = () => {
     // Error is already handled in the LoginForm component
   };
 
-  // Don't render anything while checking authentication
-  if (authState.isLoading) {
+  // Don't render anything while checking authentication (but not during login submission)
+  if (isInitialLoad && authState.isLoading) {
     return (
       <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex items-center justify-center">
         <div className="text-center">
@@ -54,11 +62,11 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
+    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center sm:py-space-10 py-space-5 sm:px-space-6 lg:px-space-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo/Brand */}
-        <div className="text-center mb-space-8">
-          <h1 className="text-display font-sf-pro font-bold text-airvik-black dark:text-airvik-white">
+        <div className="text-center mb-space-8 hidden sm:block">
+          <h1 className="lg:text-display text-h3 font-sf-pro font-bold text-airvik-black dark:text-airvik-white">
             AirVikBook
           </h1>
           <p className="mt-space-2 text-body text-gray-600 dark:text-gray-400 font-sf-pro">
@@ -67,7 +75,7 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* Login Card */}
-        <div className="card-auth py-space-8 px-space-6">
+        <div className="sm:card-auth sm:py-space-8 py-space-4 sm:px-space-6 px-space-4">
           {/* Login Form */}
           <LoginForm
             onSuccess={handleLoginSuccess}
@@ -78,10 +86,10 @@ const LoginPage: React.FC = () => {
           {/* Divider */}
           <div className="relative mb-space-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+              <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-caption">
-              <span className="px-space-2 bg-airvik-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-sf-pro">
+              <span className="px-space-2 bg-airvik-white text-sm  text-gray-500 font-sf-pro">
                 Or continue with
               </span>
             </div>

@@ -32,10 +32,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex flex-col justify-center min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle py-space-12 sm:px-space-6 lg:px-space-8">
+    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center sm:py-space-10 py-space-5 sm:px-space-6 lg:px-space-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo/Brand */}
-        <div className="text-center mb-space-8">
+        <div className="text-center mb-space-8 hidden sm:block">
           <h1 className="font-bold text-display font-sf-pro text-airvik-black dark:text-airvik-white">
             AirVikBook
           </h1>
@@ -45,7 +45,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Registration Card */}
-        <div className="card-auth py-space-8 px-space-6">
+        <div className="sm:card-auth sm:py-space-8 py-space-4 sm:px-space-6 px-space-4">
           {registrationSuccess ? (
             <div className="text-center">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-space-4 bg-success/10 rounded-radius-full">

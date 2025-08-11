@@ -87,7 +87,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
           {/* Profile Picture */}
           <div className="relative">
             <img
-              src={profile.profilePicture || '/default-avatar.png'}
+              src={profile.profilePicture || '/images/profile_picture.jpg'}
               alt={`${profile.fullName}'s profile picture`}
               className="w-20 h-20 rounded-radius-full object-cover border-4 border-airvik-white shadow-shadow-md"
             />
@@ -125,9 +125,8 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
           {showActions && onEdit && (
             <button
               onClick={onEdit}
-              className="px-space-4 py-space-2 bg-airvik-white/20 text-airvik-white rounded-radius-md font-sf-pro text-button
-                transition-all duration-normal hover:bg-airvik-white/30 hover:shadow-lg hover:-translate-y-1 
-                active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-white focus:ring-offset-2"
+              className="px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button
+                hover:bg-airvik-blue-mid focus:outline-none focus:ring-airvik-blue focus:ring-offset-2"
             >
               Edit Profile
             </button>

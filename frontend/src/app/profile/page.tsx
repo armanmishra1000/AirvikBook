@@ -206,9 +206,9 @@ export default function ProfilePage() {
               </div>
               <Link 
                 href="/dashboard" 
-                className="group inline-flex items-center gap-space-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal hover:-translate-y-0.5 active:translate-y-0 border border-gray-200 dark:border-gray-700"
+                className="group inline-flex items-center gap-space-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md  border border-gray-200 dark:border-gray-700"
               >
-                <svg className="w-5 h-5 transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
                 </svg>
                 Back to Dashboard
@@ -239,9 +239,9 @@ export default function ProfilePage() {
                 {/* Edit Profile */}
                 <Link
                   href="/profile/edit"
-                  className="relative overflow-hidden transition-all bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm hover:shadow-shadow-md dark:border-gray-700 p-space-6 duration-normal hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
                 >
-                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-airvik-blue/5 to-airvik-purple/5 group-hover:opacity-100 duration-normal" />
+                  <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-airvik-blue/5 to-airvik-purple/5 group-hover:opacity-100" />
                   <div className="relative flex items-start space-x-space-4">
                     <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-airvik-blue to-airvik-purple rounded-radius-lg shadow-shadow-sm">
                       <svg className="w-6 h-6 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
@@ -249,14 +249,14 @@ export default function ProfilePage() {
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold transition-colors text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-blue dark:group-hover:text-airvik-blue">
+                      <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-blue dark:group-hover:text-airvik-blue">
                         Edit Profile
                       </h3>
                       <p className="text-gray-600 text-body-sm dark:text-gray-400">
                         Update your personal information and preferences
                       </p>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 transition-colors group-hover:text-airvik-blue" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="w-5 h-5 text-gray-400 group-hover:text-airvik-blue" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
@@ -265,9 +265,9 @@ export default function ProfilePage() {
                 {/* Profile Picture */}
                 <Link
                   href="/profile/picture"
-                  className="relative overflow-hidden transition-all bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm hover:shadow-shadow-md dark:border-gray-700 p-space-6 duration-normal hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
                 >
-                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-airvik-purple/5 to-airvik-violet/5 group-hover:opacity-100 duration-normal" />
+                  <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-airvik-purple/5 to-airvik-violet/5 group-hover:opacity-100" />
                   <div className="relative flex items-start space-x-space-4">
                     <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-airvik-purple to-airvik-violet rounded-radius-lg shadow-shadow-sm">
                       <svg className="w-6 h-6 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
@@ -275,14 +275,14 @@ export default function ProfilePage() {
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold transition-colors text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-purple dark:group-hover:text-airvik-purple">
+                      <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-purple dark:group-hover:text-airvik-purple">
                         Profile Picture
                       </h3>
                       <p className="text-gray-600 text-body-sm dark:text-gray-400">
                         Upload or sync your profile picture
                       </p>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 transition-colors group-hover:text-airvik-purple" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="w-5 h-5 text-gray-400 group-hover:text-airvik-purple" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
@@ -291,9 +291,9 @@ export default function ProfilePage() {
                 {/* Privacy Settings */}
                 <Link
                   href="/profile/privacy"
-                  className="relative overflow-hidden transition-all bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm hover:shadow-shadow-md dark:border-gray-700 p-space-6 duration-normal hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-cyan focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-cyan focus:ring-offset-2"
                 >
-                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-airvik-cyan/5 to-airvik-blue/5 group-hover:opacity-100 duration-normal" />
+                  <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-airvik-cyan/5 to-airvik-blue/5 group-hover:opacity-100" />
                   <div className="relative flex items-start space-x-space-4">
                     <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-airvik-cyan to-airvik-blue rounded-radius-lg shadow-shadow-sm">
                       <svg className="w-6 h-6 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
@@ -301,14 +301,14 @@ export default function ProfilePage() {
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold transition-colors text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-cyan dark:group-hover:text-airvik-cyan">
+                      <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-cyan dark:group-hover:text-airvik-cyan">
                         Privacy Settings
                       </h3>
                       <p className="text-gray-600 text-body-sm dark:text-gray-400">
                         Control your profile visibility and data sharing
                       </p>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 transition-colors group-hover:text-airvik-cyan" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="w-5 h-5 text-gray-400 group-hover:text-airvik-cyan" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
@@ -317,9 +317,9 @@ export default function ProfilePage() {
                 {/* Connected Accounts */}
                 <Link
                   href="/profile/connections"
-                  className="relative overflow-hidden transition-all bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm hover:shadow-shadow-md dark:border-gray-700 p-space-6 duration-normal hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                 >
-                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 group-hover:opacity-100 duration-normal" />
+                  <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 group-hover:opacity-100" />
                   <div className="relative flex items-start space-x-space-4">
                     <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-radius-lg shadow-shadow-sm">
                       <svg className="w-6 h-6 text-white" viewBox="0 0 20 20" fill="currentColor">
@@ -327,14 +327,14 @@ export default function ProfilePage() {
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold transition-colors text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-green-600 dark:group-hover:text-green-400">
+                      <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-green-600 dark:group-hover:text-green-400">
                         Connected Accounts
                       </h3>
                       <p className="text-gray-600 text-body-sm dark:text-gray-400">
                         Manage your linked social accounts
                       </p>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400 transition-colors group-hover:text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="w-5 h-5 text-gray-400 group-hover:text-green-600" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
@@ -400,19 +400,19 @@ export default function ProfilePage() {
                 <div className="space-y-space-3">
                   <button
                     onClick={handleEditProfile}
-                    className="w-full transition-all bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white px-space-4 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+                    className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white px-space-4 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm focus:outline-none  focus:ring-airvik-blue focus:ring-offset-2"
                   >
                     Edit Profile
                   </button>
                   <button
                     onClick={handlePictureChange}
-                    className="w-full transition-all bg-gradient-to-r from-airvik-purple to-airvik-violet hover:from-airvik-violet hover:to-airvik-purple text-airvik-white px-space-4 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
+                    className="w-full bg-airvik-blue hover:bg-airvik-purple text-airvik-white px-space-4 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm focus:outline-none  focus:ring-airvik-blue focus:ring-offset-2"
                   >
                     Change Picture
                   </button>
                   <Link
                     href="/profile/privacy"
-                    className="block w-full transition-all bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-center"
+                    className="block w-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm focus:outline-none  focus:ring-gray-500 focus:ring-offset-2 text-center"
                   >
                     Privacy Settings
                   </Link>

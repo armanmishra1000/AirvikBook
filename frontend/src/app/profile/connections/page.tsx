@@ -158,14 +158,19 @@ export default function ConnectionsPage() {
             <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
             </svg>
-            <span className="font-medium text-airvik-black dark:text-airvik-white">Connected Accounts</span>
+            <span className="font-medium text-airvik-blue dark:text-airvik-white">Connected Accounts</span>
           </nav>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-space-4">
             <div>
               <h1 className="font-bold text-h2 text-airvik-black dark:text-airvik-white">Connected Accounts</h1>
               <p className="text-gray-600 mt-space-2 text-body dark:text-gray-400">Manage your linked third‑party accounts</p>
             </div>
-            <Link href="/profile" className="self-start text-gray-800 transition bg-gray-200 md:self-auto px-space-4 py-space-2 rounded-radius-md dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">Back to Profile</Link>
+            <Link href="/profile" className="group inline-flex items-center gap-space-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal  active:translate-y-0 border border-gray-200 dark:border-gray-700">
+              <svg className="w-5 h-5 transition-transform " viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+              </svg>
+              Back to Profile
+            </Link>
           </div>
         </div>
       </div>
