@@ -37,13 +37,11 @@ export default function VerifyEmailPage() {
     const emailParam = searchParams.get('email');
     const tokenParam = searchParams.get('token');
     
-    console.log('🔍 URL Params - Raw email:', emailParam);
-    console.log('🔍 URL Params - Raw token:', tokenParam);
+    // Removed sensitive data logging for security
     
     if (emailParam) {
       // Decode the email parameter (handles %40 -> @)
       const decodedEmail = decodeURIComponent(emailParam);
-      console.log('📧 Decoded email:', decodedEmail);
       setEmail(decodedEmail);
     }
     
@@ -60,7 +58,6 @@ export default function VerifyEmailPage() {
     // If both token and email are provided, auto-verify (only once)
     if (tokenParam && emailParam && !verificationAttempted.current) {
       const decodedEmail = decodeURIComponent(emailParam);
-      console.log('🚀 Auto-verifying with decoded email:', decodedEmail);
       verificationAttempted.current = true;
       verifyEmailWithToken(tokenParam, decodedEmail);
     }
@@ -116,12 +113,8 @@ export default function VerifyEmailPage() {
     
     // Prevent double verification
     if (isVerifying) {
-      console.log('⚠️ Verification already in progress, skipping');
       return;
     }
-    
-    console.log('🔍 Starting email verification with token:', verificationToken.substring(0, 10) + '...');
-    console.log('📧 Email to verify:', userEmail);
     
     setIsVerifying(true);
     setVerificationError('');
@@ -129,23 +122,12 @@ export default function VerifyEmailPage() {
     setMessage('');
 
     try {
-      console.log('📡 Calling verification API...');
       const response = await UserRegistrationService.verifyEmail({
         token: verificationToken,
         email: userEmail
       });
-
-      console.log('📨 API Response received:', response);
-      console.log('📨 Response details:', JSON.stringify(response, null, 2));
-      console.log('🔍 Mounted status:', mounted.current);
-
-      console.log('🔍 Checking isSuccessResponse:', isSuccessResponse(response));
-      console.log('🔍 Response.success:', response.success);
-      console.log('🔍 Response type:', typeof response.success);
       
       if (isSuccessResponse(response)) {
-        console.log('✅ Verification successful!');
-        
         // Only update state if component is still mounted
         if (mounted.current) {
           setIsVerified(true);
@@ -154,12 +136,9 @@ export default function VerifyEmailPage() {
         
         // Always redirect, even if component unmounted (user will see success page)
         setTimeout(() => {
-          console.log('🔄 Redirecting to success page...');
           router.push('/auth/success');
         }, 2000);
       } else {
-        console.log('❌ Verification failed:', response);
-        
         // Only update state if component is still mounted
         if (mounted.current) {
           setVerificationError(response.error || 'Email verification failed');
@@ -184,7 +163,6 @@ export default function VerifyEmailPage() {
       if (mounted.current) {
         setIsVerifying(false);
       }
-      console.log('🏁 Verification process completed. Mounted:', mounted.current);
     }
   };
 

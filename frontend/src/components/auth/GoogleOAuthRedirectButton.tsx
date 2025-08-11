@@ -59,7 +59,7 @@ export default function GoogleOAuthRedirectButton({
         text-airvik-gray-700 font-sf-pro text-button
         transition-all duration-normal
         disabled:opacity-50 disabled:cursor-not-allowed
-        focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2
+        focus:outline-none focus:ring-0
         dark:border-airvik-gray-600 dark:bg-airvik-gray-800 dark:hover:bg-airvik-gray-700
         dark:text-airvik-gray-200
         ${className}
