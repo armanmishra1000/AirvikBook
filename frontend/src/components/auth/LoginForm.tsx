@@ -319,10 +319,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           type="submit"
           disabled={isSubmitting || authState.isLoading}
           className={`w-full py-space-3 px-space-6 rounded-radius-md font-sf-pro text-button
-            transition-all duration-normal transform
             ${isSubmitting || authState.isLoading
               ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              : 'bg-airvik-blue text-airvik-white hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 active:translate-y-0'
+              : 'bg-airvik-blue text-airvik-white hover:bg-airvik-purple'
             }`}
         >
           {isSubmitting || authState.isLoading ? (

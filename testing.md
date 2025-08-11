@@ -137,9 +137,35 @@ This document contains visual testing documentation for the Hotel Management Sys
 
 **Issue Description**: User Email Logged After Successful Registration
 
-- **Current State**: After the form is submitted and registration succeeds, the success handler logs the returned `user` object and `tokens` using a console logging statement. This results in the registered user’s email address being written to browser developer tools logs.
+- **Current State**: After the form is submitted and registration succeeds, the success handler logs the returned `user` object and `tokens` using a console logging statement. This results in the registered user's email address being written to browser developer tools logs.
 
 - **Expected State**: No sensitive user information — including email addresses, authentication tokens, or any personally identifiable information — should be logged to the console or any application logs in any environment (development, staging, or production). Logging should be limited to non-sensitive operational messages.
+
+*Additional testing content will be added as provided.*
+
+### Google Sign-up Button Focus Border Issue
+
+**File Location**: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx` (Google OAuth button section)
+
+**Issue Description**: Unwanted Focus Border on Google Sign-up Button
+
+- **Current State**: When the "Sign up with Google" button is focused (either by clicking or using keyboard navigation), an unwanted border or outline appears around the button. This border is visually inconsistent with the design and creates an unprofessional appearance.
+
+- **Expected State**: The "Sign up with Google" button should not display any focus border or outline when focused. The button should maintain its clean appearance without any additional visual elements that would indicate focus state, as this is not consistent with the overall design system.
+
+- **Action Required**: Remove the focus border/outline styling from the Google sign-up button by adding appropriate CSS classes such as `focus:outline-none` and `focus:ring-0` to eliminate any focus indicators while maintaining accessibility through other means.
+
+### Create Account Button Hover Transition Issue
+
+**File Location**: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx` (Create Account button section)
+
+**Issue Description**: Unwanted Hover Transition on Create Account Button
+
+- **Current State**: The "Create Account" button displays a hover transition effect when users hover over it. This transition creates unwanted visual feedback that is not consistent with the design system.
+
+- **Expected State**: The "Create Account" button should not display any hover transition effects. The button should maintain a static appearance without any transition animations when hovered, maintaining consistency with the overall design.
+
+- **Action Required**: Remove the hover transition styling from the Create Account button by removing transition-related CSS classes or properties that cause the hover animation effect.
 
 *Additional testing content will be added as provided.*
 
@@ -189,3 +215,49 @@ This document contains visual testing documentation for the Hotel Management Sys
 **Issue**: When the login form is submitted without filling required fields, validation error messages are displayed in an inconsistent style. Currently, error messages appear in orange speech bubble-like boxes with rounded corners, featuring a circular orange icon containing a white exclamation mark, followed by the error text. This styling is inconsistent with the registration form's error message format and creates visual inconsistency across the authentication system.
 
 **Expected Behavior**: Login form validation error messages should match the registration form's error message styling. Error messages should appear as simple red text directly below the corresponding input field, accompanied by a red border around the input field itself. The error messages should not use speech bubble containers, icons, or colored backgrounds, but should maintain the clean, inline red text format consistent with the registration form validation errors.
+
+6. Google Sign-in Button Focus Border Issue
+
+**Location**: `AirvikBook/frontend/src/components/auth/LoginForm.tsx` (Google OAuth button section)
+
+**Issue**: When the "Sign in with Google" button is focused (either by clicking or using keyboard navigation), an unwanted border or outline appears around the button. This border is visually inconsistent with the design and creates an unprofessional appearance.
+
+**Expected Behavior**: The "Sign in with Google" button should not display any focus border or outline when focused. The button should maintain its clean appearance without any additional visual elements that would indicate focus state, as this is not consistent with the overall design system.
+
+7. Sign In Button Hover Transition Issue
+
+**Location**: `AirvikBook/frontend/src/components/auth/LoginForm.tsx` (Sign In button section)
+
+**Issue**: The "Sign In" button displays a hover transition effect when users hover over it. This transition creates unwanted visual feedback that is not consistent with the design system.
+
+**Expected Behavior**: The "Sign In" button should not display any hover transition effects. The button should maintain a static appearance without any transition animations when hovered, maintaining consistency with the overall design.
+
+## Email Verification Page Testing
+
+### Broken "Contact support" link on Check Your Email page
+
+**File Location**: `AirvikBook/frontend/src/app/auth/verify-email/page.tsx` (line 402)
+
+**Issue Description**: Contact Support Link Results in 404 Error
+
+- **Current State**: On the Check Your Email page, there is a "Contact support" link in the help section at the bottom of the page. When users click on this link, it attempts to navigate to "/contact" but displays a "404 Page Not Found" error. This link is intended to provide users with a way to get help if they're having trouble with email verification.
+
+- **Expected State**: When users click on the "Contact support" link, it should successfully navigate to a valid support or help page that provides assistance options. The page should be accessible and contain appropriate support content, contact information, or help resources for users experiencing email verification issues.
+
+- **Action Required**: Create a support page at the "/contact" route or update the link to point to an existing support page. The support page should provide users with multiple ways to get help, such as email contact, live chat, FAQ section, or other support resources. Alternatively, if a different support route exists, update the href attribute to point to the correct URL.
+
+### Sensitive Data Logging on Check Your Email Page
+
+**File Location**: `AirvikBook/frontend/src/app/auth/verify-email/page.tsx` (lines 40, 41, 46)
+
+**Issue Description**: User Email Address and Token Information Being Logged to Console
+
+- **Current State**: On the Check Your Email page, the browser console displays sensitive user information including:
+  - "URL Params - Raw email: [user-email@example.com]"
+  - "URL Params - Raw token: [token-value]"
+  - "Decoded email: [user-email@example.com]"
+  These logs appear multiple times and expose user email addresses and potentially sensitive token information to anyone with access to the browser's developer tools.
+
+- **Expected State**: No sensitive user information should be logged to the console or any application logs. The Check Your Email page should function properly without exposing user email addresses, tokens, or any other personally identifiable information in the browser console or application logs.
+
+- **Action Required**: Remove all console.log statements that expose user email addresses, tokens, or any other sensitive information from the Check Your Email page. Ensure that debugging information is not logged in production environments and that user privacy is maintained.
