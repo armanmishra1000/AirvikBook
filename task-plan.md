@@ -29,6 +29,11 @@ This document outlines the systematic approach to fix all visual testing issues 
   - File: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx`
   - Action: Hide by default, show only when typing, hide when complete
 
+### Password Strength Indicator Visibility Issue
+- [x] **Issue 25**: Fix password strength indicator to show only when typing
+  - File: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx`
+  - Action: Remove focus-based visibility, show only when password has content
+
 ### Terms and Conditions and Privacy Policy Links 404 Error
 - [x] **Issue 6**: Create missing Terms of Service page
   - File: `AirvikBook/frontend/src/app/terms/page.tsx` (create new)
@@ -73,6 +78,21 @@ This document outlines the systematic approach to fix all visual testing issues 
   - File: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx`
   - Action: Remove transition-all, duration-normal, transform, hover:shadow-lg, hover:-translate-y-1, and active:translate-y-0 classes
 
+### Google OAuth Button Text and Icon Styling Issues
+- [x] **Issue 26**: Fix Google OAuth button text capitalization and icon size
+  - File: `AirvikBook/frontend/src/components/auth/GoogleOAuthRedirectButton.tsx`
+  - Action: Capitalize button text and increase Google icon size from w-5 h-5 to w-6 h-6
+
+### Password Matching Validation Issue
+- [x] **Issue 28**: Fix password matching validation to clear error when passwords match
+  - File: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx`
+  - Action: Add real-time password matching validation in handleInputChange function
+
+### Password Strength Indicator Visibility Issue
+- [x] **Issue 29**: Fix password strength indicator to hide when all requirements are met
+  - File: `AirvikBook/frontend/src/components/auth/RegistrationForm.tsx`
+  - Action: Modify component rendering logic to hide entire indicator when requirements are fulfilled
+
 ## Login Page Issues
 
 ### Login Page – Issues to Fix
@@ -104,6 +124,10 @@ This document outlines the systematic approach to fix all visual testing issues 
   - File: `AirvikBook/frontend/src/components/auth/LoginForm.tsx`
   - Action: Remove transition-all, duration-normal, transform, hover:shadow-lg, hover:-translate-y-1, and active:translate-y-0 classes
 
+- [x] **Issue 27**: Fix Google OAuth button text capitalization and icon size (same as Issue 26)
+  - File: `AirvikBook/frontend/src/components/auth/GoogleOAuthRedirectButton.tsx`
+  - Action: Capitalize button text and increase Google icon size from w-5 h-5 to w-6 h-6
+
 ### Error State Focus Border Consistency
 - [x] **Issue 20**: Fix border color on error fields during focus
   - File: `AirvikBook/frontend/src/components/auth/LoginForm.tsx` and `RegistrationForm.tsx`
@@ -122,8 +146,8 @@ This document outlines the systematic approach to fix all visual testing issues 
   - Action: Remove all console.log statements that expose user email addresses, tokens, and other sensitive information
 
 ## Progress Tracking
-- Total Issues: 24
-- Completed: 24 (All issues resolved)
+- Total Issues: 29
+- Completed: 29 (All issues resolved)
 - Remaining: 0
 
 ## Notes

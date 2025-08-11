@@ -50,7 +50,6 @@ export default function RegistrationForm({
   const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   // Toast helpers
   const { showSuccess, showError } = useToastHelpers();
@@ -90,6 +89,25 @@ export default function RegistrationForm({
     // Clear field error when user starts typing
     if (errors[field as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+
+    // Handle password matching validation in real-time
+    if (field === 'password' || field === 'confirmPassword') {
+      const newFormData = { ...formData, [field]: value };
+      
+      // If both password fields have values, check if they match
+      if (newFormData.password && newFormData.confirmPassword) {
+        if (newFormData.password === newFormData.confirmPassword) {
+          // Passwords match, clear confirm password error
+          setErrors(prev => ({ ...prev, confirmPassword: undefined }));
+        } else {
+          // Passwords don't match, set confirm password error
+          setErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }));
+        }
+      } else if (field === 'confirmPassword' && newFormData.confirmPassword && !newFormData.password) {
+        // Only confirm password has value, set error
+        setErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }));
+      }
     }
 
     // Email availability check with debounce
@@ -368,8 +386,6 @@ export default function RegistrationForm({
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
-                onFocus={() => setIsPasswordFocused(true)}
-                onBlur={() => setIsPasswordFocused(false)}
                 className={`w-full px-space-4 py-space-3 pr-12 border rounded-radius-md font-sf-pro text-body
                   transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
                   ${errors.password 
@@ -402,12 +418,14 @@ export default function RegistrationForm({
             {errors.password && <p className="mt-space-1 text-caption text-error">{errors.password}</p>}
             
             {/* Password Strength Indicator */}
-            <div className="mt-space-2">
-              <PasswordStrengthIndicator 
-                password={formData.password} 
-                showRequirements={(isPasswordFocused || formData.password.length > 0) && !areAllPasswordRequirementsMet(formData.password)}
-              />
-            </div>
+            {formData.password.length > 0 && !areAllPasswordRequirementsMet(formData.password) && (
+              <div className="mt-space-2">
+                <PasswordStrengthIndicator 
+                  password={formData.password} 
+                  showRequirements={true}
+                />
+              </div>
+            )}
           </div>
 
           {/* Confirm Password Field */}
@@ -517,7 +535,7 @@ export default function RegistrationForm({
             Already have an account?{' '}
             <a
               href="/auth/login"
-              className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
+              className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple  transition-colors duration-normal"
             >
               Sign in here
             </a>
