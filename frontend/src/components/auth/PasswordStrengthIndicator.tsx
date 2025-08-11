@@ -110,7 +110,7 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
             Password Requirements:
           </p>
           
-          <ul className="space-y-space-2">
+          <ul className="space-y-space-0">
             {PASSWORD_REQUIREMENTS.map((requirement) => {
               const isMetOrNoPassword = !password || requirement.test(password);
               const isMet = password && requirement.test(password);
@@ -118,7 +118,7 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
               return (
                 <li
                   key={requirement.id}
-                  className="flex items-center space-x-space-3"
+                  className="flex items-center space-x-space-2"
                 >
                   {/* Requirement Icon */}
                   <div className={`flex-shrink-0 w-4 h-4 rounded-radius-full flex items-center justify-center transition-all duration-normal

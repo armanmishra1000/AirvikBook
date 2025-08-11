@@ -223,8 +223,8 @@ describe('PasswordResetService', () => {
     it('should successfully reset password with valid token and password', async () => {
       const resetRequest = {
         token: 'valid-token',
-        newPassword: 'NewPassword123!',
-        confirmPassword: 'NewPassword123!'
+        newPassword: 'SecurePass247!',
+        confirmPassword: 'SecurePass247!'
       };
 
       const mockToken = {
@@ -277,7 +277,7 @@ describe('PasswordResetService', () => {
       expect(result.success).toBe(true);
       expect(result.data?.passwordReset).toBe(true);
       expect(result.data?.sessionActions.allSessionsInvalidated).toBe(true);
-      expect(mockBcrypt.hash).toHaveBeenCalledWith('NewPassword123!', 12);
+      expect(mockBcrypt.hash).toHaveBeenCalledWith('SecurePass247!', 12);
       expect(mockPrisma.user.update).toHaveBeenCalled();
       expect(mockPrisma.passwordResetToken.update).toHaveBeenCalled();
     });
@@ -285,7 +285,7 @@ describe('PasswordResetService', () => {
     it('should reject mismatched passwords', async () => {
       const resetRequest = {
         token: 'valid-token',
-        newPassword: 'NewPassword123!',
+        newPassword: 'SecurePass247!',
         confirmPassword: 'DifferentPassword123!'
       };
 

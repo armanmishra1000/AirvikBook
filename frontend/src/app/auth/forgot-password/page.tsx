@@ -179,7 +179,7 @@ const ForgotPasswordPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
-      <div className="max-w-md w-full">
+      <div className="max-w-md w-full card-auth">
         {/* Header */}
         <div className="text-center mb-space-8">
           <h1 className="text-h1 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
@@ -192,10 +192,15 @@ const ForgotPasswordPage: React.FC = () => {
 
         {/* Form Card */}
         <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-lg p-space-8">
-          <form onSubmit={handleSubmit} className="space-y-space-6" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-space-4" noValidate>
+            {/* General Error Message */}
+            {errors.general && (
+              <p className="text-caption text-error">{errors.general}</p>
+            )}
+
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-label font-sf-pro font-medium text-airvik-black dark:text-airvik-white mb-space-2">
+              <label htmlFor="email" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
                 Email Address
               </label>
               <input
@@ -206,11 +211,13 @@ const ForgotPasswordPage: React.FC = () => {
                 onChange={handleInputChange}
                 placeholder="Enter your email address"
                 className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
+                  transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
                   ${errors.email 
-                    ? 'border-error focus:outline-none focus:ring-0 focus:border-error' 
-                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-airvik-blue transition-colors duration-normal'
+                    ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                    : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
                   }`}
                 disabled={isSubmitting}
+                autoComplete="email"
               />
               {errors.email && (
                 <p className="mt-space-1 text-caption text-error">
@@ -219,24 +226,19 @@ const ForgotPasswordPage: React.FC = () => {
               )}
             </div>
 
-            {/* General Error */}
-            {errors.general && (
-              <div className="p-space-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-radius-md">
-                <p className="text-body font-sf-pro text-error">
-                  {errors.general}
-                </p>
-              </div>
-            )}
-
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-normal focus:outline-none"
+              className={`w-full py-space-3 px-space-6 rounded-radius-md font-sf-pro text-button transition-all ease-linear duration-100
+                ${isSubmitting
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                  : 'bg-airvik-blue text-airvik-white hover:bg-airvik-bluehover'
+                }`}
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
+                  <div className="animate-spin mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-radius-full" />
                   Sending...
                 </div>
               ) : (

@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="font-sf-pro antialiased">
+      <body className="antialiased font-sf-pro" suppressHydrationWarning={true}>
         <ErrorBoundary>
           <ToastProvider>
             <AuthProvider>

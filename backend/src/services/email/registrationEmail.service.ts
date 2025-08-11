@@ -1,6 +1,12 @@
 import { EmailService } from '../email.service';
 import { EmailTemplatesService } from './emailTemplates.service';
 
+// Helper function to mask email addresses for security
+const maskEmail = (email: string) => {
+  const [local, domain] = email.split('@');
+  return `${local.substring(0, 2)}***@${domain}`;
+};
+
 export interface SendVerificationEmailData {
   email: string;
   fullName: string;
@@ -65,13 +71,13 @@ export class RegistrationEmailService {
       });
 
       if (result.success) {
-        console.log(`✅ Verification email sent to ${email}`);
+        console.log(`✅ Verification email sent to ${maskEmail(email)}`);
         return {
           success: true,
           messageId: result.data?.messageId || 'sent'
         };
       } else {
-        console.error(`❌ Failed to send verification email to ${email}:`, result.error);
+        console.error(`❌ Failed to send verification email to ${maskEmail(email)}:`, result.error);
         return {
           success: false,
           error: result.error
@@ -113,13 +119,13 @@ export class RegistrationEmailService {
       });
 
       if (result.success) {
-        console.log(`✅ Welcome email sent to ${email}`);
+        console.log(`✅ Welcome email sent to ${maskEmail(email)}`);
         return {
           success: true,
           messageId: result.data?.messageId || 'sent'
         };
       } else {
-        console.error(`❌ Failed to send welcome email to ${email}:`, result.error);
+        console.error(`❌ Failed to send welcome email to ${maskEmail(email)}:`, result.error);
         return {
           success: false,
           error: result.error
@@ -166,13 +172,13 @@ export class RegistrationEmailService {
       });
 
       if (result.success) {
-        console.log(`✅ Password reset email sent to ${email}`);
+        console.log(`✅ Password reset email sent to ${maskEmail(email)}`);
         return {
           success: true,
           messageId: result.data?.messageId || 'sent'
         };
       } else {
-        console.error(`❌ Failed to send password reset email to ${email}:`, result.error);
+        console.error(`❌ Failed to send password reset email to ${maskEmail(email)}:`, result.error);
         return {
           success: false,
           error: result.error

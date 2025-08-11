@@ -168,8 +168,8 @@ describe('PasswordManagementService', () => {
     it('should successfully change password for email account', async () => {
       const changeRequest = {
         currentPassword: 'oldPassword123!',
-        newPassword: 'NewPassword123!',
-        confirmPassword: 'NewPassword123!',
+        newPassword: 'SecurePass247!',
+        confirmPassword: 'SecurePass247!',
         invalidateOtherSessions: true
       };
 
@@ -208,14 +208,14 @@ describe('PasswordManagementService', () => {
       expect(result.data?.passwordChanged).toBe(true);
       expect(result.data?.sessionActions.otherSessionsInvalidated).toBe(true);
       expect(result.data?.sessionActions.sessionsInvalidated).toBe(1);
-      expect(mockBcrypt.hash).toHaveBeenCalledWith('NewPassword123!', 12);
+      expect(mockBcrypt.hash).toHaveBeenCalledWith('SecurePass247!', 12);
     });
 
     it('should reject incorrect current password', async () => {
       const changeRequest = {
         currentPassword: 'wrongPassword',
-        newPassword: 'NewPassword123!',
-        confirmPassword: 'NewPassword123!'
+        newPassword: 'SecurePass247!',
+        confirmPassword: 'SecurePass247!'
       };
 
       const mockUser = {
@@ -238,8 +238,8 @@ describe('PasswordManagementService', () => {
     it('should reject mismatched new passwords', async () => {
       const changeRequest = {
         currentPassword: 'oldPassword123!',
-        newPassword: 'NewPassword123!',
-        confirmPassword: 'DifferentPassword123!'
+        newPassword: 'SecurePass247!',
+        confirmPassword: 'DifferentPassword789!'
       };
 
       const result = await PasswordManagementService.changePassword('user123', 'session1', changeRequest);
@@ -251,8 +251,8 @@ describe('PasswordManagementService', () => {
     it('should enforce rate limiting', async () => {
       const changeRequest = {
         currentPassword: 'oldPassword123!',
-        newPassword: 'NewPassword123!',
-        confirmPassword: 'NewPassword123!'
+        newPassword: 'SecurePass247!',
+        confirmPassword: 'SecurePass247!'
       };
 
       // Simulate 5 attempts already made
@@ -273,8 +273,8 @@ describe('PasswordManagementService', () => {
   describe('setPasswordForGoogleUser', () => {
     it('should successfully set password for Google-only user', async () => {
       const setRequest = {
-        newPassword: 'NewPassword123!',
-        confirmPassword: 'NewPassword123!'
+        newPassword: 'SecurePass247!',
+        confirmPassword: 'SecurePass247!'
       };
 
       const mockUser = {
@@ -310,8 +310,8 @@ describe('PasswordManagementService', () => {
 
     it('should reject setting password for account that already has one', async () => {
       const setRequest = {
-        newPassword: 'NewPassword123!',
-        confirmPassword: 'NewPassword123!'
+        newPassword: 'SecurePass247!',
+        confirmPassword: 'SecurePass247!'
       };
 
       const mockUser = {
@@ -333,8 +333,8 @@ describe('PasswordManagementService', () => {
 
     it('should reject setting password for account without Google authentication', async () => {
       const setRequest = {
-        newPassword: 'NewPassword123!',
-        confirmPassword: 'NewPassword123!'
+        newPassword: 'SecurePass247!',
+        confirmPassword: 'SecurePass247!'
       };
 
       const mockUser = {

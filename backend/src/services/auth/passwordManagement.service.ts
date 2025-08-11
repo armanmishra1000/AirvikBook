@@ -102,7 +102,8 @@ export interface RemovePasswordResult {
 
 export class PasswordManagementService {
   private static readonly BCRYPT_ROUNDS = 12;
-  private static readonly MIN_PASSWORD_LENGTH = 8;
+  private static readonly MIN_PASSWORD_LENGTH = 12; // Increased from 8 to 12
+  private static readonly MAX_PASSWORD_LENGTH = 128; // Added maximum length
   private static readonly PASSWORD_HISTORY_LIMIT = 5;
   
   // Rate limiting maps
@@ -110,16 +111,36 @@ export class PasswordManagementService {
   private static readonly PASSWORD_CHANGE_LIMIT = 5; // 5 attempts per 15 minutes per user
   private static readonly PASSWORD_CHANGE_WINDOW = 15 * 60 * 1000; // 15 minutes
 
+  // Common passwords to prevent
+  private static readonly COMMON_PASSWORDS = [
+    'password', '123456', '123456789', 'qwerty', 'abc123', 'password123',
+    'admin', 'letmein', 'welcome', 'monkey', 'dragon', 'master', 'hello',
+    'freedom', 'whatever', 'qazwsx', 'trustno1', 'jordan', 'harley',
+    'ranger', 'iwantu', 'jennifer', 'hunter', 'buster', 'soccer',
+    'baseball', 'tiger', 'charlie', 'andrew', 'michelle', 'love',
+    'sunshine', 'jessica', 'asshole', '696969', 'amanda', 'access',
+    'computer', 'cookie', 'mickey', 'shadow', 'maggie', '654321',
+    'superman', '1qaz2wsx', '7777777', '121212', 'buster', 'butter',
+    'dragon', 'jordan', 'michael', 'michelle', 'charlie', 'andrew',
+    'matthew', 'access', 'ninja', 'password1', '12345678', 'qwerty123'
+  ];
+
   /**
-   * Validate password strength
+   * Validate password strength with enhanced security
    */
   private static validatePasswordStrength(password: string): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
+    // Length validation
     if (password.length < this.MIN_PASSWORD_LENGTH) {
       errors.push(`Password must be at least ${this.MIN_PASSWORD_LENGTH} characters long`);
     }
 
+    if (password.length > this.MAX_PASSWORD_LENGTH) {
+      errors.push(`Password must be no more than ${this.MAX_PASSWORD_LENGTH} characters long`);
+    }
+
+    // Character requirements
     if (!/[A-Z]/.test(password)) {
       errors.push('Password must contain at least one uppercase letter');
     }
@@ -136,10 +157,76 @@ export class PasswordManagementService {
       errors.push('Password must contain at least one special character');
     }
 
+    // Enhanced security checks
+    if (this.isCommonPassword(password)) {
+      errors.push('Password is too common. Please choose a more unique password');
+    }
+
+    if (this.hasSequentialCharacters(password)) {
+      errors.push('Password contains sequential characters (e.g., 123, abc)');
+    }
+
+    if (this.hasRepeatingCharacters(password)) {
+      errors.push('Password contains too many repeating characters');
+    }
+
+    if (this.hasKeyboardPatterns(password)) {
+      errors.push('Password contains keyboard patterns (e.g., qwerty, asdf)');
+    }
+
     return {
       isValid: errors.length === 0,
       errors
     };
+  }
+
+  /**
+   * Check if password is in common passwords list
+   */
+  private static isCommonPassword(password: string): boolean {
+    const normalizedPassword = password.toLowerCase().trim();
+    return this.COMMON_PASSWORDS.includes(normalizedPassword);
+  }
+
+  /**
+   * Check for sequential characters
+   */
+  private static hasSequentialCharacters(password: string): boolean {
+    const sequences = [
+      '123', '234', '345', '456', '567', '678', '789', '890',
+      'abc', 'bcd', 'cde', 'def', 'efg', 'fgh', 'ghi', 'hij', 'ijk', 'jkl', 'klm', 'lmn', 'mno', 'nop', 'opq', 'pqr', 'qrs', 'rst', 'stu', 'tuv', 'uvw', 'vwx', 'wxy', 'xyz',
+      'qwe', 'wer', 'ert', 'rty', 'tyu', 'yui', 'uio', 'iop',
+      'asd', 'sdf', 'dfg', 'fgh', 'ghj', 'hjk', 'jkl'
+    ];
+
+    const normalizedPassword = password.toLowerCase();
+    return sequences.some(seq => normalizedPassword.includes(seq));
+  }
+
+  /**
+   * Check for repeating characters
+   */
+  private static hasRepeatingCharacters(password: string): boolean {
+    // Check for 3 or more consecutive identical characters
+    for (let i = 0; i < password.length - 2; i++) {
+      if (password[i] === password[i + 1] && password[i] === password[i + 2]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Check for keyboard patterns
+   */
+  private static hasKeyboardPatterns(password: string): boolean {
+    const patterns = [
+      'qwerty', 'asdfgh', 'zxcvbn', 'qazwsx', 'edcrfv', 'tgbyhn',
+      '123456', '654321', '111111', '000000', 'aaaaaa', 'zzzzzz'
+    ];
+
+    const normalizedPassword = password.toLowerCase();
+    return patterns.some(pattern => normalizedPassword.includes(pattern));
   }
 
   /**

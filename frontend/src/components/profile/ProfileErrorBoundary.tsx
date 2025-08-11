@@ -30,29 +30,6 @@ interface State {
   errorId: string | null;
 }
 
-interface ErrorTestProps {
-  onTriggerError: () => void;
-}
-
-// Test component to intentionally trigger errors (for QA validation)
-const ErrorTestTrigger: React.FC<ErrorTestProps> = ({ onTriggerError }) => (
-  <button
-    onClick={onTriggerError}
-    className="btn-secondary text-caption"
-    data-testid="error-trigger"
-    style={{ 
-      position: 'fixed', 
-      bottom: '10px', 
-      right: '10px', 
-      zIndex: 9999,
-      fontSize: '10px',
-      padding: '4px 8px'
-    }}
-  >
-    [TEST] Trigger Error
-  </button>
-);
-
 export default class ProfileErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -98,8 +75,7 @@ export default class ProfileErrorBoundary extends Component<Props, State> {
 
     // In production, you might want to send this to an error tracking service
     if (process.env.NODE_ENV === 'production') {
-      // Example: Send to error tracking service
-      // errorTrackingService.captureException(error, { extra: errorInfo });
+      // Example: sendToErrorTrackingService(error, errorInfo, this.state.errorId);
     }
   }
 
@@ -119,11 +95,6 @@ export default class ProfileErrorBoundary extends Component<Props, State> {
     });
   };
 
-  triggerTestError = () => {
-    // This method is only for testing the error boundary
-    throw new Error('Test error triggered for error boundary validation');
-  };
-
   render() {
     if (this.state.hasError) {
       // Use custom fallback if provided
@@ -133,9 +104,9 @@ export default class ProfileErrorBoundary extends Component<Props, State> {
 
       // Default error UI with brand compliance
       return (
-        <div className="min-h-screen flex items-center justify-center p-space-4" 
+        <div className="flex items-center justify-center min-h-screen p-space-4" 
              style={{ backgroundColor: 'var(--airvik-white)' }}>
-          <div className="card p-space-8 text-center max-w-md w-full"
+          <div className="w-full max-w-md text-center card p-space-8"
                style={{ 
                  backgroundColor: 'var(--surface-primary)',
                  border: '1px solid var(--border-primary)',
@@ -144,8 +115,8 @@ export default class ProfileErrorBoundary extends Component<Props, State> {
                }}>
             
             {/* Error Icon */}
-            <div className="mb-space-6 flex justify-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center"
+            <div className="flex justify-center mb-space-6">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full"
                    style={{ backgroundColor: 'var(--error-light)' }}>
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" 
@@ -169,7 +140,7 @@ export default class ProfileErrorBoundary extends Component<Props, State> {
 
             {/* Error ID for support */}
             {this.state.errorId && (
-              <p className="text-caption mb-space-6 p-space-3 rounded" 
+              <p className="rounded text-caption mb-space-6 p-space-3" 
                  style={{ 
                    backgroundColor: 'var(--surface-secondary)', 
                    color: 'var(--text-tertiary)',
@@ -181,7 +152,7 @@ export default class ProfileErrorBoundary extends Component<Props, State> {
             )}
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-space-3 justify-center">
+            <div className="flex flex-col justify-center sm:flex-row gap-space-3">
               <button
                 onClick={this.handleRetry}
                 className="btn-primary"
@@ -253,12 +224,12 @@ export default class ProfileErrorBoundary extends Component<Props, State> {
 
             {/* Developer info in development */}
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mt-space-6 text-left">
+              <details className="text-left mt-space-6">
                 <summary className="cursor-pointer text-caption" 
                          style={{ color: 'var(--text-tertiary)' }}>
                   Developer Details
                 </summary>
-                <pre className="mt-space-2 p-space-3 rounded text-xs overflow-auto"
+                <pre className="overflow-auto text-xs rounded mt-space-2 p-space-3"
                      style={{ 
                        backgroundColor: 'var(--surface-secondary)',
                        border: '1px solid var(--border-secondary)',
@@ -273,15 +244,8 @@ export default class ProfileErrorBoundary extends Component<Props, State> {
       );
     }
 
-    // Render children normally, with test trigger in development
-    return (
-      <>
-        {this.props.children}
-        {process.env.NODE_ENV === 'development' && (
-          <ErrorTestTrigger onTriggerError={this.triggerTestError} />
-        )}
-      </>
-    );
+    // Render children normally
+    return this.props.children;
   }
 }
 

@@ -78,10 +78,10 @@ const LoginPage: React.FC = () => {
           {/* Divider */}
           <div className="relative mb-space-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+              <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-caption">
-              <span className="px-space-2 bg-airvik-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-sf-pro">
+              <span className="px-space-2 bg-airvik-white text-sm  text-gray-500 font-sf-pro">
                 Or continue with
               </span>
             </div>
@@ -96,37 +96,7 @@ const LoginPage: React.FC = () => {
           </GoogleOAuthRedirectButton>
         </div>
 
-        {/* Footer Links */}
-        <div className="mt-space-8 text-center">
-          <div className="space-y-space-2">
-            <p className="text-body text-gray-600 dark:text-gray-400 font-sf-pro">
-              Don't have an account?{' '}
-              <a 
-                href="/auth/register" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal font-medium"
-              >
-                Sign up for free
-              </a>
-            </p>
-            
-            <p className="text-caption text-gray-500 dark:text-gray-500 font-sf-pro">
-              By signing in, you agree to our{' '}
-              <a 
-                href="/terms" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal"
-              >
-                Terms of Service
-              </a>
-              {' '}and{' '}
-              <a 
-                href="/privacy" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal"
-              >
-                Privacy Policy
-              </a>
-            </p>
-          </div>
-        </div>
+
       </div>
     </div>
   );

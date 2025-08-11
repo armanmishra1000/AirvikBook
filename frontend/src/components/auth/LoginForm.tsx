@@ -11,6 +11,7 @@ import {
   LOGIN_ERROR_CODES
 } from '../../types/userLogin.types';
 import { UserLoginService } from '../../services/userLogin.service';
+import { Eye, EyeOff } from 'lucide-react';
 
 // =====================================================
 // BRAND-COMPLIANT LOGIN FORM COMPONENT
@@ -191,7 +192,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <div className={`w-full max-w-md mx-auto ${className}`}>
-      <form onSubmit={handleSubmit} className="space-y-space-4">
+      <form onSubmit={handleSubmit} className="space-y-space-4" noValidate>
         {/* Form Title */}
         <div className="text-center">
           <h2 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white">
@@ -204,20 +205,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         {/* General Error Message */}
         {errors.general && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-radius-md p-space-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-error" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-space-3">
-                <p className="text-body text-error">
-                  {errors.general}
-                </p>
-              </div>
-            </div>
-          </div>
+          <p className="text-caption text-error">{errors.general}</p>
         )}
 
         {/* Email Field */}
@@ -232,10 +220,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             value={formData.email}
             onChange={handleInputChange}
             className={`w-full px-space-4 py-space-3 border rounded-radius-md font-sf-pro text-body
-              transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+              transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
               ${errors.email 
-                ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
               }`}
             placeholder="Enter your email address"
             disabled={isSubmitting}
@@ -262,10 +250,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               value={formData.password}
               onChange={handleInputChange}
               className={`w-full px-space-4 py-space-3 pr-12 border rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
+                transition-colors duration-normal focus:outline-none focus:ring-0 focus:transition-none
                 ${errors.password 
-                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-error' 
-                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500'
+                  ? 'border-error bg-red-50 dark:bg-red-900/20 text-airvik-black dark:text-airvik-white focus:border-error focus:ring-2 focus:ring-error' 
+                  : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500 focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue'
                 }`}
               placeholder="Enter your password"
               disabled={isSubmitting}
@@ -279,15 +267,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               disabled={isSubmitting}
             >
               {showPassword ? (
-                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
-                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-                </svg>
+                <Eye className="size-5" />
               ) : (
-                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                </svg>
+                <EyeOff className="size-5" />
               )}
             </button>
           </div>
@@ -308,7 +290,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 name="rememberMe"
                 checked={formData.rememberMe}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-airvik-blue focus:ring-airvik-blue border-gray-300 rounded"
+                className="h-4 w-4 text-airvik-blue border-gray-300 rounded focus:outline-none focus:ring-0 disabled:cursor-not-allowed appearance-none checked:bg-airvik-blue checked:border-airvik-blue"
                 disabled={isSubmitting}
               />
               <label htmlFor="rememberMe" className="ml-space-2 text-body text-gray-700 dark:text-gray-300">
@@ -320,7 +302,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           {showForgotPassword && (
             <a 
               href="/auth/forgot-password" 
-              className="text-body text-airvik-blue hover:text-airvik-purple transition-colors duration-normal"
+              className="text-body text-airvik-blue transition-colors duration-normal"
             >
               Forgot password?
             </a>
@@ -331,11 +313,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <button
           type="submit"
           disabled={isSubmitting || authState.isLoading}
-          className={`w-full py-space-3 px-space-6 rounded-radius-md font-sf-pro text-button
-            transition-all duration-normal transform
+          className={`w-full py-space-3 px-space-6 rounded-radius-md font-sf-pro text-button transition-all ease-linear duration-100
             ${isSubmitting || authState.isLoading
               ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              : 'bg-airvik-blue text-airvik-white hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 active:translate-y-0'
+              : 'bg-airvik-blue text-airvik-white hover:bg-airvik-bluehover'
             }`}
         >
           {isSubmitting || authState.isLoading ? (
@@ -369,9 +350,30 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             Don't have an account?{' '}
             <a 
               href="/auth/register" 
-              className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal font-medium"
+              className="text-airvik-blue transition-colors duration-normal font-medium"
             >
               Sign up
+            </a>
+          </p>
+          
+          <p className="mt-space-2 text-caption text-gray-500 dark:text-gray-500">
+            By signing in, you agree to our{' '}
+            <a
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-airvik-blue dark:text-airvik-blue underline transition-colors duration-normal"
+            >
+              Terms of Service
+            </a>
+            {' '}and{' '}
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-airvik-blue dark:text-airvik-blue underline transition-colors duration-normal"
+            >
+              Privacy Policy
             </a>
           </p>
         </div>

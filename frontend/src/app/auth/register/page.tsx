@@ -17,7 +17,6 @@ export default function RegisterPage() {
   const [userEmail, setUserEmail] = useState('');
 
   const handleRegistrationSuccess = (user: any, tokens: any) => {
-    console.log('Registration successful:', { user, tokens });
     setUserEmail(user.email);
     setRegistrationSuccess(true);
     
@@ -33,14 +32,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
+    <div className="flex flex-col justify-center min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle py-space-12 sm:px-space-6 lg:px-space-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo/Brand */}
         <div className="text-center mb-space-8">
-          <h1 className="text-display font-sf-pro font-bold text-airvik-black dark:text-airvik-white">
+          <h1 className="font-bold text-display font-sf-pro text-airvik-black dark:text-airvik-white">
             AirVikBook
           </h1>
-          <p className="mt-space-2 text-body text-gray-600 dark:text-gray-400 font-sf-pro">
+          <p className="text-gray-600 mt-space-2 text-body dark:text-gray-400 font-sf-pro">
             Hotel Management System
           </p>
         </div>
@@ -57,12 +56,12 @@ export default function RegisterPage() {
               <h2 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
                 Account Created Successfully!
               </h2>
-              <p className="text-body text-gray-600 dark:text-gray-400 mb-space-4">
+              <p className="text-gray-600 text-body dark:text-gray-400 mb-space-4">
                 We've sent a verification email to <strong>{userEmail}</strong>
               </p>
               <div className="flex items-center justify-center">
-                <div className="animate-spin h-5 w-5 mr-space-2 border-2 border-airvik-blue border-t-transparent rounded-radius-full" />
-                <span className="text-body text-gray-600 dark:text-gray-400">
+                <div className="w-5 h-5 border-2 animate-spin mr-space-2 border-airvik-blue border-t-transparent rounded-radius-full" />
+                <span className="text-gray-600 text-body dark:text-gray-400">
                   Redirecting to verification page...
                 </span>
               </div>
@@ -75,37 +74,6 @@ export default function RegisterPage() {
           )}
         </div>
 
-        {/* Footer Links */}
-        <div className="mt-space-8 text-center">
-          <div className="space-y-space-2">
-            <p className="text-body text-gray-600 dark:text-gray-400 font-sf-pro">
-              Already have an account?{' '}
-              <a 
-                href="/auth/login" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal font-medium"
-              >
-                Sign in here
-              </a>
-            </p>
-            
-            <p className="text-caption text-gray-500 dark:text-gray-500 font-sf-pro">
-              By signing up, you agree to our{' '}
-              <a 
-                href="/terms" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal"
-              >
-                Terms of Service
-              </a>
-              {' '}and{' '}
-              <a 
-                href="/privacy" 
-                className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal"
-              >
-                Privacy Policy
-              </a>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

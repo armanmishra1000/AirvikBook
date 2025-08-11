@@ -53,20 +53,18 @@ export default function GoogleOAuthRedirectButton({
       onClick={handleGoogleOAuth}
       disabled={disabled}
       className={`
-        w-full flex items-center justify-center px-space-4 py-space-3 
+        w-full flex items-center justify-center px-space-4 py-space-3
         border border-airvik-gray-300 rounded-radius-md shadow-elevation-sm
         bg-airvik-white hover:bg-airvik-gray-50 
-        text-airvik-gray-700 font-sf-pro text-button
+        text-airvik-gray-700  text-button focus:outline-none
         transition-all duration-normal
         disabled:opacity-50 disabled:cursor-not-allowed
-        focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2
-        dark:border-airvik-gray-600 dark:bg-airvik-gray-800 dark:hover:bg-airvik-gray-700
-        dark:text-airvik-gray-200
+        focus:ring-0
         ${className}
       `}
       type="button"
     >
-      <FcGoogle className="w-5 h-5 mr-space-3" />
+      <FcGoogle className="size-7 mr-space-2" />
       {children || (
         <>
           {type === 'register' ? 'Sign up' : 'Sign in'} with Google

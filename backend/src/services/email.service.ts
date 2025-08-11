@@ -19,11 +19,21 @@ export interface EmailTemplateData {
 }
 
 export class EmailService {
-  private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter | null;
   private fromEmail: string;
 
   constructor() {
     this.fromEmail = process.env.FROM_EMAIL || 'noreply@airvikbook.com';
+    this.transporter = null;
+    
+    // Check if SMTP credentials are configured
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    
+    if (!smtpUser || !smtpPass || smtpUser === 'your-brevo-smtp-username@smtp-brevo.com' || smtpPass === 'your-brevo-smtp-password-here') {
+      console.log('⚠️ SMTP credentials not configured - email service will be disabled');
+      return;
+    }
     
     // Create transporter with Brevo SMTP configuration
     this.transporter = nodemailer.createTransport({
@@ -31,8 +41,8 @@ export class EmailService {
       port: parseInt(process.env.SMTP_PORT || '587'),
       secure: process.env.SMTP_SECURE === 'true', // false for TLS, true for SSL
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: smtpUser,
+        pass: smtpPass,
       },
       // Additional options for better compatibility
       tls: {
@@ -46,6 +56,11 @@ export class EmailService {
   }
 
   private async verifyConnection(): Promise<void> {
+    if (!this.transporter) {
+      console.log('ℹ️ Email service disabled - SMTP credentials not configured');
+      return;
+    }
+    
     try {
       await this.transporter.verify();
       console.log('✅ Email service connected successfully (Brevo SMTP)');
@@ -58,6 +73,15 @@ export class EmailService {
    * Send a single email
    */
   async sendEmail(options: EmailOptions): Promise<ServiceResponse<any>> {
+    if (!this.transporter) {
+      console.log('⚠️ Email service disabled - cannot send email');
+      return {
+        success: false,
+        error: 'Email service is disabled - SMTP credentials not configured',
+        code: 'EMAIL_SERVICE_DISABLED',
+      };
+    }
+    
     try {
       const mailOptions = {
         from: `"AirVikBook" <${this.fromEmail}>`,
@@ -260,6 +284,14 @@ export class EmailService {
    * Test email configuration
    */
   async testEmailConfiguration(): Promise<ServiceResponse<any>> {
+    if (!this.transporter) {
+      return {
+        success: false,
+        error: 'Email service is disabled - SMTP credentials not configured',
+        code: 'EMAIL_SERVICE_DISABLED',
+      };
+    }
+    
     const testEmail = {
       to: this.fromEmail,
       subject: 'AirVikBook Email Configuration Test',
