@@ -216,7 +216,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       <button
         type="button"
         onClick={handleBackClick}
-        className="absolute top-0 -left-10 p-space-1 border border-gray-300 dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+        className="absolute hidden sm:block top-0 -left-10 p-1.5 border border-gray-300 dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none"
         aria-label="Go back to homepage"
       >
         <ArrowLeft className="size-4" />
@@ -224,19 +224,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       <form onSubmit={handleSubmit} className="space-y-space-4" noValidate>
         {/* Form Title */}
-        <div className="text-center">
-          <h2 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white">
+        <div className="text-center mb-10 sm:mb-5">
+          <h2 className="sm:text-h2 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white">
             Welcome Back
           </h2>
-          <p className="text-body text-gray-600 dark:text-gray-400 mt-space-2">
+          <p className="text-body text-gray-600 dark:text-gray-400 mt-space-1">
             Sign in to your account
           </p>
         </div>
-
-        {/* General Error Message */}
-        {errors.general && (
-          <p className="text-caption text-error">{errors.general}</p>
-        )}
 
         {/* Email Field */}
         <div>
@@ -244,7 +239,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             htmlFor="email"
             className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2"
           >
-            Email Address
+            Email Address <span className="text-error">*</span>
           </label>
           <input
             type="email"
@@ -264,6 +259,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               ${
                 errors.email
                   ? "border-error focus:ring-1 focus:ring-error"
+                  
                   : "border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
               }`}
             placeholder="Enter your email address"
@@ -282,7 +278,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             htmlFor="password"
             className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2"
           >
-            Password
+            Password <span className="text-error">*</span>
           </label>
           <div className="relative">
             <input
@@ -372,16 +368,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <button
           type="submit"
           disabled={isSubmitting || authState.isLoading}
-          className={`w-full py-space-3 px-space-6 rounded-radius-md font-sf-pro text-button transition-all ease-linear duration-100
-            ${
-              isSubmitting || authState.isLoading
-                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                : "bg-airvik-blue text-airvik-white hover:bg-airvik-bluehover"
-            }`}
+          className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
         >
           {isSubmitting || authState.isLoading ? (
             <div className="flex items-center justify-center">
-              <div className="animate-spin mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-radius-full" />
+              <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
               Signing In...
             </div>
           ) : (
@@ -391,7 +382,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         {/* Sign Up Link */}
         <div className="text-center">
-          <p className="text-body text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Don't have an account?{" "}
             <a
               href="/auth/register"

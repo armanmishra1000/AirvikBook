@@ -211,7 +211,7 @@ const ForgotPasswordPage: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-space-8">
-          <h1 className="text-h1 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
+          <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
             Forgot Password
           </h1>
           <p className="text-body text-gray-600 dark:text-gray-400">
@@ -221,7 +221,7 @@ const ForgotPasswordPage: React.FC = () => {
         </div>
 
         {/* Form Card */}
-        <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-lg p-space-8 card-auth">
+        <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg sm:shadow-lg sm:p-space-6 sm:card-auth">
           <form onSubmit={handleSubmit} className="space-y-space-4" noValidate>
             {/* Email Input */}
             <div>
@@ -266,16 +266,11 @@ const ForgotPasswordPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-space-3 px-space-6 rounded-radius-md font-sf-pro text-button transition-all ease-linear duration-100
-                ${
-                  isSubmitting
-                    ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                    : "bg-airvik-blue text-airvik-white hover:bg-airvik-bluehover"
-                }`}
+              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-radius-full" />
+                  <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
                   Sending...
                 </div>
               ) : (
@@ -285,10 +280,10 @@ const ForgotPasswordPage: React.FC = () => {
           </form>
 
           {/* Back to Login */}
-          <div className="mt-space-6 text-center">
+          <div className="mt-space-4 text-center">
             <button
               onClick={() => router.push("/auth/login")}
-              className="text-body font-sf-pro text-airvik-blue hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none rounded-radius-sm"
+              className="text-body font-sf-pro bg-gray-200 w-full py-2.5 text-airvik-blue transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login
             </button>

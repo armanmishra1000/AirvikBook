@@ -62,11 +62,11 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center py-space-12 sm:px-space-6 lg:px-space-8">
+    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center sm:py-space-10 py-space-5 sm:px-space-6 lg:px-space-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo/Brand */}
-        <div className="text-center mb-space-8">
-          <h1 className="text-display font-sf-pro font-bold text-airvik-black dark:text-airvik-white">
+        <div className="text-center mb-space-8 hidden sm:block">
+          <h1 className="lg:text-display text-h3 font-sf-pro font-bold text-airvik-black dark:text-airvik-white">
             AirVikBook
           </h1>
           <p className="mt-space-2 text-body text-gray-600 dark:text-gray-400 font-sf-pro">
@@ -75,7 +75,7 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* Login Card */}
-        <div className="card-auth py-space-8 px-space-6">
+        <div className="sm:card-auth sm:py-space-8 py-space-4 sm:px-space-6 px-space-4">
           {/* Login Form */}
           <LoginForm
             onSuccess={handleLoginSuccess}

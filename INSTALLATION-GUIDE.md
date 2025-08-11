@@ -121,11 +121,44 @@ After installing ClamAV, verify the installation:
 
 ### 3. Redis Setup
 ```bash
-# Install Redis on Windows
-# Download from: https://github.com/microsoftarchive/redis/releases
+# Install Redis on Windows using winget (Recommended)
+winget install Redis
 
-# Or use Docker
-docker run -d -p 6379:6379 redis:alpine
+# Or install Memurai Developer (Redis-compatible for Windows)
+winget install Memurai.MemuraiDeveloper
+
+# Or use Docker (if Docker Desktop is running)
+docker run -d -p 6379:6379 --name airvikbook-redis redis:alpine
+
+# Verify Redis installation
+redis-cli ping
+```
+
+#### Redis Verification Steps
+After installation, verify Redis is working:
+
+```bash
+# Navigate to backend directory
+cd AirvikBook/backend
+
+# Run Redis connection test
+node test-redis.js
+
+# Run JWT Redis integration test
+node test-jwt-redis.js
+```
+
+**Expected Output:**
+```
+🔍 Testing Redis connection...
+📡 Attempting to connect to Redis...
+✅ Redis connection successful!
+🧪 Testing Redis operations...
+✅ Set operation successful
+✅ Get operation successful: Hello from AirVikBook!
+✅ JWT blacklist set successful
+✅ JWT blacklist check successful: Token is blacklisted
+🎉 All Redis tests passed! Redis is working correctly.
 ```
 
 ## 🧪 Testing the Installation
@@ -142,11 +175,25 @@ docker run -d -p 6379:6379 redis:alpine
 .\test-virustotal-integration.ps1
 ```
 
+### Redis Testing (Required)
+```bash
+# Navigate to backend directory
+cd AirvikBook/backend
+
+# Test basic Redis connectivity
+node test-redis.js
+
+# Test JWT Redis integration
+node test-jwt-redis.js
+```
+
 ### Verify Security Features
-1. **File Upload Protection**: Try uploading a file through the API
-2. **Password Validation**: Test password strength requirements
-3. **Rate Limiting**: Test API rate limits
-4. **JWT Security**: Test authentication endpoints
+1. **Redis Connectivity**: Ensure Redis is running and accessible
+2. **JWT Token Blacklisting**: Verify tokens are properly blacklisted in Redis
+3. **File Upload Protection**: Try uploading a file through the API
+4. **Password Validation**: Test password strength requirements
+5. **Rate Limiting**: Test API rate limits
+6. **JWT Security**: Test authentication endpoints
 
 ## 📊 Security Features Overview
 
@@ -154,12 +201,20 @@ docker run -d -p 6379:6379 redis:alpine
 - **Multi-layer Malware Scanning** (ClamAV + VirusTotal + Signature-based)
 - **Enhanced Password Security** (Length, complexity, history check)
 - **Rate Limiting** (Global, auth, registration, email)
-- **JWT Token Security** (Rotation, blacklisting, secure storage)
+- **JWT Token Security** (Rotation, blacklisting, secure storage with Redis)
+- **Redis Integration** (Token blacklisting, session management, caching)
 - **Input Sanitization** (XSS, SQL injection prevention)
 - **Security Headers** (HSTS, CSP, X-Frame-Options)
 - **Audit Logging** (Comprehensive security event tracking)
 - **File Upload Security** (Path traversal, MIME validation)
 - **CORS Configuration** (Environment-specific origins)
+
+### 🔄 Redis Integration Status
+- **✅ Redis Connection**: Working on `redis://localhost:6379`
+- **✅ JWT Blacklisting**: Tokens properly blacklisted with TTL
+- **✅ Session Management**: User sessions tracked in Redis
+- **✅ Token Rotation**: Refresh token rotation with Redis storage
+- **✅ Security Features**: All Redis-based security operations functional
 
 ### 🔒 Security Endpoints
 - `GET /api/v1/security/status` - System security status
@@ -196,7 +251,23 @@ redis-cli ping
 
 # Check if Redis is running
 netstat -an | findstr 6379
+
+# If Redis is not installed, install it:
+winget install Redis
+
+# Or use Docker (if Docker Desktop is running):
+docker run -d -p 6379:6379 --name airvikbook-redis redis:alpine
+
+# Test Redis from Node.js
+cd AirvikBook/backend
+node test-redis.js
 ```
+
+**Common Redis Issues:**
+- **Redis not installed**: Install using `winget install Redis`
+- **Docker not running**: Start Docker Desktop before running Redis container
+- **Port 6379 in use**: Check what's using the port with `netstat -ano | findstr 6379`
+- **Connection refused**: Ensure Redis service is running
 
 #### 4. Environment Variables Not Loading
 ```bash
@@ -266,6 +337,9 @@ VIRUSTOTAL_API_KEY=your-production-virustotal-key
 - [ ] Rate limiting configured
 - [ ] Antivirus scanning active
 - [ ] Audit logging enabled
+- [ ] Redis connection verified
+- [ ] JWT token blacklisting tested
+- [ ] Session management working
 
 ## 🆘 Support
 

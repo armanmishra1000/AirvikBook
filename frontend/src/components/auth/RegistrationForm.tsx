@@ -285,10 +285,10 @@ export default function RegistrationForm({
     <div className={`w-full max-w-md mx-auto ${className}`}>
       {/* Header */}
       <div className="text-center mb-space-6">
-        <h2 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white">
+        <h2 className="sm:text-h2 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white">
           Create Account
         </h2>
-        <p className="text-body text-gray-600 dark:text-gray-400 mt-space-2">
+        <p className="text-body text-gray-600 dark:text-gray-400 mt-space-1">
           Join AirVikBook to start booking amazing hotels
         </p>
       </div>
@@ -324,7 +324,7 @@ export default function RegistrationForm({
             htmlFor="email"
             className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2"
           >
-            Email Address *
+            Email Address <span className="text-error">*</span>
           </label>
           <div className="relative">
             <input
@@ -386,7 +386,7 @@ export default function RegistrationForm({
             htmlFor="fullName"
             className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2"
           >
-            Full Name *
+            Full Name <span className="text-error">*</span>
           </label>
           <input
             id="fullName"
@@ -465,7 +465,7 @@ export default function RegistrationForm({
             htmlFor="password"
             className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2"
           >
-            Password *
+            Password <span className="text-error">*</span>
           </label>
           <div className="relative">
             <input
@@ -533,7 +533,7 @@ export default function RegistrationForm({
             htmlFor="confirmPassword"
             className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2"
           >
-            Confirm Password *
+            Confirm Password <span className="text-error">*</span>
           </label>
           <div className="relative">
             <input
@@ -601,7 +601,7 @@ export default function RegistrationForm({
                   ${errors.acceptedTerms ? "border-error" : ""}`}
               disabled={isLoading}
             />
-            <span className="text-body text-gray-700 dark:text-gray-300">
+            <span className="text-body text-gray-700 dark:text-gray-300 cursor-pointer">
               I agree to the{" "}
               <a
                 href="/terms"
@@ -620,7 +620,7 @@ export default function RegistrationForm({
               >
                 Privacy Policy
               </a>{" "}
-              *
+              <span className="text-error">*</span>
             </span>
           </label>
         </div>
@@ -629,16 +629,11 @@ export default function RegistrationForm({
         <button
           type="submit"
           disabled={isLoading || emailAvailable === false}
-          className={`w-full py-space-3 px-space-6 rounded-radius-md font-sf-pro text-button transition-all ease-linear duration-100
-              ${
-                isLoading || emailAvailable === false
-                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                  : "bg-airvik-blue text-airvik-white hover:bg-airvik-bluehover"
-              }`}
+          className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
         >
           {isLoading ? (
             <div className="flex items-center justify-center">
-              <div className="animate-spin mr-space-2 h-4 w-4 border-2 border-white border-t-transparent rounded-radius-full" />
+              <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
               Creating Account...
             </div>
           ) : (

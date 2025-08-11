@@ -155,6 +155,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
         callback: handleGoogleResponse,
         auto_select: false,
         cancel_on_tap_outside: true,
+        use_fedcm_for_prompt: true as any,
       });
 
       // Trigger the Google sign-in prompt
@@ -276,12 +277,12 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
       >
         {isLoading || authState.isLoading ? (
           <div className="flex items-center">
-            <div className="animate-spin h-5 w-5 mr-space-3 border-2 border-airvik-blue border-t-transparent rounded-radius-full" />
+            <div className="w-5 h-5 border-2 animate-spin mr-space-3 border-airvik-blue border-t-transparent rounded-radius-full" />
             <span>Signing in with Google...</span>
           </div>
         ) : !isGoogleLoaded ? (
           <div className="flex items-center">
-            <div className="animate-pulse h-5 w-5 mr-space-3 bg-gray-300 dark:bg-gray-600 rounded-radius-full" />
+            <div className="w-5 h-5 bg-gray-300 animate-pulse mr-space-3 dark:bg-gray-600 rounded-radius-full" />
             <span>Loading Google...</span>
           </div>
         ) : (
@@ -312,11 +313,11 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
 
       {/* Account Linking Modal */}
       {showLinkingPrompt && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-space-4">
-          <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6 max-w-md w-full">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-space-4">
+          <div className="w-full max-w-md bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-radius-full bg-blue-100 dark:bg-blue-900/20 mb-space-4">
-                <svg className="h-6 w-6 text-airvik-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto bg-blue-100 rounded-radius-full dark:bg-blue-900/20 mb-space-4">
+                <svg className="w-6 h-6 text-airvik-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.102m0 0l4-4a4 4 0 105.656-5.656l-1.102 1.102m-1.102 1.102l-2.828 2.828" />
                 </svg>
               </div>
@@ -325,7 +326,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
                 Link Your Accounts
               </h3>
               
-              <p className="text-body text-gray-600 dark:text-gray-400 mb-space-6">
+              <p className="text-gray-600 text-body dark:text-gray-400 mb-space-6">
                 We found an existing account with the email <strong>{linkingEmail}</strong>. 
                 Would you like to link your Google account with your existing account?
               </p>
@@ -333,13 +334,13 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
               <div className="flex space-x-space-4">
                 <button
                   onClick={() => handleAccountLinking(false)}
-                  className="flex-1 px-space-4 py-space-2 border border-gray-300 dark:border-gray-600 rounded-radius-md text-airvik-black dark:text-airvik-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-normal font-sf-pro text-button"
+                  className="flex-1 transition-colors border border-gray-300 px-space-4 py-space-2 dark:border-gray-600 rounded-radius-md text-airvik-black dark:text-airvik-white hover:bg-gray-50 dark:hover:bg-gray-700 duration-normal font-sf-pro text-button"
                 >
                   Keep Separate
                 </button>
                 <button
                   onClick={() => handleAccountLinking(true)}
-                  className="flex-1 px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md hover:bg-airvik-purple transition-colors duration-normal font-sf-pro text-button"
+                  className="flex-1 transition-colors px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md hover:bg-airvik-purple duration-normal font-sf-pro text-button"
                 >
                   Link Accounts
                 </button>

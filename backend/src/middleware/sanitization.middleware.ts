@@ -15,8 +15,26 @@ export class SanitizationMiddleware {
    * Sanitize query parameters
    */
   static sanitizeQuery(req: Request, _res: Response, next: NextFunction) {
+    // Do NOT sanitize Google OAuth query params. Google's OAuth flow relies on
+    // an exact `state` value round-trip. Encoding characters (e.g. quotes or slashes)
+    // breaks the JSON state payload and causes "Invalid OAuth state".
+    const path = req.path || '';
+    if (path.includes('/auth/google')) {
+      return next();
+    }
+
     if (req.query) {
-      req.query = SanitizationMiddleware.sanitizeObject(req.query);
+      // Preserve `state` param verbatim even outside Google endpoints, just in case
+      // future identity providers/flows rely on the same pattern.
+      const sanitized: Record<string, any> = {};
+      for (const [key, value] of Object.entries(req.query)) {
+        if (key === 'state') {
+          sanitized[key] = value;
+        } else {
+          sanitized[key] = SanitizationMiddleware.sanitizeObject(value);
+        }
+      }
+      req.query = sanitized as any;
     }
     next();
   }
@@ -62,8 +80,11 @@ export class SanitizationMiddleware {
       return str;
     }
 
+    // Check if this looks like a URL (starts with http:// or https://)
+    const isUrl = /^https?:\/\//.test(str);
+    
     // Remove HTML tags and encode special characters
-    return str
+    let sanitized = str
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
       .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
       .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
@@ -75,8 +96,14 @@ export class SanitizationMiddleware {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;')
-      .replace(/\//g, '&#x2F;');
+      .replace(/'/g, '&#x27;');
+    
+    // Only encode forward slashes if it's NOT a URL
+    if (!isUrl) {
+      sanitized = sanitized.replace(/\//g, '&#x2F;');
+    }
+    
+    return sanitized;
   }
 
   /**

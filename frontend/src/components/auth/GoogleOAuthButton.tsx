@@ -144,6 +144,8 @@ export default function GoogleOAuthButton({
         callback: handleGoogleResponse,
         auto_select: false,
         cancel_on_tap_outside: true,
+        // Opt-in to FedCM to prevent Chrome "Can't continue with google.com" issues
+        use_fedcm_for_prompt: true as any,
       });
 
       // Show the Google sign-in prompt
@@ -227,14 +229,14 @@ export default function GoogleOAuthButton({
     >
       {isLoading ? (
         <div className="flex items-center">
-          <div className="animate-spin -ml-1 mr-space-2 h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+          <div className="w-4 h-4 -ml-1 border-2 border-gray-400 rounded-full animate-spin mr-space-2 border-t-transparent" />
           <span className="text-sm font-medium">
             {linkToEmail ? 'Linking Account...' : 'Signing in...'}
           </span>
         </div>
       ) : !isGoogleLoaded ? (
         <div className="flex items-center">
-          <div className="animate-pulse -ml-1 mr-space-2 h-4 w-4 bg-gray-300 rounded-full" />
+          <div className="w-4 h-4 -ml-1 bg-gray-300 rounded-full animate-pulse mr-space-2" />
           <span className="text-sm font-medium">Loading Google...</span>
         </div>
       ) : (

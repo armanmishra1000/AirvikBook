@@ -217,7 +217,7 @@
   
   /* Card styling utilities */
   .card-auth {
-    @apply bg-airvik-white dark:bg-gray-800 border border-[rgb(var(--card-border))] shadow-md rounded-lg;
+    @apply bg-airvik-white dark:bg-gray-800 border border-[rgb(var(--card-border))] lg:shadow-md rounded-lg;
   }
   
   /* Background patterns */
