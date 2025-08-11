@@ -27,8 +27,8 @@ const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-
 // Phone number validation (international format)
 const PHONE_REGEX = /^[\+]?[1-9][\d]{0,15}$/;
 
-// URL validation (http/https)
-const URL_REGEX = /^https?:\/\/(?:[-\w.])+(?:\:[0-9]+)?(?:\/(?:[\w\/_.])*(?:\?(?:[\w&=%.])*)?(?:\#(?:[\w.])*)?)?$/;
+// URL validation (http/https) - more flexible
+const URL_REGEX = /^https?:\/\/([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
 
 // Name validation (letters, spaces, hyphens, apostrophes)
 const NAME_REGEX = /^[a-zA-Z\s\-'\.]+$/;
@@ -56,6 +56,10 @@ export function sanitizeText(input: string): string {
     .replace(/[<>]/g, '') // Remove angle brackets
     .replace(/javascript:/gi, '') // Remove javascript: URLs
     .replace(/on\w+=/gi, '') // Remove event handlers
+    .replace(/&amp;/g, '&') // Fix HTML entities
+    .replace(/&lt;/g, '<') // Fix HTML entities
+    .replace(/&gt;/g, '>') // Fix HTML entities
+    .replace(/&quot;/g, '"') // Fix HTML entities
     .substring(0, 1000); // Limit length
 }
 
@@ -248,8 +252,28 @@ export function validateWebsite(website: string): { isValid: boolean; error?: st
     return { isValid: false, error: 'Website URL is too long (maximum 200 characters)' };
   }
 
-  if (!URL_REGEX.test(website)) {
-    return { isValid: false, error: 'Please enter a valid website URL (must start with http:// or https://)' };
+  let urlToValidate = website.trim();
+  
+  // Auto-add https:// if no protocol is provided
+  if (!urlToValidate.startsWith('http://') && !urlToValidate.startsWith('https://')) {
+    // Check if it looks like a domain (contains a dot and doesn't start with a slash)
+    if (urlToValidate.includes('.') && !urlToValidate.startsWith('/')) {
+      urlToValidate = 'https://' + urlToValidate;
+    } else {
+      return { isValid: false, error: 'Please enter a valid website URL (e.g., example.com or https://example.com)' };
+    }
+  }
+
+  // Basic domain validation
+  const domainPart = urlToValidate.replace(/^https?:\/\//, '').split('/')[0];
+  if (!domainPart || domainPart.length < 3) {
+    return { isValid: false, error: 'Website URL must have a valid domain' };
+  }
+
+  // Check for valid domain format
+  const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  if (!domainRegex.test(domainPart)) {
+    return { isValid: false, error: 'Please enter a valid domain name' };
   }
 
   return { isValid: true };
@@ -465,17 +489,52 @@ export async function validateProfilePictureFile(file: File): Promise<FileValida
  * Sanitize profile data before submission
  */
 export function sanitizeProfileData(data: ProfileUpdateRequest): ProfileUpdateRequest {
-  return {
+  // Special handling for website field to fix HTML entities and auto-add protocol
+  const fixWebsiteUrl = (url: string): string | undefined => {
+    if (!url || !url.trim()) return undefined;
+    
+    // First, decode HTML entities properly
+    let fixed = url.trim();
+    
+    // Handle the specific case where https: gets corrupted
+    if (fixed.includes('https:&#x2F;&#x2F;')) {
+      fixed = fixed.replace(/https:&#x2F;&#x2F;/g, 'https://');
+    }
+    if (fixed.includes('http:&#x2F;&#x2F;')) {
+      fixed = fixed.replace(/http:&#x2F;&#x2F;/g, 'http://');
+    }
+    
+    // Then handle other HTML entities
+    fixed = fixed
+      .replace(/&#x2F;/g, '/') // Fix HTML entities for forward slashes
+      .replace(/&amp;/g, '&') // Fix HTML entities for ampersands
+      .replace(/&lt;/g, '<') // Fix HTML entities for less than
+      .replace(/&gt;/g, '>') // Fix HTML entities for greater than
+      .replace(/&quot;/g, '"'); // Fix HTML entities for quotes
+    
+    // Auto-add https:// if no protocol is provided and it looks like a domain
+    if (!fixed.startsWith('http://') && !fixed.startsWith('https://')) {
+      if (fixed.includes('.') && !fixed.startsWith('/')) {
+        fixed = 'https://' + fixed;
+      }
+    }
+    
+    return fixed;
+  };
+  
+  const sanitized = {
     fullName: sanitizeText(data.fullName ?? ''),
     mobileNumber: data.mobileNumber ? sanitizeText(data.mobileNumber) : undefined,
-    bio: data.bio ? sanitizeText(data.bio) : undefined,
+    bio: data.bio ? sanitizeText(data.bio).replace(/&#x2F;/g, '/') : undefined,
     dateOfBirth: data.dateOfBirth || undefined,
     gender: data.gender ? sanitizeText(data.gender.toLowerCase()) : undefined,
     nationality: data.nationality ? sanitizeText(data.nationality) : undefined,
     occupation: data.occupation ? sanitizeText(data.occupation) : undefined,
-    website: data.website ? data.website.trim() : undefined,
+    website: data.website ? fixWebsiteUrl(data.website) : undefined,
     location: data.location ? sanitizeText(data.location) : undefined
   };
+  
+  return sanitized;
 }
 
 /**

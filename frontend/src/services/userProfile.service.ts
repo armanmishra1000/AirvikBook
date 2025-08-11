@@ -186,11 +186,16 @@ export class UserProfileService {
    * Get user profile
    * Endpoint: GET /user/profile
    */
-  static async getProfile(): Promise<GetProfileApiResponse> {
+  static async getProfile(cacheBust?: boolean): Promise<GetProfileApiResponse> {
     try {
+      // Add cache-busting parameter if requested
+      const endpoint = cacheBust 
+        ? `/user/profile?_t=${Date.now()}` 
+        : '/user/profile';
+
       const response = await ProfileApiClient.request<UserProfile>(
         'GET',
-        '/user/profile',
+        endpoint,
         undefined,
         { requiresAuth: true }
       );
@@ -229,6 +234,18 @@ export class UserProfileService {
 
       if (isSuccessResponse(response)) {
         return response as UpdateProfileApiResponse;
+      }
+
+      // Handle validation errors specifically
+      if (response.code === 'VALIDATION_ERROR' && response.details?.validationErrors) {
+        const validationErrors = response.details.validationErrors;
+        const errorMessages = validationErrors.map((error: any) => error.msg).join(', ');
+        return {
+          success: false,
+          error: errorMessages,
+          code: 'VALIDATION_ERROR',
+          details: response.details
+        } as UpdateProfileApiResponse;
       }
 
       return response as UpdateProfileApiResponse;
@@ -583,6 +600,9 @@ export class UserProfileService {
       [PROFILE_ERROR_CODES.RATE_LIMIT_EXCEEDED]: 'Too many requests. Please wait before trying again.',
       [PROFILE_ERROR_CODES.PROFILE_UPDATE_FAILED]: 'Failed to update profile. Please try again.',
       [PROFILE_ERROR_CODES.FILE_UPLOAD_FAILED]: 'Failed to upload file. Please try again.',
+      // Additional backend codes that may surface from picture sync endpoints
+      NO_GOOGLE_PICTURE: 'No Google profile picture available to sync.',
+      GOOGLE_SYNC_DISABLED: 'Google sync is disabled in your privacy settings.',
     };
 
     return errorMessages[code] || 'An unexpected error occurred.';

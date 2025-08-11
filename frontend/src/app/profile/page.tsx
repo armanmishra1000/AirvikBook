@@ -11,9 +11,9 @@ import { UserProfile, isSuccessResponse } from '../../types/userProfile.types';
 import { UserProfileService } from '../../services/userProfile.service';
 
 // =====================================================
-// PROFILE OVERVIEW PAGE
+// MODERN PROFILE SETTINGS PAGE
 // =====================================================
-// Main profile page with navigation to all profile sections
+// Redesigned with modern UI/UX patterns and enhanced visual hierarchy
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -39,9 +39,7 @@ export default function ProfilePage() {
       const shouldRefresh = urlParams.get('refresh') === 'true';
       
       if (shouldRefresh) {
-        // Force refresh of profile data
         loadProfile();
-        // Clean up the URL
         router.replace('/profile');
       } else {
         loadProfile();
@@ -87,32 +85,47 @@ export default function ProfilePage() {
   };
 
   // =====================================================
-  // LOADING STATE
+  // MODERN SKELETON LOADER
   // =====================================================
 
   if (authState.isLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-airvik-white dark:bg-airvik-midnight flex items-center justify-center">
-        <div className="text-center">
-          <svg className="animate-spin h-8 w-8 mx-auto mb-space-4 text-airvik-blue" viewBox="0 0 24 24">
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-              fill="none"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-          <p className="text-body text-airvik-black dark:text-airvik-white font-sf-pro">
-            Loading your profile...
-          </p>
+      <div className="min-h-screen bg-gradient-to-br from-airvik-blue/5 via-airvik-white to-airvik-purple/5 dark:from-airvik-blue/10 dark:via-airvik-midnight dark:to-airvik-purple/10">
+        {/* Header Skeleton */}
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 -z-10 opacity-20">
+            <div className="absolute top-[-8rem] left-1/4 h-96 w-96 rounded-full bg-gradient-to-r from-airvik-blue to-airvik-purple blur-3xl" />
+            <div className="absolute top-[4rem] right-1/4 h-64 w-64 rounded-full bg-gradient-to-r from-airvik-cyan to-airvik-violet blur-3xl" />
+          </div>
+          <div className="container mx-auto px-space-4 pt-space-12 pb-space-8">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-space-6">
+              <div className="space-y-space-3">
+                <div className="h-12 bg-gray-200 w-80 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
+                <div className="h-6 bg-gray-200 w-96 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+              </div>
+              <div className="w-40 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
+            </div>
+          </div>
+        </div>
+
+        {/* Content Skeleton */}
+        <div className="container mx-auto px-space-4 pb-space-16">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-space-8">
+            {/* Main Content */}
+            <div className="xl:col-span-3 space-y-space-6">
+              <div className="bg-white h-80 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm animate-pulse" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="h-32 bg-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm animate-pulse" />
+                ))}
+              </div>
+            </div>
+            {/* Sidebar */}
+            <div className="space-y-space-6">
+              <div className="h-64 bg-white dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm animate-pulse" />
+              <div className="h-48 bg-white dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm animate-pulse" />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -124,27 +137,35 @@ export default function ProfilePage() {
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-airvik-white dark:bg-airvik-midnight">
-        <div className="container mx-auto px-space-4 py-space-8">
+      <div className="min-h-screen bg-gradient-to-br from-airvik-blue/5 via-airvik-white to-airvik-purple/5 dark:from-airvik-blue/10 dark:via-airvik-midnight dark:to-airvik-purple/10">
+        <div className="container mx-auto px-space-4 py-space-16">
           <div className="max-w-2xl mx-auto">
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-radius-lg p-space-6 text-center">
-              <svg className="h-12 w-12 text-red-600 dark:text-red-400 mx-auto mb-space-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              <h3 className="text-h4 text-red-800 dark:text-red-200 mb-space-2">
+            <div className="text-center bg-white border border-red-200 dark:bg-gray-800 dark:border-red-800 rounded-radius-xl p-space-8 shadow-shadow-sm">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 mb-space-4 dark:bg-red-900/30 rounded-radius-full">
+                <svg className="w-8 h-8 text-red-600 dark:text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-h4 text-airvik-black dark:text-airvik-white mb-space-3">
                 Failed to Load Profile
               </h3>
-              <p className="text-body text-red-700 dark:text-red-300 mb-space-4">
-                We couldn't load your profile information. Please try again.
+              <p className="text-gray-600 text-body dark:text-gray-400 mb-space-6">
+                We couldn't load your profile information. Please try again or contact support if the problem persists.
               </p>
-              <button
-                onClick={loadProfile}
-                className="px-space-4 py-space-2 bg-red-600 text-airvik-white rounded-radius-md font-sf-pro text-button
-                  transition-all duration-normal hover:bg-red-700 hover:shadow-lg hover:-translate-y-1 
-                  active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-              >
-                Try Again
-              </button>
+              <div className="flex flex-col justify-center sm:flex-row gap-space-3">
+                <button
+                  onClick={loadProfile}
+                  className="transition-all bg-airvik-blue hover:bg-airvik-purple text-airvik-white px-space-6 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+                >
+                  Try Again
+                </button>
+                <Link
+                  href="/dashboard"
+                  className="transition-all bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-space-6 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  Back to Dashboard
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -163,171 +184,244 @@ export default function ProfilePage() {
         showError('An unexpected error occurred. Please reload the page.');
       }}
     >
-      <div className="min-h-screen bg-airvik-white dark:bg-airvik-midnight">
-      <div className="container mx-auto px-space-4 py-space-8">
-        {/* Header */}
-        <div className="mb-space-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-h2 text-airvik-black dark:text-airvik-white font-bold">
-                Profile Settings
-              </h1>
-              <p className="text-body text-gray-600 dark:text-gray-400 mt-space-2">
-                Manage your profile information and preferences
-              </p>
+      <div className="min-h-screen bg-gradient-to-br from-airvik-blue/5 via-airvik-white to-airvik-purple/5 dark:from-airvik-blue/10 dark:via-airvik-midnight dark:to-airvik-purple/10">
+        {/* Modern Hero Section */}
+        <div className="relative overflow-hidden">
+          {/* Background Decorations */}
+          <div className="absolute inset-0 -z-10 opacity-20">
+            <div className="absolute top-[-8rem] left-1/4 h-96 w-96 rounded-full bg-gradient-to-r from-airvik-blue to-airvik-purple blur-3xl" />
+            <div className="absolute top-[4rem] right-1/4 h-64 w-64 rounded-full bg-gradient-to-r from-airvik-cyan to-airvik-violet blur-3xl" />
+            <div className="absolute bottom-[-4rem] left-1/3 h-48 w-48 rounded-full bg-gradient-to-r from-airvik-purple to-airvik-cyan blur-3xl" />
+          </div>
+          
+          <div className="container mx-auto px-space-4 pt-space-12 pb-space-8">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-space-6">
+              <div className="space-y-space-3">
+                <h1 className="font-bold text-h1 text-airvik-black dark:text-airvik-white">
+                  Profile Settings
+                </h1>
+                <p className="max-w-2xl text-gray-600 text-body-lg dark:text-gray-400">
+                  Manage your personal information, privacy preferences, and account connections in one place
+                </p>
+              </div>
+              <Link 
+                href="/dashboard" 
+                className="group inline-flex items-center gap-space-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal hover:-translate-y-0.5 active:translate-y-0 border border-gray-200 dark:border-gray-700"
+              >
+                <svg className="w-5 h-5 transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                </svg>
+                Back to Dashboard
+              </Link>
             </div>
-            <Link
-              href="/dashboard"
-              className="px-space-4 py-space-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-radius-md font-sf-pro text-button
-                transition-all duration-normal hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-lg hover:-translate-y-1 
-                active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
-            >
-              Back to Dashboard
-            </Link>
           </div>
         </div>
 
-        {/* Profile Card */}
-        {profile && (
-          <div className="mb-space-8">
-            <ProfileCard
-              profile={profile}
-              showActions={true}
-              onEdit={handleEditProfile}
-              onPictureChange={handlePictureChange}
-            />
-          </div>
-        )}
+        <div className="container mx-auto px-space-4 pb-space-16">
+          {/* Main Layout Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-space-8">
+            {/* Main Content Area */}
+            <div className="xl:col-span-3 space-y-space-8">
+              {/* Profile Card */}
+              {profile && (
+                <div className="overflow-hidden bg-white border border-gray-100 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700">
+                  <ProfileCard
+                    profile={profile}
+                    showActions={true}
+                    onEdit={handleEditProfile}
+                    onPictureChange={handlePictureChange}
+                  />
+                </div>
+              )}
 
-        {/* Navigation Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-6">
-          {/* Edit Profile */}
-          <Link
-            href="/profile/edit"
-            className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm p-space-6 border border-gray-200 dark:border-gray-700
-              transition-all duration-normal hover:shadow-shadow-md hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
-          >
-            <div className="flex items-center space-x-space-4">
-              <div className="w-12 h-12 bg-airvik-blue/10 rounded-radius-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-airvik-blue" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-h5 text-airvik-black dark:text-airvik-white font-medium">
-                  Edit Profile
-                </h3>
-                <p className="text-caption text-gray-600 dark:text-gray-400">
-                  Update your personal information
-                </p>
+              {/* Settings Navigation Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-6">
+                {/* Edit Profile */}
+                <Link
+                  href="/profile/edit"
+                  className="relative overflow-hidden transition-all bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm hover:shadow-shadow-md dark:border-gray-700 p-space-6 duration-normal hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+                >
+                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-airvik-blue/5 to-airvik-purple/5 group-hover:opacity-100 duration-normal" />
+                  <div className="relative flex items-start space-x-space-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-airvik-blue to-airvik-purple rounded-radius-lg shadow-shadow-sm">
+                      <svg className="w-6 h-6 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold transition-colors text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-blue dark:group-hover:text-airvik-blue">
+                        Edit Profile
+                      </h3>
+                      <p className="text-gray-600 text-body-sm dark:text-gray-400">
+                        Update your personal information and preferences
+                      </p>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-400 transition-colors group-hover:text-airvik-blue" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </Link>
+
+                {/* Profile Picture */}
+                <Link
+                  href="/profile/picture"
+                  className="relative overflow-hidden transition-all bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm hover:shadow-shadow-md dark:border-gray-700 p-space-6 duration-normal hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
+                >
+                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-airvik-purple/5 to-airvik-violet/5 group-hover:opacity-100 duration-normal" />
+                  <div className="relative flex items-start space-x-space-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-airvik-purple to-airvik-violet rounded-radius-lg shadow-shadow-sm">
+                      <svg className="w-6 h-6 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold transition-colors text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-purple dark:group-hover:text-airvik-purple">
+                        Profile Picture
+                      </h3>
+                      <p className="text-gray-600 text-body-sm dark:text-gray-400">
+                        Upload or sync your profile picture
+                      </p>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-400 transition-colors group-hover:text-airvik-purple" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </Link>
+
+                {/* Privacy Settings */}
+                <Link
+                  href="/profile/privacy"
+                  className="relative overflow-hidden transition-all bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm hover:shadow-shadow-md dark:border-gray-700 p-space-6 duration-normal hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-cyan focus:ring-offset-2"
+                >
+                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-airvik-cyan/5 to-airvik-blue/5 group-hover:opacity-100 duration-normal" />
+                  <div className="relative flex items-start space-x-space-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-airvik-cyan to-airvik-blue rounded-radius-lg shadow-shadow-sm">
+                      <svg className="w-6 h-6 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold transition-colors text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-cyan dark:group-hover:text-airvik-cyan">
+                        Privacy Settings
+                      </h3>
+                      <p className="text-gray-600 text-body-sm dark:text-gray-400">
+                        Control your profile visibility and data sharing
+                      </p>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-400 transition-colors group-hover:text-airvik-cyan" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </Link>
+
+                {/* Connected Accounts */}
+                <Link
+                  href="/profile/connections"
+                  className="relative overflow-hidden transition-all bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm hover:shadow-shadow-md dark:border-gray-700 p-space-6 duration-normal hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                >
+                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 group-hover:opacity-100 duration-normal" />
+                  <div className="relative flex items-start space-x-space-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-radius-lg shadow-shadow-sm">
+                      <svg className="w-6 h-6 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold transition-colors text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-green-600 dark:group-hover:text-green-400">
+                        Connected Accounts
+                      </h3>
+                      <p className="text-gray-600 text-body-sm dark:text-gray-400">
+                        Manage your linked social accounts
+                      </p>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-400 transition-colors group-hover:text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </Link>
+
+
               </div>
             </div>
-          </Link>
 
-          {/* Profile Picture */}
-          <Link
-            href="/profile/picture"
-            className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm p-space-6 border border-gray-200 dark:border-gray-700
-              transition-all duration-normal hover:shadow-shadow-md hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
-          >
-            <div className="flex items-center space-x-space-4">
-              <div className="w-12 h-12 bg-airvik-purple/10 rounded-radius-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-airvik-purple" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-h5 text-airvik-black dark:text-airvik-white font-medium">
-                  Profile Picture
-                </h3>
-                <p className="text-caption text-gray-600 dark:text-gray-400">
-                  Upload or sync your profile picture
-                </p>
+            {/* Sidebar */}
+            <div className="space-y-space-6">
+              {/* Profile Overview */}
+              {profile && (
+                <div className="bg-white border border-gray-100 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6">
+                  <div className="flex items-center space-x-space-3 mb-space-4">
+                    <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-airvik-blue to-airvik-purple rounded-radius-lg">
+                      <svg className="w-4 h-4 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white">Profile Overview</h3>
+                  </div>
+                  
+                  <div className="space-y-space-4">
+                    <div className="flex items-center justify-between border-b border-gray-100 py-space-2 dark:border-gray-700">
+                      <span className="text-gray-600 text-body-sm dark:text-gray-400">Name</span>
+                      <span className="text-body-sm font-medium text-airvik-black dark:text-airvik-white truncate max-w-[12rem]">{profile.fullName}</span>
+                    </div>
+                    <div className="flex items-center justify-between border-b border-gray-100 py-space-2 dark:border-gray-700">
+                      <span className="text-gray-600 text-body-sm dark:text-gray-400">Email</span>
+                      <span className="text-body-sm font-medium text-airvik-black dark:text-airvik-white truncate max-w-[12rem]">{profile.email}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-space-2">
+                      <span className="text-gray-600 text-body-sm dark:text-gray-400">Google</span>
+                      {profile.connectedAccounts?.google?.connected ? (
+                        <span className="inline-flex items-center text-xs font-medium text-green-800 bg-green-100 px-space-2 py-space-1 rounded-radius-full dark:bg-green-900/30 dark:text-green-200">
+                          <svg className="w-3 h-3 mr-space-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Connected
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center text-xs font-medium text-gray-800 bg-gray-100 px-space-2 py-space-1 rounded-radius-full dark:bg-gray-700 dark:text-gray-200">
+                          Not Connected
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Actions */}
+              <div className="bg-white border border-gray-100 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6">
+                <div className="flex items-center space-x-space-3 mb-space-4">
+                  <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-airvik-cyan to-airvik-blue rounded-radius-lg">
+                    <svg className="w-4 h-4 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white">Quick Actions</h3>
+                </div>
+                
+                <div className="space-y-space-3">
+                  <button
+                    onClick={handleEditProfile}
+                    className="w-full transition-all bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white px-space-4 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+                  >
+                    Edit Profile
+                  </button>
+                  <button
+                    onClick={handlePictureChange}
+                    className="w-full transition-all bg-gradient-to-r from-airvik-purple to-airvik-violet hover:from-airvik-violet hover:to-airvik-purple text-airvik-white px-space-4 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
+                  >
+                    Change Picture
+                  </button>
+                  <Link
+                    href="/profile/privacy"
+                    className="block w-full transition-all bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-center"
+                  >
+                    Privacy Settings
+                  </Link>
+                </div>
               </div>
             </div>
-          </Link>
-
-          {/* Privacy Settings */}
-          <Link
-            href="/profile/privacy"
-            className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm p-space-6 border border-gray-200 dark:border-gray-700
-              transition-all duration-normal hover:shadow-shadow-md hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
-          >
-            <div className="flex items-center space-x-space-4">
-              <div className="w-12 h-12 bg-airvik-cyan/10 rounded-radius-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-airvik-cyan" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-h5 text-airvik-black dark:text-airvik-white font-medium">
-                  Privacy Settings
-                </h3>
-                <p className="text-caption text-gray-600 dark:text-gray-400">
-                  Control your profile visibility
-                </p>
-              </div>
-            </div>
-          </Link>
-
-          {/* Connected Accounts */}
-          <Link
-            href="/profile/connections"
-            className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm p-space-6 border border-gray-200 dark:border-gray-700
-              transition-all duration-normal hover:shadow-shadow-md hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
-          >
-            <div className="flex items-center space-x-space-4">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-radius-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-600 dark:text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-h5 text-airvik-black dark:text-airvik-white font-medium">
-                  Connected Accounts
-                </h3>
-                <p className="text-caption text-gray-600 dark:text-gray-400">
-                  Manage your linked accounts
-                </p>
-              </div>
-            </div>
-          </Link>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-space-8 bg-airvik-blue-light/20 dark:bg-airvik-blue/10 rounded-radius-lg p-space-6">
-          <h3 className="text-h5 text-airvik-black dark:text-airvik-white mb-space-4">
-            Quick Actions
-          </h3>
-          <div className="flex flex-wrap gap-space-3">
-            <button
-              onClick={handleEditProfile}
-              className="px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button
-                transition-all duration-normal hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 
-                active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
-            >
-              Edit Profile
-            </button>
-            <button
-              onClick={handlePictureChange}
-              className="px-space-4 py-space-2 bg-airvik-purple text-airvik-white rounded-radius-md font-sf-pro text-button
-                transition-all duration-normal hover:bg-airvik-purple-light hover:shadow-lg hover:-translate-y-1 
-                active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
-            >
-              Change Picture
-            </button>
-            <Link
-              href="/profile/privacy"
-              className="px-space-4 py-space-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-radius-md font-sf-pro text-button
-                transition-all duration-normal hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-lg hover:-translate-y-1 
-                active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
-            >
-              Privacy Settings
-            </Link>
           </div>
         </div>
       </div>
-    </div>
     </ProfileErrorBoundary>
   );
 }

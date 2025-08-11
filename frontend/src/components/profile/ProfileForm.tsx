@@ -26,13 +26,16 @@ interface ProfileFormProps {
   onError?: (error: string) => void;
   className?: string;
   initialData?: UserProfile;
+  // Optional: bubble current form data to parent for live preview/analytics
+  onChange?: (data: ProfileFormData) => void;
 }
 
 export const ProfileForm: React.FC<ProfileFormProps> = ({
   onSuccess,
   onError,
   className = '',
-  initialData
+  initialData,
+  onChange
 }) => {
   const { authState } = useAuth();
   const { showSuccess, showError } = useToastHelpers();
@@ -85,6 +88,18 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         website: initialData.website || '',
         location: initialData.location || ''
       });
+      // Notify parent with initial values for live preview
+      onChange?.({
+        fullName: initialData.fullName || '',
+        mobileNumber: initialData.mobileNumber || '',
+        bio: initialData.bio || '',
+        dateOfBirth: initialData.dateOfBirth ? new Date(initialData.dateOfBirth).toISOString().split('T')[0] : '',
+        gender: initialData.gender || '',
+        nationality: initialData.nationality || '',
+        occupation: initialData.occupation || '',
+        website: initialData.website || '',
+        location: initialData.location || ''
+      });
     } else {
       loadProfileData();
     }
@@ -97,6 +112,17 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       if (isSuccessResponse(response)) {
         const profile = response.data;
         setFormData({
+          fullName: profile.fullName || '',
+          mobileNumber: profile.mobileNumber || '',
+          bio: profile.bio || '',
+          dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : '',
+          gender: profile.gender || '',
+          nationality: profile.nationality || '',
+          occupation: profile.occupation || '',
+          website: profile.website || '',
+          location: profile.location || ''
+        });
+        onChange?.({
           fullName: profile.fullName || '',
           mobileNumber: profile.mobileNumber || '',
           bio: profile.bio || '',
@@ -121,57 +147,15 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   // FORM VALIDATION
   // =====================================================
 
+  // Note: Validation is now handled by the useProfileValidation hook
+  // This local validation function is kept for backward compatibility but not used
   const validateField = (name: keyof ProfileFormData, value: any): string | undefined => {
-    switch (name) {
-      case 'fullName':
-        if (!value.trim()) return 'Full name is required';
-        if (value.trim().length < 2) return 'Full name must be at least 2 characters';
-        if (value.trim().length > 100) return 'Full name must be less than 100 characters';
-        return undefined;
-
-      case 'mobileNumber':
-        if (value && !/^\+?[\d\s\-\(\)]+$/.test(value)) {
-          return 'Please enter a valid phone number';
-        }
-        return undefined;
-
-      case 'bio':
-        if (value && value.length > 500) return 'Bio must be less than 500 characters';
-        return undefined;
-
-      case 'website':
-        if (value && !/^https?:\/\/.+/.test(value)) {
-          return 'Website must be a valid URL starting with http:// or https://';
-        }
-        return undefined;
-
-      case 'dateOfBirth':
-        if (value) {
-          const date = new Date(value);
-          const today = new Date();
-          const age = today.getFullYear() - date.getFullYear();
-          if (age < 13 || age > 120) {
-            return 'Date of birth must be for someone between 13 and 120 years old';
-          }
-        }
-        return undefined;
-
-      default:
-        return undefined;
-    }
+    return undefined; // All validation is handled by the hook
   };
 
+  // Note: Form validation is now handled by the useProfileValidation hook
   const validateForm = (): boolean => {
-    const newErrors: ProfileFormErrors = {};
-    
-    Object.keys(formData).forEach((key) => {
-      const fieldName = key as keyof ProfileFormData;
-      const error = validateField(fieldName, formData[fieldName]);
-      if (error && error.length > 0) newErrors[fieldName] = error;
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return isFormValid; // Use the validation state from the hook
   };
 
   // =====================================================
@@ -185,6 +169,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       ...prev,
       [name]: value
     }));
+
+    // Notify parent of changes for live preview
+    onChange?.({
+      ...formData,
+      [name]: value
+    });
 
     // Real-time validation with the new hook
     validateFieldHook(name as keyof ProfileUpdateRequest, value);
@@ -208,11 +198,21 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     }
 
     // Create update data from form
+    const normalizeDate = (value?: string): string | undefined => {
+      if (!value) return undefined;
+      // Accept both YYYY-MM-DD and DD-MM-YYYY; convert the latter to ISO
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value; // already ISO
+      if (/^\d{2}-\d{2}-\d{4}$/.test(value)) {
+        const [dd, mm, yyyy] = value.split('-');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+      return value; // fallback; backend will validate
+    };
     const updateData: ProfileUpdateRequest = {
       fullName: formData.fullName.trim(),
       mobileNumber: formData.mobileNumber.trim() || undefined,
       bio: formData.bio.trim() || undefined,
-      dateOfBirth: formData.dateOfBirth || undefined,
+      dateOfBirth: normalizeDate(formData.dateOfBirth),
       gender: formData.gender || undefined,
       nationality: formData.nationality || undefined,
       occupation: formData.occupation || undefined,
@@ -223,7 +223,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     // Validate with the enhanced hook
     const currentErrors = validateAllFields(updateData);
     if (Object.keys(currentErrors).length > 0) {
-      showError('Please fix the errors in the form');
+      onError?.('Please fix the errors in the form');
       return;
     }
 
@@ -233,25 +233,24 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     setIsSubmitting(true);
 
     try {
-
       // Ensure dateOfBirth is sent as 'YYYY-MM-DD' (string) to align with backend parsing
       const normalizedData = {
         ...sanitizedData,
         dateOfBirth: sanitizedData.dateOfBirth || undefined
       };
+      
       const response = await UserProfileService.updateProfile(normalizedData);
 
       if (isSuccessResponse(response)) {
         showSuccess('Profile updated successfully');
         onSuccess?.();
       } else {
-        const errorMessage = UserProfileService.getErrorMessage(response.code || 'PROFILE_UPDATE_FAILED');
-        showError(errorMessage);
+        // Use the specific error message from the response if available
+        const errorMessage = response.error || UserProfileService.getErrorMessage(response.code || 'PROFILE_UPDATE_FAILED');
         onError?.(errorMessage);
       }
     } catch (error) {
       const errorMessage = 'Failed to update profile. Please try again.';
-      showError(errorMessage);
       onError?.(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -266,7 +265,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     return (
       <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm p-space-6 ${className}`}>
         <div className="flex items-center justify-center py-space-12">
-          <svg className="animate-spin h-8 w-8 text-airvik-blue" viewBox="0 0 24 24">
+          <svg className="w-8 h-8 animate-spin text-airvik-blue" viewBox="0 0 24 24">
             <circle
               className="opacity-25"
               cx="12"
@@ -298,7 +297,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           <h3 className="text-h3 text-airvik-black dark:text-airvik-white">
             Profile Information
           </h3>
-          <p className="text-body text-gray-600 dark:text-gray-400 mt-space-2">
+          <p className="text-gray-600 text-body dark:text-gray-400 mt-space-2">
             Update your personal information and preferences
           </p>
         </div>
@@ -381,13 +380,13 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             disabled={isSubmitting}
             maxLength={500}
           />
-          <div className="flex justify-between items-center mt-space-1">
+          <div className="flex items-center justify-between mt-space-1">
             {errors.bio && (
               <p className="text-caption text-error">
                 {errors.bio}
               </p>
             )}
-            <p className="text-caption text-gray-500 dark:text-gray-400 ml-auto">
+            <p className="ml-auto text-gray-500 text-caption dark:text-gray-400">
               {formData.bio.length}/500
             </p>
           </div>
@@ -455,9 +454,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               name="nationality"
               value={formData.nationality}
               onChange={handleInputChange}
-              className="w-full px-space-4 py-space-3 border border-gray-300 dark:border-gray-600 rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
-                bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500"
+              className="w-full transition-colors border border-gray-300 px-space-4 py-space-3 dark:border-gray-600 rounded-radius-md font-sf-pro text-body duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500"
               placeholder="e.g., United States"
               disabled={isSubmitting}
             />
@@ -473,9 +470,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               name="occupation"
               value={formData.occupation}
               onChange={handleInputChange}
-              className="w-full px-space-4 py-space-3 border border-gray-300 dark:border-gray-600 rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
-                bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500"
+              className="w-full transition-colors border border-gray-300 px-space-4 py-space-3 dark:border-gray-600 rounded-radius-md font-sf-pro text-body duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500"
               placeholder="e.g., Software Engineer"
               disabled={isSubmitting}
             />
@@ -520,9 +515,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               name="location"
               value={formData.location}
               onChange={handleInputChange}
-              className="w-full px-space-4 py-space-3 border border-gray-300 dark:border-gray-600 rounded-radius-md font-sf-pro text-body
-                transition-colors duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue
-                bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500"
+              className="w-full transition-colors border border-gray-300 px-space-4 py-space-3 dark:border-gray-600 rounded-radius-md font-sf-pro text-body duration-normal focus:outline-none focus:ring-2 focus:ring-airvik-blue bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400 dark:hover:border-gray-500"
               placeholder="e.g., San Francisco, CA"
               disabled={isSubmitting}
             />
@@ -530,7 +523,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end pt-space-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex justify-end border-t border-gray-200 pt-space-4 dark:border-gray-700">
           <button
             type="submit"
             disabled={isSubmitting || authState.isLoading || (!isFormValid && submitAttemptedRef.current)}
@@ -543,7 +536,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           >
             {isSubmitting || authState.isLoading ? (
               <div className="flex items-center">
-                <svg className="animate-spin h-4 w-4 mr-space-2" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 animate-spin mr-space-2" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"
                     cx="12"

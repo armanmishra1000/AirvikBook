@@ -44,24 +44,40 @@ export class ProfileController {
       .optional()
       .isLength({ min: 2, max: 100 })
       .withMessage('Full name must be between 2 and 100 characters')
-      .matches(/^[a-zA-Z\s]+$/)
-      .withMessage('Full name can only contain letters and spaces'),
+      .matches(/^[a-zA-Z\s\-'\.]+$/)
+      .withMessage('Full name can only contain letters, spaces, hyphens, apostrophes, and periods'),
     body('mobileNumber')
       .optional()
-      .matches(/^\+[1-9]\d{1,14}$/)
-      .withMessage('Mobile number must be in international format (+1234567890)'),
+      .custom((value) => {
+        if (!value) return true; // Allow empty values
+        
+        // Allow various phone number formats
+        const phoneRegex = /^(\+?[1-9]\d{1,14}|\(\d{3}\)\s?\d{3}-\d{4}|\d{3}-\d{3}-\d{4}|\d{10})$/;
+        if (!phoneRegex.test(value)) {
+          throw new Error('Mobile number must be in a valid format (e.g., +1234567890, (123) 456-7890, 123-456-7890, or 1234567890)');
+        }
+        return true;
+      }),
     body('bio')
       .optional()
       .isLength({ max: 500 })
       .withMessage('Bio must be less than 500 characters'),
     body('dateOfBirth')
       .optional()
-      .isISO8601({ strict: false })
-      .withMessage('Date of birth must be a valid date (YYYY-MM-DD)')
       .custom((value) => {
-        if (value && new Date(value) >= new Date()) {
+        if (!value) return true; // Allow empty/undefined values
+        
+        // Try to parse the date
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+          throw new Error('Date of birth must be a valid date');
+        }
+        
+        // Check if it's in the past
+        if (date >= new Date()) {
           throw new Error('Date of birth must be in the past');
         }
+        
         return true;
       }),
     body('gender')
@@ -78,8 +94,37 @@ export class ProfileController {
       .withMessage('Occupation must be a string'),
     body('website')
       .optional()
-      .isURL()
-      .withMessage('Website must be a valid URL'),
+      .custom((value) => {
+        if (!value) {
+          return true; // Allow empty values
+        }
+        
+        let urlToValidate = value.trim();
+        
+        // Auto-add https:// if no protocol is provided
+        if (!urlToValidate.startsWith('http://') && !urlToValidate.startsWith('https://')) {
+          // Check if it looks like a domain (contains a dot and doesn't start with a slash)
+          if (urlToValidate.includes('.') && !urlToValidate.startsWith('/')) {
+            urlToValidate = 'https://' + urlToValidate;
+          } else {
+            throw new Error('Please enter a valid website URL (e.g., example.com or https://example.com)');
+          }
+        }
+        
+        // Check if it has a domain part
+        const domainPart = urlToValidate.replace(/^https?:\/\//, '').split('/')[0];
+        if (!domainPart || domainPart.length < 3) {
+          throw new Error('Website must have a valid domain');
+        }
+        
+        // Check for valid domain format
+        const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        if (!domainRegex.test(domainPart)) {
+          throw new Error('Please enter a valid domain name');
+        }
+        
+        return true;
+      }),
     body('location')
       .optional()
       .isLength({ min: 2, max: 100 })
@@ -132,6 +177,13 @@ export class ProfileController {
           statusCode
         );
       }
+
+      // Add cache control headers to prevent caching of profile data
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
 
       return ResponseUtil.success(res, result.data, 'Profile retrieved successfully');
 
