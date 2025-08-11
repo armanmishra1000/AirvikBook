@@ -242,7 +242,7 @@ const ResetPasswordPage: React.FC = () => {
   // INVALID TOKEN STATE
   // =====================================================
 
-  if (isTokenValid) {
+  if (!isTokenValid) {
     return (
       <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center lg:px-space-4">
         <div className="max-w-md w-full sm:card-auth">
