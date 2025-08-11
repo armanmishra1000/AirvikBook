@@ -332,7 +332,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
               transition-all duration-normal transform
               ${isSubmitting
                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                : 'bg-airvik-blue text-airvik-white hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2'
+                : 'bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white  hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2'
               }`}
           >
             {isSubmitting ? (

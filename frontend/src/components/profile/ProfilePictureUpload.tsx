@@ -234,14 +234,14 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
                 <button
                   onClick={handleUpload}
                   disabled={isUploading}
-                  className="transition-all px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
+                  className="transition-all px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-airvik-purple hover:shadow-lg  active:translate-y-0 focus:outline-none  focus:ring-airvik-blue focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {isUploading ? 'Uploading...' : 'Upload Picture'}
                 </button>
                 <button
                   onClick={handleRemove}
                   disabled={isUploading}
-                  className="text-gray-700 transition-all bg-gray-200 px-space-4 py-space-2 dark:bg-gray-700 dark:text-gray-300 rounded-radius-md font-sf-pro text-button duration-normal hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:transform-none"
+                  className="text-gray-700 transition-all bg-gray-200 px-space-4 py-space-2 dark:bg-gray-700 dark:text-gray-300 rounded-radius-md font-sf-pro text-button duration-normal hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-lg  active:translate-y-0 focus:outline-none  focus:ring-gray-400 focus:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   Remove
                 </button>
@@ -302,7 +302,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="transition-all px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
+            className="transition-all px-space-4 py-space-2 bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal focus:outline-none  focus:ring-airvik-blue focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
           >
             Choose File
           </button>
@@ -310,7 +310,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
           <button
             onClick={handleSyncFromGoogle}
             disabled={isUploading || Date.now() < cooldownUntil}
-            className="transition-all px-space-4 py-space-2 bg-airvik-purple text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-airvik-purple-light hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
+            className="transition-all px-space-4 py-space-2 bg-airvik-blue hover:bg-airvik-purple text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal  focus:outline-none  focus:ring-airvik-purple focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
           >
             {Date.now() < cooldownUntil ? 'Please wait...' : 'Sync from Google'}
           </button>
@@ -319,7 +319,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
             <button
               onClick={handleDelete}
               disabled={isUploading}
-              className="transition-all bg-red-600 px-space-4 py-space-2 text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-red-700 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
+              className="transition-all bg-red-600 px-space-4 py-space-2 text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-red-700  focus:outline-none  focus:ring-red-500  disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
             >
               Remove Picture
             </button>
