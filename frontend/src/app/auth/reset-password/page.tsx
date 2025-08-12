@@ -10,6 +10,7 @@ import {
   isSuccessResponse,
   PASSWORD_ERROR_CODES,
 } from "../../../types/passwordManagement.types";
+import { ArrowLeft } from "lucide-react";
 
 // =====================================================
 // RESET PASSWORD PAGE COMPONENT (Query Parameter Version)
@@ -160,6 +161,10 @@ const ResetPasswordPage: React.FC = () => {
         confirmPassword: confirmPasswordError,
       }));
     }
+  };
+
+  const handleBackClick = () => {
+    router.push("/");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -348,7 +353,16 @@ const ResetPasswordPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
-      <div className="max-w-md w-full">
+      <div className="max-w-md w-full relative">
+        {/* Back Button */}
+        <button
+          type="button"
+          onClick={handleBackClick}
+          className="absolute hidden sm:block top-space-4 -left-10 p-1.5 border border-card-border dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none"
+          aria-label="Go back to homepage"
+        >
+          <ArrowLeft className="size-4" />
+        </button>
         {/* Header */}
         <div className="text-center mb-space-8">
           <h1 className="text-h1 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
@@ -416,7 +430,7 @@ const ResetPasswordPage: React.FC = () => {
           <div className="mt-space-4 text-center">
             <button
               onClick={() => router.push("/auth/login")}
-              className="text-body font-sf-pro bg-gray-200 w-full py-2.5 text-airvik-blue hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none rounded-radius-sm"
+              className="font-semibold tracking-normal font-sf-pro bg-gray-200 w-full py-2.5 text-airvik-blue hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login
             </button>

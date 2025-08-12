@@ -62,49 +62,13 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex flex-col justify-center sm:py-space-10 py-space-5 sm:px-space-6 lg:px-space-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        {/* Logo/Brand */}
-        <div className="text-center mb-space-8 hidden sm:block">
-          <h1 className="lg:text-display text-h3 font-sf-pro font-bold text-airvik-black dark:text-airvik-white">
-            AirVikBook
-          </h1>
-          <p className="mt-space-2 text-body text-gray-600 dark:text-gray-400 font-sf-pro">
-            Hotel Management System
-          </p>
-        </div>
-
-        {/* Login Card */}
-        <div className="sm:card-auth sm:py-space-8 py-space-4 sm:px-space-6 px-space-4">
-          {/* Login Form */}
-          <LoginForm
-            onSuccess={handleLoginSuccess}
-            onError={handleLoginError}
-            className="mb-space-6"
-          />
-
-          {/* Divider */}
-          <div className="relative mb-space-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-caption">
-              <span className="px-space-2 bg-airvik-white text-sm  text-gray-500 font-sf-pro">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          {/* Google Login */}
-          <GoogleOAuthRedirectButton
-            type="login"
-            redirectTo="/dashboard"
-          >
-            Sign in with Google
-          </GoogleOAuthRedirectButton>
-        </div>
-
-
+    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
+      <div className="max-w-md w-full">
+        {/* Login Form */}
+        <LoginForm
+          onSuccess={handleLoginSuccess}
+          onError={handleLoginError}
+        />
       </div>
     </div>
   );
