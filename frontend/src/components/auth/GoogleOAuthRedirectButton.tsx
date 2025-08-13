@@ -53,7 +53,7 @@ export default function GoogleOAuthRedirectButton({
       onClick={handleGoogleOAuth}
       disabled={disabled}
       className={`
-        w-full flex items-center justify-center px-space-4 py-2.5
+        w-full flex items-center justify-center px-space-4 py-space-3
         border border-airvik-gray-300 rounded-radius-md hover:bg-gray-200 shadow-elevation-sm
         bg-airvik-white hover:bg-airvik-gray-50 
         text-airvik-gray-700  text-button focus:outline-none
