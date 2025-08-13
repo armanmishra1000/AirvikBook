@@ -27,7 +27,7 @@ export default function OAuthError() {
           </div>
 
           {/* Title */}
-          <h2 className="text-3xl font-bold text-airvik-gray-900 dark:text-airvik-white mb-space-2">
+          <h2 className="text-h2 text-airvik-gray-900 dark:text-airvik-white mb-space-2">
             Authentication Error
           </h2>
 

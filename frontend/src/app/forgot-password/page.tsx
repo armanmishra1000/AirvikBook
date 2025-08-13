@@ -90,9 +90,7 @@ const ForgotPasswordPage: React.FC = () => {
     }
   };
 
-  const handleBackClick = () => {
-    router.push("/");
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -190,7 +188,7 @@ const ForgotPasswordPage: React.FC = () => {
               <div className="space-y-space-3">
                 <button
                   onClick={() => router.push(AUTH_PATHS.LOGIN)}
-                  className="w-full bg-airvik-blue hover:bg-airvik-bluehover text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-all duration-100 ease-linear focus:outline-none"
+                  className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-all duration-100 ease-linear focus:outline-none"
                 >
                   Back to Login
                 </button>
@@ -215,15 +213,6 @@ const ForgotPasswordPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
       <div className="max-w-md w-full relative">
-        {/* Back Button */}
-        <button
-          type="button"
-          onClick={handleBackClick}
-          className="absolute hidden sm:block top-space-4 -left-10 p-1.5 border border-card-border dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none"
-          aria-label="Go back to homepage"
-        >
-          <ArrowLeft className="size-4" />
-        </button>
         {/* Header */}
         <div className="text-center mb-space-8">
           <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
@@ -281,7 +270,7 @@ const ForgotPasswordPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
+              className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
@@ -298,7 +287,7 @@ const ForgotPasswordPage: React.FC = () => {
           <div className="mt-space-4 text-center">
             <button
               onClick={() => router.push(AUTH_PATHS.LOGIN)}
-              className="font-sf-pro bg-gray-200 font-semibold tracking-normal  w-full py-2.5 text-airvik-blue transition-colors duration-normal focus:outline-none rounded-radius-sm"
+              className="font-sf-pro bg-gray-200 font-medium tracking-normal text-gray-700  w-full py-space-3 transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login
             </button>
