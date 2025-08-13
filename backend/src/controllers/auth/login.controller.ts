@@ -256,6 +256,7 @@ export class LoginController {
 
       return ResponseUtil.success(res, {
         accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
         expiresIn: result.expiresIn,
         user: result.user
       });

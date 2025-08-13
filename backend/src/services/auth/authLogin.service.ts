@@ -468,25 +468,26 @@ export class AuthLoginService {
   static async refreshSession(refreshToken: string): Promise<{
     success: boolean;
     accessToken?: string;
+    refreshToken?: string;
     expiresIn?: number;
     user?: Omit<User, 'password'>;
     error?: string;
     code?: string;
   }> {
     try {
-      // Use existing JWT service refresh functionality
-      const refreshResult = await JwtService.refreshAccessToken(refreshToken);
+      // Use new JWT service token rotation functionality
+      const rotationResult = await JwtService.rotateTokens(refreshToken);
       
-      if (!refreshResult.success) {
+      if (!rotationResult.success) {
         return {
           success: false,
-          error: refreshResult.error,
-          code: refreshResult.code
+          error: rotationResult.error,
+          code: rotationResult.code
         };
       }
 
       // Get user information for the response
-      const tokenValidation = JwtService.validateRefreshToken(refreshToken);
+      const tokenValidation = JwtService.validateRefreshToken(rotationResult.newRefreshToken!);
       if (!tokenValidation.isValid || !tokenValidation.payload) {
         return {
           success: false,
@@ -536,7 +537,8 @@ export class AuthLoginService {
 
       return {
         success: true,
-        accessToken: refreshResult.accessToken,
+        accessToken: rotationResult.accessToken,
+        refreshToken: rotationResult.newRefreshToken,
         expiresIn: this.ACCESS_TOKEN_EXPIRY_SECONDS,
         user
       };
