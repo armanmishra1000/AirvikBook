@@ -295,7 +295,7 @@ export default function ProfilePage() {
                 {/* Edit Profile */}
                 <Link
                   href="/profile/edit"
-                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-400 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-700 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
                 >
                   <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-airvik-blue/5 to-airvik-purple/5 group-hover:opacity-100" />
                   <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
@@ -321,7 +321,7 @@ export default function ProfilePage() {
                 {/* Profile Picture */}
                 <Link
                   href="/profile/picture"
-                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-400 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-700 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
                 >
                   <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-airvik-purple/5 to-airvik-violet/5 group-hover:opacity-100" />
                   <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
@@ -347,7 +347,7 @@ export default function ProfilePage() {
                 {/* Privacy Settings */}
                 <Link
                   href="/profile/privacy"
-                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-400 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-cyan focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-700 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-cyan focus:ring-offset-2"
                 >
                   <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-airvik-cyan/5 to-airvik-blue/5 group-hover:opacity-100" />
                   <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
@@ -373,7 +373,7 @@ export default function ProfilePage() {
                 {/* Connected Accounts */}
                 <Link
                   href="/profile/connections"
-                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-400 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-700 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                 >
                   <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 group-hover:opacity-100" />
                   <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
