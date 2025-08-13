@@ -14,6 +14,7 @@ import {
 import { UserLoginService } from "../../services/userLogin.service";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import GoogleOAuthRedirectButton from "./GoogleOAuthRedirectButton";
+import { AUTH_PATHS } from "../../lib/paths";
 
 // =====================================================
 // BRAND-COMPLIANT LOGIN FORM COMPONENT
@@ -392,7 +393,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
           {showForgotPassword && (
             <a
-              href="/auth/forgot-password"
+              href={AUTH_PATHS.FORGOT_PASSWORD}
               className="text-body text-airvik-blue transition-colors duration-normal"
             >
               Forgot password?
@@ -406,7 +407,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <p className="text-body text-gray-600 dark:text-gray-400">
             Don't have an account?{" "}
             <a
-              href="/auth/register"
+              href={AUTH_PATHS.REGISTER}
               className="text-airvik-blue transition-colors duration-normal font-medium"
             >
               Sign up

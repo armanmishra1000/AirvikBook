@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth, useIsAuthenticated } from '../../context/AuthContext';
+import { AUTH_PATHS } from '../../lib/paths';
 import { useToastHelpers } from '../../components/common/Toast';
 import { ProfileCard } from '../../components/profile/ProfileCard';
 import { ProfileErrorBoundary } from '../../components/profile/ProfileErrorBoundary';
@@ -30,7 +31,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!authState.isLoading && !isAuthenticated) {
-      router.replace('/auth/login');
+      router.replace(AUTH_PATHS.LOGIN);
       return;
     }
 

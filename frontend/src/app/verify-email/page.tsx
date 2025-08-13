@@ -9,8 +9,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { isSuccessResponse } from '../../../types/userRegistration.types';
-import UserRegistrationService from '../../../services/userRegistration.service';
+import { isSuccessResponse } from '../../types/userRegistration.types';
+import UserRegistrationService from '../../services/userRegistration.service';
+import { AUTH_PATHS } from '../../lib/paths';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function VerifyEmailPage() {
     
     // If no email provided, redirect to registration
     if (!emailParam) {
-      router.push('/auth/register');
+      router.push(AUTH_PATHS.REGISTER);
       return;
     }
     
@@ -148,7 +149,7 @@ export default function VerifyEmailPage() {
         
         // Always redirect, even if component unmounted (user will see success page)
         setTimeout(() => {
-          router.push('/auth/success');
+          router.push(AUTH_PATHS.SUCCESS);
         }, 2000);
       } else {
         // Only update state if component is still mounted
@@ -367,7 +368,7 @@ export default function VerifyEmailPage() {
         {isVerified && (
           <div className="text-center mb-space-6">
             <button
-              onClick={() => router.push('/auth/success')}
+                              onClick={() => router.push(AUTH_PATHS.SUCCESS)}
               className="w-full font-medium text-white transition-colors duration-200 bg-green-600 rounded-md px-space-6 py-space-3 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               Continue to Dashboard
@@ -384,7 +385,7 @@ export default function VerifyEmailPage() {
               </p>
               <div className="space-y-space-2">
                 <button
-                  onClick={() => router.push('/auth/register')}
+                  onClick={() => router.push(AUTH_PATHS.REGISTER)}
                   className="block w-full text-sm text-blue-600 underline dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
                 >
                   Try registering again

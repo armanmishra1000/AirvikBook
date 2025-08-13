@@ -3,6 +3,7 @@
 import React from 'react';
 import { SessionManager } from '../../../components/auth/SessionManager';
 import { useAuth, useIsAuthenticated } from '../../../context/AuthContext';
+import { AUTH_PATHS } from '../../../lib/paths';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -19,7 +20,7 @@ const SessionsPage: React.FC = () => {
   // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated && !authState.isLoading) {
-      router.replace('/auth/login');
+      router.replace(AUTH_PATHS.LOGIN);
     }
   }, [isAuthenticated, authState.isLoading, router]);
 
@@ -172,7 +173,7 @@ const SessionsPage: React.FC = () => {
               
               <div className="space-y-space-3">
                 <button
-                  onClick={() => router.push('/auth/forgot-password')}
+                  onClick={() => router.push(AUTH_PATHS.FORGOT_PASSWORD)}
                   className="w-full text-left px-space-4 py-space-3 border border-gray-300 dark:border-gray-600 rounded-radius-md text-airvik-black dark:text-airvik-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-normal"
                 >
                   <div className="flex items-center justify-between">

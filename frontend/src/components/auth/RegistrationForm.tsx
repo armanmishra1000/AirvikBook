@@ -27,6 +27,7 @@ import GoogleOAuthRedirectButton from "./GoogleOAuthRedirectButton";
 import PasswordStrengthIndicator from "./PasswordStrengthIndicator";
 import { useToastHelpers } from "../common/Toast";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { AUTH_PATHS } from "../../lib/paths";
 
 interface RegistrationFormProps {
   onSuccess?: (user: any, tokens: any) => void;
@@ -670,7 +671,7 @@ export default function RegistrationForm({
         <p className="text-body text-gray-600 dark:text-gray-300">
           Already have an account?{" "}
           <a
-            href="/auth/login"
+            href={AUTH_PATHS.LOGIN}
             className="text-airvik-blue transition-colors duration-normal"
           >
             Sign in here

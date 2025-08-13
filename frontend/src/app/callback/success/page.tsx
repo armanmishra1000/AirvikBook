@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '../../../../context/AuthContext';
+import { AUTH_PATHS, getCallbackPath } from '../../../lib/paths';
+import { useAuth } from '../../../context/AuthContext';
 
 /**
  * Google OAuth Callback Success Page
@@ -82,7 +83,7 @@ export default function OAuthCallbackSuccess() {
         
         // Redirect to login page after showing error
         setTimeout(() => {
-          router.push('/auth/login?error=oauth_callback_failed');
+          router.push(getCallbackPath('oauth_callback_failed'));
         }, 3000);
       }
     };
@@ -146,7 +147,7 @@ export default function OAuthCallbackSuccess() {
                 You will be redirected to the login page.
               </p>
               <button
-                onClick={() => router.push('/auth/login')}
+                onClick={() => router.push(AUTH_PATHS.LOGIN)}
                 className="text-airvik-blue hover:text-airvik-purple underline text-sm"
               >
                 Go to Login Now

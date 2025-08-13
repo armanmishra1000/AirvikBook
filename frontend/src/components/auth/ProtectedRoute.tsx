@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, useIsAuthenticated } from '../../context/AuthContext';
+import { AUTH_PATHS } from '../../lib/paths';
 
 // =====================================================
 // PROTECTED ROUTE COMPONENT
@@ -19,7 +20,7 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
-  redirectTo = '/auth/login',
+  redirectTo = AUTH_PATHS.LOGIN,
   requireEmailVerification = false,
   allowedRoles = [],
   fallback
@@ -40,7 +41,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     // Check email verification if required
     if (requireEmailVerification && authState.user && !authState.user.isEmailVerified) {
-      router.replace('/auth/verify-email');
+      router.replace(AUTH_PATHS.VERIFY_EMAIL);
       return;
     }
 

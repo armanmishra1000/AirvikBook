@@ -9,7 +9,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import RegistrationForm from '../../../components/auth/RegistrationForm';
+import RegistrationForm from '../../components/auth/RegistrationForm';
+import { getVerifyEmailPath } from '../../lib/paths';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function RegisterPage() {
     
     // Redirect to verification pending page after a brief delay for UX
     setTimeout(() => {
-      router.push(`/auth/verify-email?email=${encodeURIComponent(user.email)}`);
+      router.push(getVerifyEmailPath(user.email));
     }, 1500);
   };
 

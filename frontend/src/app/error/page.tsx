@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { AUTH_PATHS } from '../../lib/paths';
 import Link from 'next/link';
 
 /**
@@ -38,14 +39,14 @@ export default function OAuthError() {
           {/* Action Buttons */}
           <div className="space-y-space-3">
             <Link
-              href="/auth/login"
+              href={AUTH_PATHS.LOGIN}
               className="w-full flex justify-center py-space-3 px-space-4 border border-transparent rounded-radius-md shadow-elevation-sm text-button font-sf-pro text-airvik-white bg-airvik-blue hover:bg-airvik-purple focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-airvik-blue transition-colors duration-normal"
             >
               Try Again
             </Link>
             
             <Link
-              href="/auth/register"
+              href={AUTH_PATHS.REGISTER}
               className="w-full flex justify-center py-space-3 px-space-4 border border-airvik-gray-300 dark:border-airvik-gray-600 rounded-radius-md shadow-elevation-sm text-button font-sf-pro text-airvik-gray-700 dark:text-airvik-gray-200 bg-airvik-white dark:bg-airvik-gray-800 hover:bg-airvik-gray-50 dark:hover:bg-airvik-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-airvik-blue transition-colors duration-normal"
             >
               Create New Account

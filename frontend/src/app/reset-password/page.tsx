@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { PasswordManagementService } from "../../../services/passwordManagement.service";
-import { PasswordInput } from "../../../components/auth/PasswordInput";
-import { PasswordStrengthIndicator } from "../../../components/auth/PasswordStrengthIndicator";
-import { useToastHelpers } from "../../../components/common/Toast";
+import { PasswordManagementService } from "../../services/passwordManagement.service";
+import { PasswordInput } from "../../components/auth/PasswordInput";
+import { PasswordStrengthIndicator } from "../../components/auth/PasswordStrengthIndicator";
+import { useToastHelpers } from "../../components/common/Toast";
 import {
   isSuccessResponse,
   PASSWORD_ERROR_CODES,
-} from "../../../types/passwordManagement.types";
+} from "../../types/passwordManagement.types";
 import { ArrowLeft } from "lucide-react";
+import { AUTH_PATHS } from "../../lib/paths";
 
 // =====================================================
 // RESET PASSWORD PAGE COMPONENT (Query Parameter Version)
@@ -281,13 +282,13 @@ const ResetPasswordPage: React.FC = () => {
             {/* Action Buttons */}
             <div className="space-y-space-3">
               <button
-                onClick={() => router.push("/auth/forgot-password")}
+                onClick={() => router.push(AUTH_PATHS.FORGOT_PASSWORD)}
                 className="w-full bg-airvik-blue hover:bg-airvik-bluehover text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid transition-all ease-linear duration-100 focus:outline-none"
               >
                 Request New Reset Link
               </button>
               <button
-                onClick={() => router.push("/auth/login")}
+                onClick={() => router.push(AUTH_PATHS.LOGIN)}
                 className="w-full bg-gray-200 text-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-colors duration-normal focus:outline-none"
               >
                 Back to Login
@@ -336,7 +337,7 @@ const ResetPasswordPage: React.FC = () => {
 
             {/* Action Button */}
             <button
-              onClick={() => router.push("/auth/login")}
+              onClick={() => router.push(AUTH_PATHS.LOGIN)}
               className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid transition-colors duration-normal focus:outline-none"
             >
               Continue to Login
@@ -429,7 +430,7 @@ const ResetPasswordPage: React.FC = () => {
           {/* Back to Login */}
           <div className="mt-space-4 text-center">
             <button
-              onClick={() => router.push("/auth/login")}
+              onClick={() => router.push(AUTH_PATHS.LOGIN)}
               className="font-semibold tracking-normal font-sf-pro bg-gray-200 w-full py-2.5 text-airvik-blue hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login

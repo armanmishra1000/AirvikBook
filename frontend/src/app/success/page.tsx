@@ -9,7 +9,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import UserRegistrationService from '../../../services/userRegistration.service';
+import { AUTH_PATHS } from '../../lib/paths';
+import UserRegistrationService from '../../services/userRegistration.service';
 
 export default function SuccessPage() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function SuccessPage() {
       setUser(currentUser);
     } else {
       // If no user data, redirect to login
-      router.push('/auth/login');
+      router.push(AUTH_PATHS.LOGIN);
     }
   }, [router]);
 
