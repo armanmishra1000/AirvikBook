@@ -107,18 +107,34 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
           
           {/* Profile Info */}
             <div className="flex-1">
-              <h2 className="text-h3 sm:text-h2 text-airvik-white font-bold">
-                {profile.fullName}
-              </h2>
+              <div className="flex items-center space-x-space-2">
+                <svg className="w-5 h-5 text-airvik-white/90" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
+                <h2 className="text-h3 sm:text-h2 text-airvik-white font-bold">
+                  {profile.fullName}
+                </h2>
+              </div>
               {profile.occupation && (
-                <p className="text-body-sm sm:text-body text-airvik-white/90 mt-space-1">
-                  {profile.occupation}
-                </p>
+                <div className="flex items-center space-x-space-2 mt-space-1">
+                  <svg className="w-4 h-4 text-airvik-white/80" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
+                    <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
+                  </svg>
+                  <p className="text-body-sm sm:text-body text-airvik-white/90">
+                    {profile.occupation}
+                  </p>
+                </div>
               )}
               {profile.location && (
-                <p className="text-caption text-airvik-white/80 mt-space-1">
-                  📍 {profile.location}
-                </p>
+                <div className="flex items-center space-x-space-2 mt-space-1">
+                  <svg className="w-4 h-4 text-airvik-white/80" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-caption text-airvik-white/80">
+                    {profile.location}
+                  </p>
+                </div>
               )}
             </div>
           </div>
@@ -232,7 +248,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
               {profile.nationality && (
                 <div className="flex items-center space-x-space-2">
                   <svg className="w-4 h-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clipRule="evenodd" />
                   </svg>
                   <span className="text-body text-gray-700 dark:text-gray-300">
                     {profile.nationality}

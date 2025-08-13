@@ -73,32 +73,134 @@ export default function EditProfilePage() {
   };
 
   // =====================================================
-  // LOADING STATE
+  // MODERN SKELETON LOADER
   // =====================================================
 
   if (authState.isLoading || isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-airvik-white dark:bg-airvik-midnight">
-        <div className="text-center">
-          <svg className="w-8 h-8 mx-auto animate-spin mb-space-4 text-airvik-blue" viewBox="0 0 24 24">
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-              fill="none"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-          <p className="text-body text-airvik-black dark:text-airvik-white font-sf-pro">
-            Loading your profile...
-          </p>
+      <div className="min-h-screen bg-gradient-to-b from-airvik-blue/5 via-transparent to-transparent dark:from-airvik-blue/10 dark:bg-airvik-midnight">
+        {/* Header Skeleton */}
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 -z-10 opacity-30 blur-3xl">
+            <div className="absolute top-[-4rem] left-1/3 h-64 w-64 rounded-full bg-airvik-blue" />
+            <div className="absolute top-[6rem] left-[10%] h-40 w-40 rounded-full bg-airvik-purple" />
+          </div>
+          <div className="container mx-auto px-space-4 pt-space-10 pb-space-6">
+            {/* Navigation Skeleton */}
+            <div className="flex items-center space-x-space-2 mb-space-4">
+              <div className="h-4 bg-gray-200 w-16 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+              <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+              <div className="h-4 bg-gray-200 w-24 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+            </div>
+            
+            {/* Header Content Skeleton */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-4">
+              <div className="space-y-space-2">
+                <div className="h-8 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
+                <div className="h-5 bg-gray-200 w-80 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+              </div>
+              <div className="w-40 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
+            </div>
+          </div>
+        </div>
+
+        {/* Content Skeleton */}
+        <div className="container mx-auto px-space-4 pb-space-12">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-space-6">
+            {/* Form Skeleton */}
+            <div className="xl:col-span-2">
+              <div className="bg-white dark:bg-gray-800 rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm p-space-4 lg:p-space-6">
+                {/* Form Header Skeleton */}
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4 mb-space-6">
+                  <div className="h-6 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
+                  <div className="h-4 bg-gray-200 w-80 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
+                
+                {/* Form Fields Skeleton */}
+                <div className="space-y-space-6">
+                  {/* Full Name Field */}
+                  <div>
+                    <div className="h-4 bg-gray-200 w-24 dark:bg-gray-700 rounded-radius-sm animate-pulse mb-space-2" />
+                    <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                  </div>
+                  
+                  {/* Mobile Number Field */}
+                  <div>
+                    <div className="h-4 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-sm animate-pulse mb-space-2" />
+                    <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                  </div>
+                  
+                  {/* Bio Field */}
+                  <div>
+                    <div className="h-4 bg-gray-200 w-12 dark:bg-gray-700 rounded-radius-sm animate-pulse mb-space-2" />
+                    <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                  </div>
+                  
+                  {/* Date of Birth and Gender Row */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-4">
+                    <div>
+                      <div className="h-4 bg-gray-200 w-28 dark:bg-gray-700 rounded-radius-sm animate-pulse mb-space-2" />
+                      <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="h-4 bg-gray-200 w-16 dark:bg-gray-700 rounded-radius-sm animate-pulse mb-space-2" />
+                      <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  {/* Nationality and Occupation Row */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-4">
+                    <div>
+                      <div className="h-4 bg-gray-200 w-24 dark:bg-gray-700 rounded-radius-sm animate-pulse mb-space-2" />
+                      <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="h-4 bg-gray-200 w-24 dark:bg-gray-700 rounded-radius-sm animate-pulse mb-space-2" />
+                      <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  {/* Website and Location Row */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-4">
+                    <div>
+                      <div className="h-4 bg-gray-200 w-20 dark:bg-gray-700 rounded-radius-sm animate-pulse mb-space-2" />
+                      <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="h-4 bg-gray-200 w-20 dark:bg-gray-700 rounded-radius-sm animate-pulse mb-space-2" />
+                      <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  {/* Submit Button Skeleton */}
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-space-4">
+                    <div className="flex flex-col sm:flex-row sm:justify-end">
+                      <div className="w-32 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar Skeleton */}
+            <div className="space-y-space-6">
+              {/* Profile Guidelines Skeleton */}
+              <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
+                <div className="h-5 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
+                <div className="space-y-space-1">
+                  <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-3/4 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-2/3 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
+              </div>
+              
+              {/* Pro Tip Skeleton */}
+              <div className="border border-green-200 rounded-radius-lg dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-space-4 lg:p-space-5">
+                <div className="h-5 bg-green-200 w-20 dark:bg-green-700 rounded-radius-md animate-pulse mb-space-2" />
+                <div className="h-3 bg-green-200 w-full dark:bg-green-700 rounded-radius-sm animate-pulse" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -110,25 +212,35 @@ export default function EditProfilePage() {
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-airvik-white dark:bg-airvik-midnight">
-        <div className="container mx-auto px-space-4 py-space-8">
+      <div className="min-h-screen bg-gradient-to-b from-airvik-blue/5 via-transparent to-transparent dark:from-airvik-blue/10 dark:bg-airvik-midnight">
+        <div className="container mx-auto px-space-4 py-space-16">
           <div className="max-w-2xl mx-auto">
-            <div className="text-center border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 rounded-radius-lg p-space-6">
-              <svg className="w-12 h-12 mx-auto text-red-600 dark:text-red-400 mb-space-4" viewBox="0 0 20 20" fill="currentColor">
+            <div className="text-center bg-white border border-red-200 dark:bg-gray-800 dark:border-red-800 rounded-radius-xl p-space-8 shadow-shadow-sm">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 mb-space-4 dark:bg-red-900/30 rounded-radius-full">
+                <svg className="w-8 h-8 text-red-600 dark:text-red-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
-              <h3 className="text-red-800 text-h4 dark:text-red-200 mb-space-2">
+              </div>
+              <h3 className="font-semibold text-h4 text-airvik-black dark:text-airvik-white mb-space-3">
                 Failed to Load Profile
               </h3>
-              <p className="text-red-700 text-body dark:text-red-300 mb-space-4">
-                We couldn't load your profile information. Please try again.
+              <p className="text-gray-600 text-body dark:text-gray-400 mb-space-6">
+                We couldn't load your profile information. Please try again or contact support if the problem persists.
               </p>
+              <div className="flex flex-col justify-center sm:flex-row gap-space-3">
               <button
                 onClick={() => loadProfile()}
-                className="transition-all bg-red-600 px-space-4 py-space-2 text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-red-700 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className="transition-all bg-airvik-blue hover:bg-airvik-purple text-airvik-white px-space-6 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
               >
                 Try Again
               </button>
+                <Link
+                  href="/profile"
+                  className="transition-all bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-space-6 py-space-3 rounded-radius-lg font-medium text-button shadow-shadow-sm hover:shadow-shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  Back to Profile
+                </Link>
+              </div>
             </div>
           </div>
         </div>
