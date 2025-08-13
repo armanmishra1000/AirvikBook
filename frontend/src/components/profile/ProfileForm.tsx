@@ -290,14 +290,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   }
 
   return (
-    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm ${className}`}>
-      <form onSubmit={handleSubmit} className="p-space-6 space-y-space-6">
+    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
+      <form onSubmit={handleSubmit} className="p-space-4 lg:p-space-8 space-y-space-8 lg:space-y-space-6 ">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4">
-          <h3 className="text-h3 text-airvik-black dark:text-airvik-white">
+          <h3 className="text-h4 lg:text-h3 text-airvik-black dark:text-airvik-white">
             Profile Information
           </h3>
-          <p className="text-gray-600 text-body dark:text-gray-400 mt-space-2">
+          <p className="text-gray-600 text-body-sm lg:text-body dark:text-gray-400 mt-space-2">
             Update your personal information and preferences
           </p>
         </div>
@@ -390,7 +390,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         </div>
 
         {/* Date of Birth and Gender */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-space-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-4">
           <div>
             <label htmlFor="dateOfBirth" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
               Date of Birth
@@ -438,7 +438,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         </div>
 
         {/* Nationality and Occupation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-space-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-4">
           <div>
             <label htmlFor="nationality" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
               Nationality
@@ -473,7 +473,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         </div>
 
         {/* Website and Location */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-space-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-4">
           <div>
             <label htmlFor="website" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
               Website
@@ -517,7 +517,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end border-t border-gray-200 pt-space-4 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row sm:justify-end border-t border-gray-200 pt-space-4 dark:border-gray-700 gap-space-3 sm:gap-space-0">
           <button
             type="submit"
             disabled={isSubmitting || authState.isLoading || (!isFormValid && submitAttemptedRef.current)}

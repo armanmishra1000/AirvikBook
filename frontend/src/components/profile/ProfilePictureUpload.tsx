@@ -199,14 +199,14 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
   const displayUrl = previewUrl || currentPictureUrl;
 
   return (
-    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm ${className}`}>
-      <div className="p-space-6 space-y-space-6">
+    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg  border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
+      <div className="p-space-4 lg:p-space-8 space-y-space-8 lg:space-y-space-6">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4">
-          <h3 className="text-h3 text-airvik-black dark:text-airvik-white">
+          <h3 className="text-h4 lg:text-h3 text-airvik-black dark:text-airvik-white">
             Profile Picture
           </h3>
-          <p className="text-gray-600 text-body dark:text-gray-400 mt-space-2">
+          <p className="text-gray-600 text-body-sm lg:text-body dark:text-gray-400 mt-space-2">
             Upload or sync your profile picture
           </p>
         </div>
@@ -218,7 +218,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
               <img
                 src={displayUrl}
                 alt="Profile picture"
-                className="object-cover w-32 h-32 border-4 border-gray-200 rounded-radius-full dark:border-gray-700"
+                className="object-cover w-24 h-24 sm:w-32 sm:h-32 border-4 border-gray-200 rounded-radius-full dark:border-gray-700"
               />
               {previewUrl && (
                 <div className="absolute -top-2 -right-2 bg-airvik-blue text-airvik-white rounded-radius-full p-space-1">
@@ -230,7 +230,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
             </div>
             
             {previewUrl && (
-              <div className="flex space-x-space-3">
+              <div className="flex flex-col sm:flex-row space-y-space-2 sm:space-y-0 sm:space-x-space-3">
                 <button
                   onClick={handleUpload}
                   disabled={isUploading}
@@ -256,21 +256,21 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-radius-lg p-space-8 text-center transition-colors duration-normal
+            className={`border-2 border-dashed rounded-radius-lg p-space-6 lg:p-space-8 text-center transition-colors duration-normal
               ${isDragOver
                 ? 'border-airvik-blue bg-airvik-blue-light/20'
                 : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
               }`}
           >
             <div className="space-y-space-4">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-800 rounded-radius-full">
-                <svg className="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 mx-auto bg-gray-100 dark:bg-gray-800 rounded-radius-full">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
               
               <div>
-                <p className="text-body text-airvik-black dark:text-airvik-white">
+                <p className="text-body-sm lg:text-body text-airvik-black dark:text-airvik-white">
                   Drag and drop your image here, or{' '}
                   <button
                     type="button"
@@ -298,7 +298,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
         />
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap border-t border-gray-200 gap-space-3 pt-space-4 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row flex-wrap border-t border-gray-200 gap-space-3 pt-space-4 dark:border-gray-700">
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}

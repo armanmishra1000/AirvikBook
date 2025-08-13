@@ -194,19 +194,19 @@ export default function ProfilePage() {
             <div className="absolute bottom-[-4rem] left-1/3 h-48 w-48 rounded-full bg-gradient-to-r from-airvik-purple to-airvik-cyan blur-3xl" />
           </div>
           
-          <div className="container mx-auto px-space-4 pt-space-12 pb-space-8">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-space-6">
-              <div className="space-y-space-3">
-                <h1 className="font-bold text-h1 text-airvik-black dark:text-airvik-white">
+          <div className="container mx-auto px-space-4 pt-space-8 lg:pt-space-12 pb-space-6 lg:pb-space-8">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-space-4 lg:gap-space-6">
+              <div className="space-y-space-2 lg:space-y-space-3">
+                <h1 className="font-bold text-h2 lg:text-h1 text-airvik-black dark:text-airvik-white">
                   Profile Settings
                 </h1>
-                <p className="max-w-2xl text-gray-600 text-body-lg dark:text-gray-400">
+                <p className="max-w-2xl text-gray-600 text-body lg:text-body-lg dark:text-gray-400">
                   Manage your personal information, privacy preferences, and account connections in one place
                 </p>
               </div>
               <Link 
                 href="/dashboard" 
-                className="group inline-flex items-center gap-space-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md  border border-gray-200 dark:border-gray-700"
+                className="group inline-flex items-center gap-space-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md border border-gray-200 dark:border-gray-700 self-start lg:self-auto"
               >
                 <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
@@ -219,9 +219,9 @@ export default function ProfilePage() {
 
         <div className="container mx-auto px-space-4 pb-space-16">
           {/* Main Layout Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-space-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-space-6 lg:gap-space-8">
             {/* Main Content Area */}
-            <div className="xl:col-span-3 space-y-space-8">
+            <div className="lg:col-span-3 space-y-space-6 lg:space-y-space-8">
               {/* Profile Card */}
               {profile && (
                 <div className="overflow-hidden bg-white border border-gray-100 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700">
@@ -235,24 +235,24 @@ export default function ProfilePage() {
               )}
 
               {/* Settings Navigation Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-space-4 lg:gap-space-6">
                 {/* Edit Profile */}
                 <Link
                   href="/profile/edit"
-                  className="relative overflow-hidden bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-400 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
                 >
                   <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-airvik-blue/5 to-airvik-purple/5 group-hover:opacity-100" />
-                  <div className="relative flex items-start space-x-space-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-airvik-blue to-airvik-purple rounded-radius-lg shadow-shadow-sm">
+                  <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
+                    <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-airvik-blue to-airvik-purple rounded-radius-lg shadow-shadow-sm">
                       <svg className="w-6 h-6 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-blue dark:group-hover:text-airvik-blue">
+                      <h3 className="font-semibold text-h6 lg:text-h5 text-airvik-black dark:text-airvik-white mb-space-1 lg:mb-space-2 group-hover:text-airvik-blue dark:group-hover:text-airvik-blue">
                         Edit Profile
                       </h3>
-                      <p className="text-gray-600 text-body-sm dark:text-gray-400">
+                      <p className="text-gray-600 text-caption lg:text-body-sm dark:text-gray-400">
                         Update your personal information and preferences
                       </p>
                     </div>
@@ -265,20 +265,20 @@ export default function ProfilePage() {
                 {/* Profile Picture */}
                 <Link
                   href="/profile/picture"
-                  className="relative overflow-hidden bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-400  group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-purple focus:ring-offset-2"
                 >
                   <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-airvik-purple/5 to-airvik-violet/5 group-hover:opacity-100" />
-                  <div className="relative flex items-start space-x-space-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-airvik-purple to-airvik-violet rounded-radius-lg shadow-shadow-sm">
+                  <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
+                    <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-airvik-purple to-airvik-violet rounded-radius-lg shadow-shadow-sm">
                       <svg className="w-6 h-6 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-purple dark:group-hover:text-airvik-purple">
+                      <h3 className="font-semibold text-h6 lg:text-h5 text-airvik-black dark:text-airvik-white mb-space-1 lg:mb-space-2 group-hover:text-airvik-purple dark:group-hover:text-airvik-purple">
                         Profile Picture
                       </h3>
-                      <p className="text-gray-600 text-body-sm dark:text-gray-400">
+                      <p className="text-gray-600 text-caption lg:text-body-sm dark:text-gray-400">
                         Upload or sync your profile picture
                       </p>
                     </div>
@@ -291,20 +291,20 @@ export default function ProfilePage() {
                 {/* Privacy Settings */}
                 <Link
                   href="/profile/privacy"
-                  className="relative overflow-hidden bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-cyan focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-400  group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-cyan focus:ring-offset-2"
                 >
                   <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-airvik-cyan/5 to-airvik-blue/5 group-hover:opacity-100" />
-                  <div className="relative flex items-start space-x-space-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-airvik-cyan to-airvik-blue rounded-radius-lg shadow-shadow-sm">
+                  <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
+                    <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-airvik-cyan to-airvik-blue rounded-radius-lg shadow-shadow-sm">
                       <svg className="w-6 h-6 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-airvik-cyan dark:group-hover:text-airvik-cyan">
+                      <h3 className="font-semibold text-h6 lg:text-h5 text-airvik-black dark:text-airvik-white mb-space-1 lg:mb-space-2 group-hover:text-airvik-cyan dark:group-hover:text-airvik-cyan">
                         Privacy Settings
                       </h3>
-                      <p className="text-gray-600 text-body-sm dark:text-gray-400">
+                      <p className="text-gray-600 text-caption lg:text-body-sm dark:text-gray-400">
                         Control your profile visibility and data sharing
                       </p>
                     </div>
@@ -317,20 +317,20 @@ export default function ProfilePage() {
                 {/* Connected Accounts */}
                 <Link
                   href="/profile/connections"
-                  className="relative overflow-hidden bg-white border border-gray-100 group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="relative overflow-hidden bg-white border border-gray-200 dark:border-gray-400  group dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                 >
                   <div className="absolute inset-0 opacity-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 group-hover:opacity-100" />
-                  <div className="relative flex items-start space-x-space-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-radius-lg shadow-shadow-sm">
+                  <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
+                    <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-radius-lg shadow-shadow-sm">
                       <svg className="w-6 h-6 text-white" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-h5 text-airvik-black dark:text-airvik-white mb-space-2 group-hover:text-green-600 dark:group-hover:text-green-400">
+                      <h3 className="font-semibold text-h6 lg:text-h5 text-airvik-black dark:text-airvik-white mb-space-1 lg:mb-space-2 group-hover:text-green-600 dark:group-hover:text-green-400">
                         Connected Accounts
                       </h3>
-                      <p className="text-gray-600 text-body-sm dark:text-gray-400">
+                      <p className="text-gray-600 text-caption lg:text-body-sm dark:text-gray-400">
                         Manage your linked social accounts
                       </p>
                     </div>
@@ -345,10 +345,10 @@ export default function ProfilePage() {
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-space-6">
+            <div className="space-y-space-4 lg:space-y-space-6">
               {/* Profile Overview */}
               {profile && (
-                <div className="bg-white border border-gray-100 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6">
+                <div className="bg-white border border-gray-100 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6">
                   <div className="flex items-center space-x-space-3 mb-space-4">
                     <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-airvik-blue to-airvik-purple rounded-radius-lg">
                       <svg className="w-4 h-4 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
@@ -387,7 +387,7 @@ export default function ProfilePage() {
               )}
 
               {/* Quick Actions */}
-              <div className="bg-white border border-gray-100 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-6">
+              <div className="bg-white border border-gray-100 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm dark:border-gray-700 p-space-4 lg:p-space-6">
                 <div className="flex items-center space-x-space-3 mb-space-4">
                   <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-airvik-cyan to-airvik-blue rounded-radius-lg">
                     <svg className="w-4 h-4 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">

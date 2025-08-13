@@ -156,12 +156,12 @@ export default function EditProfilePage() {
             </svg>
             <span className="font-medium text-airvik-blue dark:text-airvik-white">Edit Profile</span>
           </nav>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-space-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-4">
             <div>
-              <h1 className="font-bold text-h2 text-airvik-black dark:text-airvik-white">Edit Profile</h1>
-              <p className="text-gray-600 mt-space-2 text-body dark:text-gray-400">Update your personal information and preferences</p>
+              <h1 className="font-bold text-h3 lg:text-h2 text-airvik-black dark:text-airvik-white">Edit Profile</h1>
+              <p className="text-gray-600 mt-space-2 text-body-sm lg:text-body dark:text-gray-400">Update your personal information and preferences</p>
             </div>
-            <Link href="/profile" className="group inline-flex items-center gap-space-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal  active:translate-y-0 border border-gray-200 dark:border-gray-700">
+            <Link href="/profile" className="group inline-flex items-center gap-space-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal active:translate-y-0 border border-gray-200 dark:border-gray-700 self-start sm:self-auto">
               <svg className="w-5 h-5 transition-transform " viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
               </svg>
@@ -172,9 +172,9 @@ export default function EditProfilePage() {
       </div>
 
       <div className="container mx-auto px-space-4 pb-space-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-space-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-space-6">
           {/* Form */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-2">
             {profile && (
               <ProfileForm
                 initialData={profile}
@@ -185,8 +185,8 @@ export default function EditProfilePage() {
           </div>
 
         {/* Tips */}
-          <aside className="space-y-space-6">
-            <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-5 shadow-shadow-sm">
+          <aside className="space-y-space-4 lg:space-y-space-6">
+            <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
               <h3 className="text-h6 mb-space-2 text-airvik-black dark:text-airvik-white">Profile Guidelines</h3>
               <ul className="text-gray-600 text-caption dark:text-gray-400 space-y-space-1">
                 <li>• Full Name should be 2-100 characters</li>
@@ -194,7 +194,7 @@ export default function EditProfilePage() {
                 <li>• Use a valid website URL if provided</li>
               </ul>
             </div>
-            <div className="border border-green-200 rounded-radius-lg dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-space-5">
+            <div className="border border-green-200 rounded-radius-lg dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-space-4 lg:p-space-5">
               <h3 className="text-green-800 text-h6 mb-space-2 dark:text-green-200">Pro Tip</h3>
               <p className="text-green-700 text-caption dark:text-green-300">Use a recent, clear profile photo and keep your occupation and location updated to help teammates recognize you.</p>
             </div>

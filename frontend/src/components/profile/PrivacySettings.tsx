@@ -164,14 +164,14 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
   }
 
   return (
-    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm ${className}`}>
-      <form onSubmit={handleSubmit} className="p-space-6 space-y-space-6">
+    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
+      <form onSubmit={handleSubmit} className="p-space-4 lg:p-space-8 space-y-space-8 lg:space-y-space-6">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4">
-          <h3 className="text-h3 text-airvik-black dark:text-airvik-white">
+          <h3 className="text-h4 lg:text-h3 text-airvik-black dark:text-airvik-white">
             Privacy Settings
           </h3>
-          <p className="text-body text-gray-600 dark:text-gray-400 mt-space-2">
+          <p className="text-body-sm lg:text-body text-gray-600 dark:text-gray-400 mt-space-2">
             Control who can see your profile information
           </p>
         </div>
@@ -202,14 +202,14 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
 
         {/* Contact Information Toggles */}
         <div className="space-y-space-4">
-          <h4 className="text-h5 text-airvik-black dark:text-airvik-white">
+          <h4 className="text-h6 lg:text-h5 text-airvik-black dark:text-airvik-white">
             Contact Information
           </h4>
           
           {/* Show Email Toggle */}
-          <div className="flex items-center justify-between p-space-4 bg-gray-50 dark:bg-gray-800 rounded-radius-md">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-4 bg-gray-50 dark:bg-gray-800 rounded-radius-md gap-space-3 sm:gap-space-0">
             <div className="flex-1">
-              <h5 className="text-body font-medium text-airvik-black dark:text-airvik-white">
+              <h5 className="text-body-sm lg:text-body font-medium text-airvik-black dark:text-airvik-white">
                 Show Email Address
               </h5>
               <p className="text-caption text-gray-600 dark:text-gray-400">
@@ -237,9 +237,9 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
           </div>
 
           {/* Show Phone Toggle */}
-          <div className="flex items-center justify-between p-space-4 bg-gray-50 dark:bg-gray-800 rounded-radius-md">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-4 bg-gray-50 dark:bg-gray-800 rounded-radius-md gap-space-3 sm:gap-space-0">
             <div className="flex-1">
-              <h5 className="text-body font-medium text-airvik-black dark:text-airvik-white">
+              <h5 className="text-body-sm lg:text-body font-medium text-airvik-black dark:text-airvik-white">
                 Show Phone Number
               </h5>
               <p className="text-caption text-gray-600 dark:text-gray-400">
@@ -269,14 +269,14 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
 
         {/* Google Integration */}
         <div className="space-y-space-4">
-          <h4 className="text-h5 text-airvik-black dark:text-airvik-white">
+          <h4 className="text-h6 lg:text-h5 text-airvik-black dark:text-airvik-white">
             Google Integration
           </h4>
           
           {/* Allow Google Sync Toggle */}
-          <div className="flex items-center justify-between p-space-4 bg-gray-50 dark:bg-gray-800 rounded-radius-md">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-4 bg-gray-50 dark:bg-gray-800 rounded-radius-md gap-space-3 sm:gap-space-0">
             <div className="flex-1">
-              <h5 className="text-body font-medium text-airvik-black dark:text-airvik-white">
+              <h5 className="text-body-sm lg:text-body font-medium text-airvik-black dark:text-airvik-white">
                 Allow Google Sync
               </h5>
               <p className="text-caption text-gray-600 dark:text-gray-400">
@@ -313,7 +313,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
               </svg>
             </div>
             <div className="ml-space-3">
-              <h5 className="text-body font-medium text-airvik-black dark:text-airvik-white">
+              <h5 className="text-body-sm lg:text-body font-medium text-airvik-black dark:text-airvik-white">
                 Privacy Information
               </h5>
               <p className="text-caption text-gray-600 dark:text-gray-400 mt-space-1">
@@ -324,7 +324,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end pt-space-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row sm:justify-end pt-space-4 border-t border-gray-200 dark:border-gray-700 gap-space-3 sm:gap-space-0">
           <button
             type="submit"
             disabled={isSubmitting}
