@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   RegistrationFormData,
   FormErrors,
@@ -25,7 +26,7 @@ import UserRegistrationService from "../../services/userRegistration.service";
 import GoogleOAuthRedirectButton from "./GoogleOAuthRedirectButton";
 import PasswordStrengthIndicator from "./PasswordStrengthIndicator";
 import { useToastHelpers } from "../common/Toast";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 interface RegistrationFormProps {
   onSuccess?: (user: any, tokens: any) => void;
@@ -38,6 +39,8 @@ export default function RegistrationForm({
   onError,
   className = "",
 }: RegistrationFormProps) {
+  const router = useRouter();
+  
   // Form data state
   const [formData, setFormData] = useState<RegistrationFormData>({
     email: "",
@@ -238,6 +241,13 @@ export default function RegistrationForm({
   };
 
   /**
+   * Handle back button click
+   */
+  const handleBackClick = () => {
+    router.push("/");
+  };
+
+  /**
    * Handle form submission
    */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -282,16 +292,29 @@ export default function RegistrationForm({
   };
 
   return (
-    <div className={`w-full max-w-md mx-auto ${className}`}>
+    <div className={`w-full max-w-md mx-auto relative ${className}`}>
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={handleBackClick}
+        className="absolute hidden sm:block top-space-4 -left-10 p-1.5 border border-card-border dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none"
+        aria-label="Go back to homepage"
+      >
+        <ArrowLeft className="size-4" />
+      </button>
+
       {/* Header */}
-      <div className="text-center mb-space-6">
-        <h2 className="sm:text-h2 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white">
+      <div className="text-center mb-space-8">
+        <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
           Create Account
-        </h2>
-        <p className="text-body text-gray-600 dark:text-gray-400 mt-space-1">
+        </h1>
+        <p className="text-body text-gray-600 dark:text-gray-400">
           Join AirVikBook to start booking amazing hotels
         </p>
       </div>
+
+      {/* Form Card */}
+      <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg sm:shadow-lg sm:p-space-6 sm:card-auth">
 
       {/* Google OAuth Button */}
       <div className="mb-space-4">
@@ -653,27 +676,7 @@ export default function RegistrationForm({
             Sign in here
           </a>
         </p>
-
-        {/* <p className="mt-space-2 text-caption text-gray-500 dark:text-gray-500">
-            By signing up, you agree to our{' '}
-            <a
-              href="/terms"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
-            >
-              Terms of Service
-            </a>
-            {' '}and{' '}
-            <a
-              href="/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-airvik-blue dark:text-airvik-blue hover:text-airvik-purple dark:hover:text-airvik-purple underline transition-colors duration-normal"
-            >
-              Privacy Policy
-            </a>
-          </p> */}
+      </div>
       </div>
     </div>
   );

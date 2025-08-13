@@ -13,6 +13,7 @@ import {
 } from "../../types/userLogin.types";
 import { UserLoginService } from "../../services/userLogin.service";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import GoogleOAuthRedirectButton from "./GoogleOAuthRedirectButton";
 
 // =====================================================
 // BRAND-COMPLIANT LOGIN FORM COMPONENT
@@ -211,26 +212,46 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   // =====================================================
 
   return (
-    <div className={`w-full max-w-md mx-auto relative ${className}`}>
+    <div className={`w-full max-w-md mx-auto relative pb-6 ${className}`}>
       {/* Back Button */}
       <button
         type="button"
         onClick={handleBackClick}
-        className="absolute hidden sm:block top-0 -left-10 p-1.5 border border-gray-300 dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none"
+        className="absolute hidden sm:block top-space-4 -left-10 p-1.5 border border-card-border dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none"
         aria-label="Go back to homepage"
       >
         <ArrowLeft className="size-4" />
       </button>
 
-      <form onSubmit={handleSubmit} className="space-y-space-4" noValidate>
-        {/* Form Title */}
-        <div className="text-center mb-10 sm:mb-5">
-          <h2 className="sm:text-h2 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white">
-            Welcome Back
-          </h2>
-          <p className="text-body text-gray-600 dark:text-gray-400 mt-space-1">
-            Sign in to your account
-          </p>
+      {/* Header */}
+      <div className="text-center mb-space-8">
+        <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
+          Welcome Back
+        </h1>
+        <p className="text-body text-gray-600 dark:text-gray-400">
+          Sign in to your account
+        </p>
+      </div>
+
+      {/* Form Card */}
+      <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg sm:shadow-lg sm:p-space-6 sm:card-auth">
+        <form onSubmit={handleSubmit} className="space-y-space-4" noValidate>
+
+        {/* Google Login */}
+        <GoogleOAuthRedirectButton type="login" redirectTo="/dashboard">
+          Sign in with Google
+        </GoogleOAuthRedirectButton>
+
+        {/* Divider */}
+        <div className="relative mb-space-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-caption">
+            <span className="px-space-2 bg-airvik-white text-sm  text-gray-500 font-sf-pro">
+              Or Sign in with
+            </span>
+          </div>
         </div>
 
         {/* Email Field */}
@@ -247,7 +268,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            className={`w-full px-space-4 py-space-3  shadow-none
+            className={`w-full px-space-4 py-space-3 shadow-none
             text-body font-sf-pro 
             bg-airvik-white dark:bg-gray-100 
             rounded-radius-md 
@@ -259,7 +280,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               ${
                 errors.email
                   ? "border-error focus:ring-1 focus:ring-error"
-                  
                   : "border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
               }`}
             placeholder="Enter your email address"
@@ -332,8 +352,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           )}
         </div>
 
-        {/* Remember Me & Forgot Password */}
-        <div className="flex items-center justify-between">
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isSubmitting || authState.isLoading}
+          className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
+        >
+          {isSubmitting || authState.isLoading ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
+              Signing In...
+            </div>
+          ) : (
+            "Sign In"
+          )}
+        </button>
+
+         {/* Remember Me & Forgot Password */}
+         <div className="flex items-center justify-between">
           {showRememberMe && (
             <div className="flex items-center">
               <input
@@ -363,26 +399,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             </a>
           )}
         </div>
+        </form>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isSubmitting || authState.isLoading}
-          className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
-        >
-          {isSubmitting || authState.isLoading ? (
-            <div className="flex items-center justify-center">
-              <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
-              Signing In...
-            </div>
-          ) : (
-            "Sign In"
-          )}
-        </button>
-
-        {/* Sign Up Link */}
-        <div className="text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        {/* Back to Login */}
+        <div className="mt-space-4 text-center">
+          <p className="text-body text-gray-600 dark:text-gray-400">
             Don't have an account?{" "}
             <a
               href="/auth/register"
@@ -391,29 +412,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               Sign up
             </a>
           </p>
-
-          <h1 className="mt-space-2 text-sm text-gray-500">
-            By signing in, you agree to our{" "}
-            <a
-              href="/terms"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-airvik-blue dark:text-airvik-blue underline transition-colors duration-normal"
-            >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-airvik-blue dark:text-airvik-blue underline transition-colors duration-normal"
-            >
-              Privacy Policy
-            </a>
-          </h1>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

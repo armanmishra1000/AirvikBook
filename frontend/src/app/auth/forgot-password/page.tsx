@@ -8,6 +8,7 @@ import {
   PASSWORD_ERROR_CODES,
 } from "../../../types/passwordManagement.types";
 import { useToastHelpers } from "../../../components/common/Toast";
+import { ArrowLeft } from "lucide-react";
 
 // =====================================================
 // FORGOT PASSWORD PAGE COMPONENT
@@ -88,6 +89,10 @@ const ForgotPasswordPage: React.FC = () => {
     }
   };
 
+  const handleBackClick = () => {
+    router.push("/");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     submitAttemptedRef.current = true;
@@ -152,10 +157,10 @@ const ForgotPasswordPage: React.FC = () => {
       <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
         <div className="max-w-md w-full">
           {/* Success Card */}
-          <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-lg p-space-8 card-auth">
+          <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg sm:shadow-lg sm:p-space-8 p-space-0 sm:card-auth">
             <div className="text-center">
               {/* Success Icon */}
-              <div className="mx-auto w-16 h-16 bg-success text-airvik-white rounded-radius-full flex items-center justify-center mb-space-6">
+              <div className="mx-auto sm:size-16 size-12 bg-success text-airvik-white rounded-radius-full flex items-center justify-center mb-space-6">
                 <svg
                   className="w-8 h-8"
                   fill="none"
@@ -208,7 +213,16 @@ const ForgotPasswordPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
-      <div className="max-w-md w-full">
+      <div className="max-w-md w-full relative">
+        {/* Back Button */}
+        <button
+          type="button"
+          onClick={handleBackClick}
+          className="absolute hidden sm:block top-space-4 -left-10 p-1.5 border border-card-border dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none"
+          aria-label="Go back to homepage"
+        >
+          <ArrowLeft className="size-4" />
+        </button>
         {/* Header */}
         <div className="text-center mb-space-8">
           <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
@@ -283,7 +297,7 @@ const ForgotPasswordPage: React.FC = () => {
           <div className="mt-space-4 text-center">
             <button
               onClick={() => router.push("/auth/login")}
-              className="text-body font-sf-pro bg-gray-200 w-full py-2.5 text-airvik-blue transition-colors duration-normal focus:outline-none rounded-radius-sm"
+              className="font-sf-pro bg-gray-200 font-semibold tracking-normal  w-full py-2.5 text-airvik-blue transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login
             </button>
