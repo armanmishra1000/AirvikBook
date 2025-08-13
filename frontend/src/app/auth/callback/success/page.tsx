@@ -3,158 +3,147 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../../../context/AuthContext';
+import { UserLoginService } from '../../../../services/userLogin.service';
 
-/**
- * Google OAuth Callback Success Page
- * 
- * Handles the successful OAuth callback from Google,
- * extracts tokens from URL parameters, sets up authentication,
- * and redirects to the intended destination.
- */
-export default function OAuthCallbackSuccess() {
+// =====================================================
+// GOOGLE OAUTH CALLBACK SUCCESS PAGE
+// =====================================================
+// Handles the redirect from Google OAuth with tokens in URL
+
+const GoogleOAuthCallbackSuccess: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login: authLogin } = useAuth();
-  const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
-  const [message, setMessage] = useState('Processing your login...');
+  const { login } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const processCallback = async () => {
+    const processOAuthCallback = async () => {
       try {
-        // Extract parameters from URL
+        // Extract tokens and user data from URL parameters
         const accessToken = searchParams.get('access_token');
         const refreshToken = searchParams.get('refresh_token');
-        const userStr = searchParams.get('user');
+        const userParam = searchParams.get('user');
         const redirectTo = searchParams.get('redirect_to') || '/dashboard';
         const isNewUser = searchParams.get('is_new_user') === 'true';
 
+        console.log('🔐 Processing Google OAuth callback...');
+
         // Validate required parameters
-        if (!accessToken || !refreshToken || !userStr) {
-          throw new Error('Missing authentication data in callback');
+        if (!accessToken || !refreshToken || !userParam) {
+          throw new Error('Missing required authentication parameters');
         }
 
+        // Parse user data
         let user;
         try {
-          user = JSON.parse(decodeURIComponent(userStr));
-        } catch (parseError) {
-          throw new Error('Invalid user data in callback');
+          user = JSON.parse(decodeURIComponent(userParam));
+        } catch (err) {
+          throw new Error('Invalid user data format');
         }
 
-        console.log('🔄 Processing OAuth callback:', { 
-          hasTokens: !!accessToken && !!refreshToken,
-          hasUser: !!user,
-          isNewUser,
-          redirectTo 
-        });
-
-        // Store tokens in local storage (as per AuthContext pattern)
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-
-        // Set user in auth context (simulate login)
-        // Note: AuthContext will validate these tokens with the backend
-        await new Promise(resolve => {
-          // Give a moment for localStorage to be set
-          setTimeout(resolve, 100);
-        });
-
-        setStatus('success');
-        setMessage(isNewUser ? 
-          'Welcome! Your account has been created successfully.' :
-          'Welcome back! You have been signed in successfully.'
-        );
-
-        // Show success message briefly, then redirect
-        setTimeout(() => {
-          console.log(`🔀 Redirecting to: ${redirectTo}`);
-          router.push(redirectTo);
-          
-          // Trigger a page reload to ensure AuthContext picks up the new tokens
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        }, 2000);
-
-      } catch (error) {
-        console.error('❌ OAuth callback processing error:', error);
-        setStatus('error');
-        setMessage(error instanceof Error ? error.message : 'Authentication failed');
+        // Store tokens and user data directly
+        sessionStorage.setItem('airvik_access_token', accessToken);
+        localStorage.setItem('airvik_refresh_token', refreshToken);
+        localStorage.setItem('airvik_user', JSON.stringify(user));
         
-        // Redirect to login page after showing error
+        // Set flag to indicate this is an OAuth redirect
+        sessionStorage.setItem('oauth_redirect', 'true');
+
+        // For OAuth, we don't need to call the login API since we already have valid tokens
+        // Just update the auth context state directly
+        console.log('✅ OAuth tokens stored successfully');
+        
+        // Trigger a page reload to ensure AuthContext picks up the new tokens
+        // This is the safest way to ensure proper authentication state
         setTimeout(() => {
-          router.push('/auth/login?error=oauth_callback_failed');
+          window.location.href = redirectTo;
+        }, 1000);
+
+        // Don't show toast here - let the AuthContext handle it after page reload
+        console.log('✅ OAuth authentication completed, redirecting...');
+
+        console.log('✅ Google OAuth authentication completed successfully');
+
+        // Redirect is handled by window.location.href above
+
+      } catch (err) {
+        console.error('❌ Error processing OAuth callback:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Authentication failed';
+        setError(errorMessage);
+        
+        // Redirect to login page after error
+        setTimeout(() => {
+          router.replace('/auth/login');
         }, 3000);
+      } finally {
+        setIsProcessing(false);
       }
     };
 
-    processCallback();
-  }, [searchParams, router, authLogin]);
+         processOAuthCallback();
+   }, [searchParams, login, router]);
+
+  if (isProcessing) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-airvik-white dark:bg-gray-900">
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-4 border-4 rounded-full animate-spin border-airvik-blue border-t-transparent" />
+          <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+            Completing Sign In...
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Please wait while we complete your Google sign-in.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-airvik-white dark:bg-gray-900">
+        <div className="max-w-md px-4 mx-auto text-center">
+          <div className="mb-4">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full dark:bg-red-900">
+              <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+            Authentication Failed
+          </h2>
+          <p className="mb-4 text-gray-600 dark:text-gray-400">
+            {error}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Redirecting to login page...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-airvik-gray-50 dark:bg-airvik-gray-900">
-      <div className="max-w-md w-full space-y-space-6 p-space-6">
-        <div className="text-center">
-          {/* Loading/Success/Error Icon */}
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-space-4">
-            {status === 'processing' && (
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-airvik-blue"></div>
-            )}
-            {status === 'success' && (
-              <div className="bg-airvik-green-100 dark:bg-airvik-green-900/20 rounded-full h-12 w-12 flex items-center justify-center">
-                <svg className="h-6 w-6 text-airvik-green-600 dark:text-airvik-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-              </div>
-            )}
-            {status === 'error' && (
-              <div className="bg-airvik-red-100 dark:bg-airvik-red-900/20 rounded-full h-12 w-12 flex items-center justify-center">
-                <svg className="h-6 w-6 text-airvik-red-600 dark:text-airvik-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </div>
-            )}
+    <div className="flex items-center justify-center min-h-screen bg-airvik-white dark:bg-gray-900">
+      <div className="max-w-md px-4 mx-auto text-center">
+        <div className="mb-4">
+          <div className="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full dark:bg-green-900">
+            <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
-
-          {/* Title */}
-          <h2 className="text-3xl font-bold text-airvik-gray-900 dark:text-airvik-white mb-space-2">
-            {status === 'processing' && 'Processing...'}
-            {status === 'success' && 'Success!'}
-            {status === 'error' && 'Authentication Failed'}
-          </h2>
-
-          {/* Message */}
-          <p className="text-airvik-gray-600 dark:text-airvik-gray-300 mb-space-6">
-            {message}
-          </p>
-
-          {/* Additional messaging */}
-          {status === 'processing' && (
-            <p className="text-sm text-airvik-gray-500 dark:text-airvik-gray-400">
-              Please wait while we set up your account...
-            </p>
-          )}
-          
-          {status === 'success' && (
-            <p className="text-sm text-airvik-gray-500 dark:text-airvik-gray-400">
-              You will be redirected shortly...
-            </p>
-          )}
-          
-          {status === 'error' && (
-            <div className="space-y-space-2">
-              <p className="text-sm text-airvik-gray-500 dark:text-airvik-gray-400">
-                You will be redirected to the login page.
-              </p>
-              <button
-                onClick={() => router.push('/auth/login')}
-                className="text-airvik-blue hover:text-airvik-purple underline text-sm"
-              >
-                Go to Login Now
-              </button>
-            </div>
-          )}
         </div>
+        <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+          Sign In Successful!
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400">
+          Redirecting you to your dashboard...
+        </p>
       </div>
     </div>
   );
-}
+};
+
+export default GoogleOAuthCallbackSuccess;

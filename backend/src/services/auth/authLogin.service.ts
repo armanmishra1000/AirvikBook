@@ -338,18 +338,18 @@ export class AuthLoginService {
     userAgent?: string,
     rememberMe: boolean = false
   ): Promise<{ id: string }> {
-    const expiresAt = new Date();
-    if (rememberMe) {
-      expiresAt.setDate(expiresAt.getDate() + 30); // 30 days
-    } else {
-      expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
-    }
+    try {
+      const expiresAt = new Date();
+      if (rememberMe) {
+        expiresAt.setDate(expiresAt.getDate() + 30); // 30 days
+      } else {
+        expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+      }
 
-    // Generate a unique session token
-    const sessionToken = require('crypto').randomBytes(32).toString('hex');
+      // Generate a unique session token
+      const sessionToken = require('crypto').randomBytes(32).toString('hex');
 
-    const session = await prisma.session.create({
-      data: {
+      const sessionData = {
         userId,
         token: sessionToken, // Unique session identifier
         refreshToken,
@@ -358,10 +358,16 @@ export class AuthLoginService {
         deviceInfo: deviceInfo ? JSON.stringify(deviceInfo) : Prisma.JsonNull,
         ipAddress,
         userAgent
-      }
-    });
+      };
 
-    return { id: session.id };
+      const session = await prisma.session.create({
+        data: sessionData
+      });
+      
+      return { id: session.id };
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**
@@ -468,26 +474,25 @@ export class AuthLoginService {
   static async refreshSession(refreshToken: string): Promise<{
     success: boolean;
     accessToken?: string;
-    refreshToken?: string;
     expiresIn?: number;
     user?: Omit<User, 'password'>;
     error?: string;
     code?: string;
   }> {
     try {
-      // Use new JWT service token rotation functionality
-      const rotationResult = await JwtService.rotateTokens(refreshToken);
+      // Use existing JWT service refresh functionality
+      const refreshResult = await JwtService.refreshAccessToken(refreshToken);
       
-      if (!rotationResult.success) {
+      if (!refreshResult.success) {
         return {
           success: false,
-          error: rotationResult.error,
-          code: rotationResult.code
+          error: refreshResult.error,
+          code: refreshResult.code
         };
       }
 
       // Get user information for the response
-      const tokenValidation = JwtService.validateRefreshToken(rotationResult.newRefreshToken!);
+      const tokenValidation = JwtService.validateRefreshToken(refreshToken);
       if (!tokenValidation.isValid || !tokenValidation.payload) {
         return {
           success: false,
@@ -537,8 +542,7 @@ export class AuthLoginService {
 
       return {
         success: true,
-        accessToken: rotationResult.accessToken,
-        refreshToken: rotationResult.newRefreshToken,
+        accessToken: refreshResult.accessToken,
         expiresIn: this.ACCESS_TOKEN_EXPIRY_SECONDS,
         user
       };

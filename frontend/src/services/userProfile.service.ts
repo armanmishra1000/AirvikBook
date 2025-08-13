@@ -102,9 +102,14 @@ class ProfileApiClient {
         response.status === 401 && 
         responseData.code === 'TOKEN_EXPIRED'
       ) {
+        console.log('Token expired, attempting refresh...');
         const refreshResult = await UserLoginService.refreshToken();
         
         if (isSuccessResponse(refreshResult)) {
+          console.log('Token refresh successful, retrying request...');
+          // Update the stored access token immediately
+          sessionStorage.setItem('airvik_access_token', refreshResult.data.accessToken);
+          
           // Retry original request with new token
           return this.request<T>(method, endpoint, data, { 
             ...options, 
@@ -112,6 +117,7 @@ class ProfileApiClient {
             retryCount: retryCount + 1
           });
         } else {
+          console.log('Token refresh failed:', refreshResult.error);
           // Refresh failed, clear tokens and redirect to login
           UserLoginService.clearAuthData();
           return {

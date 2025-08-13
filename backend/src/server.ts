@@ -19,8 +19,6 @@ import DatabaseConfigService from './config/database.config';
 // Load environment variables
 dotenv.config();
 console.log('🔧 Environment variables loaded:');
-console.log('   CLAMAV_PATH:', process.env.CLAMAV_PATH || 'NOT SET');
-console.log('   VIRUSTOTAL_API_KEY:', process.env.VIRUSTOTAL_API_KEY ? 'SET' : 'NOT SET');
 
 // Create Express app
 const app = express();
@@ -71,7 +69,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Refresh-Token'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

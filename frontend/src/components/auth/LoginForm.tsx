@@ -228,7 +228,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
           Welcome Back
         </h1>
-        <p className="text-body text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600 text-body dark:text-gray-400">
           Sign in to your account
         </p>
       </div>
@@ -248,7 +248,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-center text-caption">
-            <span className="px-space-2 bg-airvik-white text-sm  text-gray-500 font-sf-pro">
+            <span className="text-sm text-gray-500 px-space-2 bg-airvik-white font-sf-pro">
               Or Sign in with
             </span>
           </div>
@@ -329,13 +329,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="absolute right-space-3 top-1/2 transform -translate-y-1/2
-              p-space-2 rounded-radius-sm
-              text-gray-500 dark:text-gray-400
-              hover:text-gray-700 dark:hover:text-gray-200
-              focus:outline-none
-              disabled:opacity-50 disabled:cursor-not-allowed
-              transition-colors duration-normal"
+              className="absolute text-gray-500 transition-colors transform -translate-y-1/2 right-space-3 top-1/2 p-space-2 rounded-radius-sm dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed duration-normal"
               disabled={isSubmitting}
             >
               {showPassword ? (
@@ -356,11 +350,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <button
           type="submit"
           disabled={isSubmitting || authState.isLoading}
-          className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
+          className="w-full font-medium transition-all duration-100 ease-linear bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
         >
           {isSubmitting || authState.isLoading ? (
             <div className="flex items-center justify-center">
-              <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
+              <div className="w-5 h-5 border-2 animate-spin border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
               Signing In...
             </div>
           ) : (
@@ -378,12 +372,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 name="rememberMe"
                 checked={formData.rememberMe}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-airvik-blue border-gray-300 rounded focus:outline-none focus:ring-0 disabled:cursor-not-allowed appearance-none checked:bg-airvik-blue checked:border-airvik-blue"
+                className="w-4 h-4 border-gray-300 rounded appearance-none text-airvik-blue focus:outline-none focus:ring-0 disabled:cursor-not-allowed checked:bg-airvik-blue checked:border-airvik-blue"
                 disabled={isSubmitting}
               />
               <label
                 htmlFor="rememberMe"
-                className="ml-space-2 text-body text-gray-700 dark:text-gray-300"
+                className="text-gray-700 ml-space-2 text-body dark:text-gray-300"
               >
                 Remember me
               </label>
@@ -393,7 +387,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           {showForgotPassword && (
             <a
               href="/auth/forgot-password"
-              className="text-body text-airvik-blue transition-colors duration-normal"
+              className="transition-colors text-body text-airvik-blue duration-normal"
             >
               Forgot password?
             </a>
@@ -402,12 +396,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </form>
 
         {/* Back to Login */}
-        <div className="mt-space-4 text-center">
-          <p className="text-body text-gray-600 dark:text-gray-400">
+        <div className="text-center mt-space-4">
+          <p className="text-gray-600 text-body dark:text-gray-400">
             Don't have an account?{" "}
             <a
               href="/auth/register"
-              className="text-airvik-blue transition-colors duration-normal font-medium"
+              className="font-medium transition-colors text-airvik-blue duration-normal"
             >
               Sign up
             </a>

@@ -233,15 +233,17 @@ class ApiClient {
       requiresAuth?: boolean;
       skipAuthRefresh?: boolean;
       retryCount?: number;
+      customHeaders?: Record<string, string>;
     } = {}
   ): Promise<ApiResponse<T>> {
-    const { requiresAuth = false, skipAuthRefresh = false, retryCount = 0 } = options;
+    const { requiresAuth = false, skipAuthRefresh = false, retryCount = 0, customHeaders = {} } = options;
 
     try {
       const url = `${this.BASE_URL}${this.API_PREFIX}${endpoint}`;
       
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
+        ...customHeaders
       };
 
       // Add authentication header if required
@@ -561,11 +563,15 @@ export class UserLoginService {
    * Get active sessions for current user
    */
   static async getSessions(): Promise<SessionsApiResponse> {
+    const refreshToken = TokenStorage.getRefreshToken();
     const response = await ApiClient.request<SessionsApiResponse['data']>(
       'GET',
       '/auth/sessions',
       undefined,
-      { requiresAuth: true }
+      { 
+        requiresAuth: true,
+        customHeaders: refreshToken ? { 'X-Refresh-Token': refreshToken } : {}
+      }
     );
     return response as SessionsApiResponse;
   }
@@ -636,6 +642,13 @@ export class UserLoginService {
    */
   static isAuthenticated(): boolean {
     return TokenStorage.hasValidTokens();
+  }
+
+  /**
+   * Check if user has a refresh token (for authentication restoration)
+   */
+  static hasRefreshToken(): boolean {
+    return !!TokenStorage.getRefreshToken();
   }
 
   /**

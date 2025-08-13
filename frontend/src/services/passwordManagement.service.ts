@@ -155,14 +155,16 @@ class ApiClient {
       requiresAuth?: boolean;
       skipAuthRefresh?: boolean;
       retryCount?: number;
+      customHeaders?: Record<string, string>;
     } = {}
   ): Promise<ApiResponse<T>> {
-    const { requiresAuth = true, skipAuthRefresh = false, retryCount = 0 } = options;
+    const { requiresAuth = true, skipAuthRefresh = false, retryCount = 0, customHeaders = {} } = options;
 
     try {
       // Prepare headers
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
+        ...customHeaders
       };
 
       // Add authentication header if required

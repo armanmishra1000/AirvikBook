@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { UserLoginService } from '../services/userLogin.service';
 import { PasswordManagementService } from '../services/passwordManagement.service';
+import { useToastHelpers } from '../components/common/Toast';
 import {
   AuthState,
   AuthContextValue,
@@ -198,6 +199,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [authState, dispatch] = useReducer(authReducer, initialState);
   const initializationRef = useRef(false);
   const tokenRefreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { showSuccess } = useToastHelpers();
 
   // =====================================================
   // INITIALIZATION EFFECT
@@ -209,15 +211,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const initializeAuth = async () => {
       try {
-        // Check if user is already authenticated
-        const isAuthenticated = UserLoginService.isAuthenticated();
+        // Check if user has refresh token (even if access token is missing)
+        const hasRefreshToken = UserLoginService.hasRefreshToken();
         const user = UserLoginService.getCurrentUser();
         
-        if (isAuthenticated && user) {
-          // Try to refresh token to verify authentication
+        if (hasRefreshToken && user) {
+          console.log('Found refresh token, attempting to restore authentication...');
+          // Try to refresh token to restore authentication
           const refreshResult = await UserLoginService.refreshToken();
           
           if (isSuccessResponse(refreshResult)) {
+            console.log('Authentication restored successfully');
             dispatch({
               type: 'AUTH_SUCCESS',
               payload: {
@@ -227,14 +231,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               }
             });
             
+            // Show welcome message for OAuth users (only if coming from OAuth callback)
+            const isFromOAuth = sessionStorage.getItem('oauth_redirect');
+            if (isFromOAuth) {
+              sessionStorage.removeItem('oauth_redirect'); // Clear the flag
+              showSuccess(
+                'Welcome to AirVikBook!',
+                `Successfully signed in as ${refreshResult.data.user.fullName}`
+              );
+            }
+            
             // Setup automatic token refresh
             setupTokenRefresh();
           } else {
+            console.log('Failed to restore authentication, clearing storage');
             // Invalid authentication, clear storage
             UserLoginService.clearAuthData();
             dispatch({ type: 'AUTH_LOGOUT' });
           }
         } else {
+          console.log('No refresh token found, user not authenticated');
           dispatch({ type: 'AUTH_LOGOUT' });
         }
       } catch (error) {
@@ -260,11 +276,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Setup automatic refresh 2 minutes before expiration (13 minutes)
     const refreshTimeout = 13 * 60 * 1000; // 13 minutes
     
+    console.log(`Setting up token refresh in ${refreshTimeout / 1000 / 60} minutes`);
+    
     tokenRefreshTimeoutRef.current = setTimeout(async () => {
       try {
+        console.log('Executing automatic token refresh...');
         const refreshResult = await UserLoginService.refreshToken();
         
         if (isSuccessResponse(refreshResult)) {
+          console.log('Automatic token refresh successful');
           dispatch({
             type: 'TOKEN_REFRESH',
             payload: {
@@ -276,12 +296,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Setup next refresh
           setupTokenRefresh();
         } else {
+          console.log('Automatic token refresh failed:', refreshResult.error);
           // Refresh failed, logout user
           await handleLogout();
+          // Redirect to login
+          window.location.href = '/auth/login';
         }
       } catch (error) {
         console.error('Token refresh error:', error);
         await handleLogout();
+        window.location.href = '/auth/login';
       }
     }, refreshTimeout);
   };
