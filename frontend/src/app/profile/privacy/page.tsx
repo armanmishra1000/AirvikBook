@@ -148,12 +148,12 @@ export default function PrivacyPage() {
                   </div>
                   
                   {/* Privacy Information Section Skeleton */}
-                  <div className="bg-airvik-blue-light/20 dark:bg-airvik-blue/10 rounded-radius-md p-space-4">
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-radius-md p-space-4 border border-gray-200 dark:border-gray-700">
                     <div className="flex items-start space-x-space-3">
-                      <div className="w-5 h-5 bg-airvik-blue rounded-radius-sm animate-pulse" />
+                      <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                       <div className="space-y-space-1">
-                        <div className="h-4 bg-airvik-blue w-40 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
-                        <div className="h-3 bg-airvik-blue w-full dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
+                        <div className="h-4 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                       </div>
                     </div>
                   </div>
@@ -171,12 +171,12 @@ export default function PrivacyPage() {
             {/* Sidebar Skeleton */}
             <div className="space-y-space-4 lg:space-y-space-6">
               {/* Visibility Levels Skeleton */}
-              <div className="border border-yellow-200 rounded-radius-lg dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 p-space-4 lg:p-space-5">
-                <div className="h-5 bg-yellow-200 w-36 dark:bg-yellow-700 rounded-radius-md animate-pulse mb-space-2" />
+              <div className="border border-gray-200 rounded-radius-lg dark:border-gray-700 bg-white dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
+                <div className="h-5 bg-gray-200 w-36 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
                 <div className="space-y-space-1">
-                  <div className="h-3 bg-yellow-200 w-full dark:bg-yellow-700 rounded-radius-sm animate-pulse" />
-                  <div className="h-3 bg-yellow-200 w-3/4 dark:bg-yellow-700 rounded-radius-sm animate-pulse" />
-                  <div className="h-3 bg-yellow-200 w-2/3 dark:bg-yellow-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-3/4 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-2/3 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                 </div>
               </div>
               

@@ -148,12 +148,12 @@ export default function ProfilePicturePage() {
               </div>
               
               {/* Pro Tips Skeleton */}
-              <div className="border border-green-200 rounded-radius-lg dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-space-4 lg:p-space-5">
-                <div className="h-5 bg-green-200 w-20 dark:bg-green-700 rounded-radius-md animate-pulse mb-space-2" />
+              <div className="border border-gray-200 rounded-radius-lg dark:border-gray-700 bg-white dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
+                <div className="h-5 bg-gray-200 w-20 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
                 <div className="space-y-space-1">
-                  <div className="h-3 bg-green-200 w-full dark:bg-green-700 rounded-radius-sm animate-pulse" />
-                  <div className="h-3 bg-green-200 w-3/4 dark:bg-green-700 rounded-radius-sm animate-pulse" />
-                  <div className="h-3 bg-green-200 w-2/3 dark:bg-green-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-3/4 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-2/3 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                 </div>
               </div>
               

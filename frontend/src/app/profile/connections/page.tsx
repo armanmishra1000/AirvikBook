@@ -97,15 +97,15 @@ export default function ConnectionsPage() {
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-space-6">
             {/* Connected Accounts Form Skeleton */}
             <div className="xl:col-span-2">
-              <div className="bg-white dark:bg-gray-800 rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm p-space-4 lg:p-space-8">
+              <div className="bg-white dark:bg-gray-800 rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm p-space-4 lg:p-space-8 space-y-space-8 lg:space-y-space-6">
                 {/* Form Header Skeleton */}
-                <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4 mb-space-6">
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4">
                   <div className="h-6 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
                   <div className="h-4 bg-gray-200 w-80 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                 </div>
                 
                 {/* Google Account Section Skeleton */}
-                <div className="space-y-space-6">
+                <div className="space-y-space-4">
                   {/* Google Account Header Skeleton */}
                   <div className="flex items-center space-x-space-3">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
@@ -133,28 +133,28 @@ export default function ConnectionsPage() {
                 </div>
                 
                 {/* Benefits Information Section Skeleton */}
-                <div className="bg-airvik-blue-light/20 dark:bg-airvik-blue/10 rounded-radius-md p-space-4">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-radius-md p-space-4 border border-gray-200 dark:border-gray-700">
                   <div className="flex items-start">
-                    <div className="w-5 h-5 bg-airvik-blue rounded-radius-sm animate-pulse" />
+                    <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                     <div className="ml-space-3 space-y-space-1">
-                      <div className="h-4 bg-airvik-blue w-40 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
+                      <div className="h-4 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                       <div className="space-y-space-1">
-                        <div className="h-3 bg-airvik-blue w-full dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
-                        <div className="h-3 bg-airvik-blue w-3/4 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
-                        <div className="h-3 bg-airvik-blue w-2/3 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
-                        <div className="h-3 bg-airvik-blue w-1/2 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-gray-200 w-3/4 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-gray-200 w-2/3 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-gray-200 w-1/2 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                       </div>
                     </div>
                   </div>
                 </div>
                 
                 {/* Security Notice Section Skeleton */}
-                <div className="border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 rounded-radius-md p-space-4">
+                <div className="border border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 rounded-radius-md p-space-4">
                   <div className="flex items-start">
-                    <div className="w-5 h-5 bg-yellow-600 rounded-radius-sm animate-pulse" />
+                    <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                     <div className="ml-space-3 space-y-space-1">
-                      <div className="h-4 bg-yellow-600 w-32 dark:bg-yellow-600 rounded-radius-sm animate-pulse" />
-                      <div className="h-3 bg-yellow-600 w-full dark:bg-yellow-600 rounded-radius-sm animate-pulse" />
+                      <div className="h-4 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                      <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                     </div>
                   </div>
                 </div>
@@ -177,12 +177,12 @@ export default function ConnectionsPage() {
               </div>
               
               {/* Benefits Card Skeleton */}
-              <div className="border border-green-200 rounded-radius-lg dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-space-4 lg:p-space-5">
-                <div className="h-5 bg-green-200 w-20 dark:bg-green-700 rounded-radius-md animate-pulse mb-space-2" />
+              <div className="border border-gray-200 rounded-radius-lg dark:border-gray-700 bg-white dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
+                <div className="h-5 bg-gray-200 w-20 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
                 <div className="space-y-space-1">
-                  <div className="h-3 bg-green-200 w-full dark:bg-green-700 rounded-radius-sm animate-pulse" />
-                  <div className="h-3 bg-green-200 w-3/4 dark:bg-green-700 rounded-radius-sm animate-pulse" />
-                  <div className="h-3 bg-green-200 w-2/3 dark:bg-green-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-3/4 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-2/3 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                 </div>
               </div>
             </div>
