@@ -86,16 +86,7 @@ export default function ConnectionsPage() {
             <div className="flex items-center space-x-space-2 mb-space-4">
               <div className="h-4 bg-gray-200 w-16 dark:bg-gray-700 rounded-radius-md animate-pulse" />
               <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
-              <div className="h-4 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-md animate-pulse" />
-            </div>
-            
-            {/* Header Content Skeleton */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-4">
-              <div className="space-y-space-2">
-                <div className="h-8 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
-                <div className="h-5 bg-gray-200 w-80 dark:bg-gray-700 rounded-radius-md animate-pulse" />
-              </div>
-              <div className="w-40 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
+              <div className="h-4 bg-gray-200 w-44 dark:bg-gray-700 rounded-radius-md animate-pulse" />
             </div>
           </div>
         </div>
@@ -103,10 +94,10 @@ export default function ConnectionsPage() {
         {/* Content Skeleton */}
         <div className="container mx-auto px-space-4 pb-space-12">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-space-6">
-            {/* Main Content Skeleton */}
+            {/* Connected Accounts Form Skeleton */}
             <div className="xl:col-span-2">
               <div className="bg-white dark:bg-gray-800 rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm p-space-4 lg:p-space-8">
-                {/* Header Skeleton */}
+                {/* Form Header Skeleton */}
                 <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4 mb-space-6">
                   <div className="h-6 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
                   <div className="h-4 bg-gray-200 w-80 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
@@ -114,29 +105,55 @@ export default function ConnectionsPage() {
                 
                 {/* Google Account Section Skeleton */}
                 <div className="space-y-space-6">
-                  <div>
-                    <div className="h-5 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-3" />
-                    <div className="space-y-space-4">
-                      {/* Account Info Skeleton */}
-                      <div className="flex items-center space-x-space-3">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
-                        <div className="flex-1 space-y-space-1">
-                          <div className="h-4 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
-                          <div className="h-3 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
-                        </div>
-                      </div>
-                      
-                      {/* Connection Status Skeleton */}
-                      <div className="flex items-center justify-between">
+                  {/* Google Account Header Skeleton */}
+                  <div className="flex items-center space-x-space-3">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    <div className="space-y-space-1">
+                      <div className="h-5 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                      <div className="h-4 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  {/* Connection Status Skeleton */}
+                  <div className="border border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 rounded-radius-md p-space-4">
+                    <div className="flex items-start">
+                      <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                      <div className="ml-space-3 space-y-space-1">
                         <div className="h-4 bg-gray-200 w-24 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
-                        <div className="h-6 bg-gray-200 w-20 dark:bg-gray-700 rounded-radius-full animate-pulse" />
+                        <div className="h-3 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                       </div>
-                      
-                      {/* Action Buttons Skeleton */}
-                      <div className="flex flex-col sm:flex-row gap-space-3">
-                        <div className="w-32 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
-                        <div className="w-32 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  {/* Action Button Skeleton */}
+                  <div className="flex flex-col sm:flex-row space-y-space-2 sm:space-y-0 sm:space-x-space-3">
+                    <div className="w-40 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                  </div>
+                </div>
+                
+                {/* Benefits Information Section Skeleton */}
+                <div className="bg-airvik-blue-light/20 dark:bg-airvik-blue/10 rounded-radius-md p-space-4">
+                  <div className="flex items-start">
+                    <div className="w-5 h-5 bg-airvik-blue rounded-radius-sm animate-pulse" />
+                    <div className="ml-space-3 space-y-space-1">
+                      <div className="h-4 bg-airvik-blue w-40 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
+                      <div className="space-y-space-1">
+                        <div className="h-3 bg-airvik-blue w-full dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-airvik-blue w-3/4 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-airvik-blue w-2/3 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-airvik-blue w-1/2 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
                       </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Security Notice Section Skeleton */}
+                <div className="border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 rounded-radius-md p-space-4">
+                  <div className="flex items-start">
+                    <div className="w-5 h-5 bg-yellow-600 rounded-radius-sm animate-pulse" />
+                    <div className="ml-space-3 space-y-space-1">
+                      <div className="h-4 bg-yellow-600 w-32 dark:bg-yellow-600 rounded-radius-sm animate-pulse" />
+                      <div className="h-3 bg-yellow-600 w-full dark:bg-yellow-600 rounded-radius-sm animate-pulse" />
                     </div>
                   </div>
                 </div>
@@ -144,7 +161,7 @@ export default function ConnectionsPage() {
             </div>
 
             {/* Sidebar Skeleton */}
-            <div className="space-y-space-6">
+            <div className="space-y-space-4 lg:space-y-space-6">
               {/* Overview Card Skeleton */}
               <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
                 <div className="h-5 bg-gray-200 w-24 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-3" />
@@ -232,10 +249,10 @@ export default function ConnectionsPage() {
             </svg>
             <span className="font-medium text-airvik-blue dark:text-airvik-white">Connected Accounts</span>
           </nav>
-          <div>
+          {/* <div>
             <h1 className="font-bold text-h3 lg:text-h2 text-airvik-black dark:text-airvik-white">Connected Accounts</h1>
             <p className="text-gray-600 mt-space-2 text-body-sm lg:text-body dark:text-gray-400">Manage your linked third‑party accounts</p>
-          </div>
+          </div> */}
         </div>
       </div>
 

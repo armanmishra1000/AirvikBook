@@ -93,33 +93,80 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-white dark:bg-airvik-midnight">
         {/* Header Skeleton */}
         <div className="relative overflow-hidden">
-          <div className="container mx-auto px-space-4 pt-space-12 pb-space-8">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-space-6">
-              <div className="space-y-space-3">
-                <div className="h-12 bg-gray-200 w-80 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
-                <div className="h-6 bg-gray-200 w-96 dark:bg-gray-700 rounded-radius-md animate-pulse" />
-              </div>
-              <div className="w-40 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
+          <div className="container mx-auto px-space-4 pt-space-8 lg:pt-space-12 pb-space-6 lg:pb-space-8">
+            {/* Header Content Skeleton */}
+            <div className="space-y-space-2 lg:space-y-space-3">
+              <div className="h-8 lg:h-10 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
+              <div className="h-5 lg:h-6 bg-gray-200 w-80 lg:w-96 dark:bg-gray-700 rounded-radius-md animate-pulse" />
             </div>
           </div>
         </div>
 
         {/* Content Skeleton */}
-        <div className="container mx-auto px-space-4 pb-space-16">
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-space-8">
-            {/* Main Content */}
-            <div className="xl:col-span-3 space-y-space-6">
-              <div className="bg-white h-80 dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm animate-pulse" />
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="h-32 bg-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm animate-pulse" />
-                ))}
+        <div className="container mx-auto px-space-4 pb-space-12">
+          <div className="space-y-space-6 lg:space-y-space-8">
+            {/* Profile Card Skeleton */}
+            <div className="bg-white dark:bg-gray-800 rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm p-space-4 lg:p-space-6">
+              {/* Profile Card Header Skeleton */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-4 mb-space-6">
+                <div className="flex items-center space-x-space-4">
+                  {/* Avatar Skeleton */}
+                  <div className="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded-radius-full animate-pulse" />
+                  <div className="space-y-space-2">
+                    <div className="h-6 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    <div className="h-4 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  </div>
+                </div>
+                <div className="w-32 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-lg animate-pulse" />
+              </div>
+              
+              {/* Profile Info Skeleton */}
+              <div className="space-y-space-4">
+                <div className="h-4 bg-gray-200 w-24 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-space-4">
+                  <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-3/4 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
               </div>
             </div>
-            {/* Sidebar */}
-            <div className="space-y-space-6">
-              <div className="h-64 bg-white dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm animate-pulse" />
-              <div className="h-48 bg-white dark:bg-gray-800 rounded-radius-xl shadow-shadow-sm animate-pulse" />
+
+            {/* Settings Navigation Grid Skeleton */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-space-4 lg:gap-space-6">
+              {/* Profile Picture Box Skeleton */}
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-400 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6">
+                <div className="flex items-start space-x-space-3 lg:space-x-space-4">
+                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-white rounded-radius-md shadow-shadow-sm animate-pulse" />
+                  <div className="flex-1 min-w-0 space-y-space-2">
+                    <div className="h-5 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    <div className="h-3 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  </div>
+                  <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
+              </div>
+
+              {/* Privacy Settings Box Skeleton */}
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-400 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6">
+                <div className="flex items-start space-x-space-3 lg:space-x-space-4">
+                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-white rounded-radius-md shadow-shadow-sm animate-pulse" />
+                  <div className="flex-1 min-w-0 space-y-space-2">
+                    <div className="h-5 bg-gray-200 w-36 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    <div className="h-3 bg-gray-200 w-56 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  </div>
+                  <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
+              </div>
+
+              {/* Connected Accounts Box Skeleton */}
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-400 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6">
+                <div className="flex items-start space-x-space-3 lg:space-x-space-4">
+                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-white rounded-radius-md shadow-shadow-sm animate-pulse" />
+                  <div className="flex-1 min-w-0 space-y-space-2">
+                    <div className="h-5 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    <div className="h-3 bg-gray-200 w-44 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  </div>
+                  <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
