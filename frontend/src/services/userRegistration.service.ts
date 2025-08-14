@@ -162,9 +162,15 @@ export class UserRegistrationService {
       body: JSON.stringify(verificationData),
     });
 
-    // Update stored user data if verification successful
+    // Update stored user data and tokens if verification successful
     if (isSuccessResponse(response)) {
       this.storeUser(response.data.user);
+      
+      // Store new tokens after email verification
+      if (response.data.tokens) {
+        sessionStorage.setItem('airvik_access_token', response.data.tokens.accessToken);
+        localStorage.setItem('airvik_refresh_token', response.data.tokens.refreshToken);
+      }
     }
 
     return response;

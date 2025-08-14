@@ -291,17 +291,28 @@ export class AuthController {
         return ResponseUtil.error(res, 'User not found', 'USER_NOT_FOUND', 404);
       }
 
+      // Generate new JWT tokens after email verification
+      const tokenPair = JwtService.generateTokenPair({
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      });
+
+      // Store new refresh token
+      await JwtService.storeRefreshToken(user.id, tokenPair.refreshToken);
+
       // Send welcome email
       const welcomeEmailResult = await RegistrationEmailService.sendWelcomeEmail({
         email: user.email,
         fullName: user.fullName
       });
 
-      // Return user data without password
+      // Return user data without password and new tokens
       const { password: _, ...userWithoutPassword } = user;
 
       return ResponseUtil.success(res, {
         user: userWithoutPassword,
+        tokens: tokenPair,
         welcomeEmailSent: welcomeEmailResult.success
       }, 'Email verified successfully. Welcome to AirVikBook!');
 

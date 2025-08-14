@@ -452,6 +452,68 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  /**
+   * Handle authentication after email verification
+   * This method is called when user completes email verification
+   */
+  const handleEmailVerificationAuth = async (): Promise<void> => {
+    try {
+      // Check if we have tokens from email verification
+      const accessToken = sessionStorage.getItem('airvik_access_token');
+      const refreshToken = localStorage.getItem('airvik_refresh_token');
+      const user = UserLoginService.getCurrentUser();
+      
+      if (accessToken && refreshToken && user) {
+        console.log('Email verification completed, setting up authentication...');
+        
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: {
+            user: user,
+            accessToken: accessToken,
+            refreshToken: user.id // We don't expose refresh token
+          }
+        });
+        
+        // Setup automatic token refresh
+        setupTokenRefresh();
+        
+        showSuccess(
+          'Welcome to AirVikBook!',
+          `Your email has been verified. Welcome, ${user.fullName}!`
+        );
+      } else {
+        console.log('No tokens found after email verification, attempting refresh...');
+        // Try to refresh token if we have refresh token but no access token
+        const refreshResult = await UserLoginService.refreshToken();
+        
+        if (isSuccessResponse(refreshResult)) {
+          dispatch({
+            type: 'AUTH_SUCCESS',
+            payload: {
+              user: refreshResult.data.user,
+              accessToken: refreshResult.data.accessToken,
+              refreshToken: refreshResult.data.user.id
+            }
+          });
+          
+          setupTokenRefresh();
+          
+          showSuccess(
+            'Welcome to AirVikBook!',
+            `Your email has been verified. Welcome, ${refreshResult.data.user.fullName}!`
+          );
+        } else {
+          console.log('Failed to authenticate after email verification');
+          dispatch({ type: 'AUTH_LOGOUT' });
+        }
+      }
+    } catch (error) {
+      console.error('Error handling email verification auth:', error);
+      dispatch({ type: 'AUTH_LOGOUT' });
+    }
+  };
+
   // =====================================================
   // SESSION MANAGEMENT METHODS
   // =====================================================
@@ -894,7 +956,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updatePrivacySettings,
     connectGoogleAccount,
     disconnectGoogleAccount,
-    refreshUserData
+    refreshUserData,
+    
+    // Email Verification
+    handleEmailVerificationAuth
   };
 
   return (

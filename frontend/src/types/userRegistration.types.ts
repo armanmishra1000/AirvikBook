@@ -95,6 +95,7 @@ export interface RegistrationResponse {
 
 export interface EmailVerificationResponse {
   user: User;
+  tokens: AuthTokens;
   welcomeEmailSent: boolean;
 }
 
