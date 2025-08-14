@@ -199,7 +199,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
   const displayUrl = previewUrl || currentPictureUrl;
 
   return (
-    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg  border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
+    <div className={`bg-airvik-white-pure dark:bg-airvik-midnight rounded-radius-lg  border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
       <div className="p-space-4 lg:p-space-8 space-y-space-8 lg:space-y-space-6">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4">
@@ -241,7 +241,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
                 <button
                   onClick={handleRemove}
                   disabled={isUploading}
-                  className="text-gray-700 transition-all bg-gray-200 px-space-4 py-space-2 dark:bg-gray-700 dark:text-gray-300 rounded-radius-md font-sf-pro text-button duration-normal hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-lg  active:translate-y-0 focus:outline-none  focus:ring-gray-400 focus:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:transform-none"
+                  className="transition-all bg-red-600 px-space-4 py-space-2 text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-red-700 hover:shadow-lg active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   Remove
                 </button>
@@ -319,7 +319,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
             <button
               onClick={handleDelete}
               disabled={isUploading}
-              className="transition-all bg-red-600 px-space-4 py-space-2 text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-red-700  focus:outline-none  focus:ring-red-500  disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
+              className="transition-all bg-red-600 px-space-4 py-space-2 text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-red-700 hover:shadow-lg active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
             >
               Remove Picture
             </button>

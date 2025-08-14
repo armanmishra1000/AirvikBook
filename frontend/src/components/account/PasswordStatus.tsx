@@ -25,7 +25,7 @@ export const PasswordStatus: React.FC<PasswordStatusProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-sm p-space-6 ${className}`}>
+    <div className={`bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm p-space-6 ${className}`}>
       <h2 className="text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-4">
         Password Actions
       </h2>

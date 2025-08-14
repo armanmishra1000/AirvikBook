@@ -332,7 +332,7 @@ const SecurityPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="shadow-sm bg-airvik-white dark:bg-gray-800">
+              <div className="bg-airvik-white dark:bg-gray-800 shadow-shadow-sm">
         <div className="mx-auto max-w-7xl px-space-4 sm:px-space-6 lg:px-space-8">
           <div className="flex items-center justify-between py-space-6">
             <div className="flex items-center">
@@ -418,7 +418,7 @@ const SecurityPage: React.FC = () => {
 
         {/* Change Password Form */}
         {showChangePassword && (
-          <div className="shadow-sm mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6">
+          <div className="mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm p-space-6">
             <h3 className="text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-6">
               Change Password
             </h3>
@@ -505,7 +505,7 @@ const SecurityPage: React.FC = () => {
 
         {/* Set Password Form */}
         {showSetPassword && (
-          <div className="shadow-sm mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6">
+          <div className="mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm p-space-6">
             <h3 className="text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-6">
               Set Password
             </h3>
@@ -566,7 +566,7 @@ const SecurityPage: React.FC = () => {
 
         {/* Remove Password Form */}
         {showRemovePassword && (
-          <div className="shadow-sm mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6">
+          <div className="mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm p-space-6">
             <h3 className="text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-6">
               Remove Password
             </h3>

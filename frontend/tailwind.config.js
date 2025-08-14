@@ -18,7 +18,20 @@ module.exports = {
   			'airvik-cyan': '#68D8FC',
   			'airvik-violet': '#B688FF',
   			'airvik-white': '#F8F9FE',
+  			'airvik-white-pure': '#FFFFFF',
   			'airvik-bluehover': '#002bcd',
+  			
+  			// Brand Gray Scale
+  			'gray-100': '#F8F9FE',
+  			'gray-200': '#E6E8F7',
+  			'gray-300': '#D6D6E1',
+  			'gray-400': '#B0B8CF',
+  			'gray-500': '#888FA3',
+  			'gray-600': '#484F5E',
+  			'gray-700': '#333747',
+  			'gray-800': '#121624',
+  			'gray-900': '#0A0F1A',
+  			'gray-950': '#020A18',
   			
   			// Secondary Colors
   			'blue-mid': '#006CFF',

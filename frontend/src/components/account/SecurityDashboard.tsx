@@ -71,7 +71,10 @@ export const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
       </div>
 
       {/* Session Management */}
-      <div className="shadow-sm bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6">
+              <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-sm p-space-6">
+        <h2 className="text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-4">
+          Active Sessions
+        </h2>
         <SessionManager 
           showCurrentSessionFirst={true}
           autoRefresh={true}

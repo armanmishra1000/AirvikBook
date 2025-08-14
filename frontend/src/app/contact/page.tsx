@@ -68,7 +68,7 @@ export default function ContactSupportPage() {
         {/* Contact Methods */}
         <div className="grid md:grid-cols-2 gap-space-6 mb-space-12">
           {/* Email Support */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-space-6 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-md p-space-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center mb-space-4">
               <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-space-3">
                 <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,14 +89,14 @@ export default function ContactSupportPage() {
             </p>
             <a
               href="mailto:support@airvikbook.com"
-              className="inline-flex items-center px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-md hover:bg-airvik-purple transition-colors duration-normal font-medium"
+              className="inline-flex items-center px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md hover:bg-airvik-purple transition-colors duration-normal font-medium"
             >
               Send Email
             </a>
           </div>
 
           {/* Phone Support */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-space-6 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-md p-space-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center mb-space-4">
               <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mr-space-3">
                 <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +117,7 @@ export default function ContactSupportPage() {
             </p>
             <a
               href="tel:+1-800-AIRVIK"
-              className="inline-flex items-center px-space-4 py-space-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-normal font-medium"
+              className="inline-flex items-center px-space-4 py-space-2 bg-green-600 text-white rounded-radius-md hover:bg-green-700 transition-colors duration-normal font-medium"
             >
               Call +1-800-AIRVIK
             </a>
@@ -125,7 +125,7 @@ export default function ContactSupportPage() {
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-space-6 border border-gray-200 dark:border-gray-700 mb-space-8">
+        <div className="bg-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-md p-space-6 border border-gray-200 dark:border-gray-700 mb-space-8">
           <h2 className="text-h2 font-sf-pro font-bold text-airvik-black dark:text-airvik-white mb-space-6">
             Frequently Asked Questions
           </h2>
@@ -154,7 +154,7 @@ export default function ContactSupportPage() {
           {/* FAQ Items */}
           <div className="space-y-space-4">
             {faqData[selectedCategory as keyof typeof faqData].map((item, index) => (
-              <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-md">
+              <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-radius-md">
                 <button
                   className="w-full text-left p-space-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-normal"
                   onClick={() => {
@@ -184,7 +184,7 @@ export default function ContactSupportPage() {
         </div>
 
         {/* Additional Help */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-space-6">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-radius-lg p-space-6">
           <h3 className="text-h3 font-sf-pro font-semibold text-blue-800 dark:text-blue-200 mb-space-3">
             Still Need Help?
           </h3>
@@ -194,13 +194,13 @@ export default function ContactSupportPage() {
           <div className="flex flex-col sm:flex-row gap-space-3">
             <a
               href="mailto:support@airvikbook.com"
-              className="inline-flex items-center justify-center px-space-4 py-space-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-normal font-medium"
+              className="inline-flex items-center justify-center px-space-4 py-space-2 bg-blue-600 text-white rounded-radius-md hover:bg-blue-700 transition-colors duration-normal font-medium"
             >
               Email Support
             </a>
             <a
               href="tel:+1-800-AIRVIK"
-              className="inline-flex items-center justify-center px-space-4 py-space-2 border border-blue-600 text-blue-600 dark:text-blue-400 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-colors duration-normal font-medium"
+              className="inline-flex items-center justify-center px-space-4 py-space-2 border border-blue-600 text-blue-600 dark:text-blue-400 rounded-radius-md hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-colors duration-normal font-medium"
             >
               Call Support
             </a>

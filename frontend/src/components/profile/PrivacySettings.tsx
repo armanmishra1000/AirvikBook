@@ -137,7 +137,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
 
   if (isLoading) {
     return (
-      <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm p-space-6 ${className}`}>
+      <div className={`bg-airvik-white-pure dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm p-space-6 ${className}`}>
         <div className="flex items-center justify-center py-space-12">
           <svg className="animate-spin h-8 w-8 text-airvik-blue" viewBox="0 0 24 24">
             <circle
@@ -164,7 +164,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
   }
 
   return (
-    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
+    <div className={`bg-airvik-white-pure dark:bg-airvik-midnight rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
       <form onSubmit={handleSubmit} className="p-space-4 lg:p-space-8 space-y-space-8 lg:space-y-space-6">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4">
@@ -195,7 +195,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
             <option value="FRIENDS">Friends - Only friends can view</option>
             <option value="PRIVATE">Private - Only you can view</option>
           </select>
-          <p className="mt-space-1 text-caption text-gray-500 dark:text-gray-400">
+          <p className="mt-space-1 text-body-sm text-gray-500 dark:text-gray-400">
             Choose who can see your profile information
           </p>
         </div>
@@ -207,12 +207,12 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
           </h4>
           
           {/* Show Email Toggle */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-4 bg-gray-50 dark:bg-gray-800 rounded-radius-md gap-space-3 sm:gap-space-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-4 gap-space-3 sm:gap-space-0">
             <div className="flex-1">
               <h5 className="text-body-sm lg:text-body font-medium text-airvik-black dark:text-airvik-white">
                 Show Email Address
               </h5>
-              <p className="text-caption text-gray-600 dark:text-gray-400">
+              <p className="text-body-sm text-gray-600 dark:text-gray-400">
                 Allow others to see your email address on your profile
               </p>
             </div>
@@ -237,12 +237,12 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
           </div>
 
           {/* Show Phone Toggle */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-4 bg-gray-50 dark:bg-gray-800 rounded-radius-md gap-space-3 sm:gap-space-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-4 gap-space-3 sm:gap-space-0">
             <div className="flex-1">
               <h5 className="text-body-sm lg:text-body font-medium text-airvik-black dark:text-airvik-white">
                 Show Phone Number
               </h5>
-              <p className="text-caption text-gray-600 dark:text-gray-400">
+              <p className="text-body-sm text-gray-600 dark:text-gray-400">
                 Allow others to see your phone number on your profile
               </p>
             </div>
@@ -274,12 +274,12 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
           </h4>
           
           {/* Allow Google Sync Toggle */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-4 bg-gray-50 dark:bg-gray-800 rounded-radius-md gap-space-3 sm:gap-space-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-4 gap-space-3 sm:gap-space-0">
             <div className="flex-1">
               <h5 className="text-body-sm lg:text-body font-medium text-airvik-black dark:text-airvik-white">
                 Allow Google Sync
               </h5>
-              <p className="text-caption text-gray-600 dark:text-gray-400">
+              <p className="text-body-sm text-gray-600 dark:text-gray-400">
                 Automatically sync profile data from your Google account
               </p>
             </div>
@@ -316,7 +316,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({
               <h5 className="text-body-sm lg:text-body font-medium text-airvik-black dark:text-airvik-white">
                 Privacy Information
               </h5>
-              <p className="text-caption text-gray-600 dark:text-gray-400 mt-space-1">
+              <p className="text-body-sm text-gray-600 dark:text-gray-400 mt-space-1">
                 Your privacy settings only affect what other users can see. Administrators and support staff may still access your information for account management and support purposes.
               </p>
             </div>
