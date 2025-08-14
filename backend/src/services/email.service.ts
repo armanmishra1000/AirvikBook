@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { ServiceResponse } from '../utils/response.utils';
+import { AUTH_PATHS } from '../lib/paths';
 
 export interface EmailOptions {
   to: string | string[];
@@ -218,7 +219,7 @@ export class EmailService {
    * Send password reset email
    */
   async sendPasswordResetEmail(to: string, userName: string, resetToken: string): Promise<ServiceResponse<any>> {
-          const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+          const resetUrl = `${process.env.FRONTEND_URL}${AUTH_PATHS.RESET_PASSWORD}?token=${resetToken}`;
     const subject = 'Reset Your AirVikBook Password';
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -252,7 +253,7 @@ export class EmailService {
    * Send email verification
    */
   async sendEmailVerification(to: string, userName: string, verificationToken: string): Promise<ServiceResponse<any>> {
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${process.env.FRONTEND_URL}${AUTH_PATHS.VERIFY_EMAIL}?token=${verificationToken}`;
     const subject = 'Verify Your AirVikBook Email';
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { UserLoginService } from '../services/userLogin.service';
+import { AUTH_PATHS } from '../lib/paths';
 import { PasswordManagementService } from '../services/passwordManagement.service';
 import { useToastHelpers } from '../components/common/Toast';
 import {
@@ -301,14 +302,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await handleLogout();
           // Redirect to login using router if available, otherwise fallback to window.location
           if (typeof window !== 'undefined') {
-            window.location.href = '/login';
+            window.location.href = AUTH_PATHS.LOGIN;
           }
         }
       } catch (error) {
         console.error('Token refresh error:', error);
         await handleLogout();
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          window.location.href = AUTH_PATHS.LOGIN;
         }
       }
     }, refreshTimeout);

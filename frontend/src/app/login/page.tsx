@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LoginForm } from '../../components/auth/LoginForm';
-import GoogleOAuthRedirectButton from '../../components/auth/GoogleOAuthRedirectButton';
 import { useAuth, useIsAuthenticated } from '../../context/AuthContext';
 
 // =====================================================
@@ -42,8 +41,10 @@ const LoginPage: React.FC = () => {
     // Error is already handled in the LoginForm component
   };
 
-  // Don't render anything while checking authentication (but not during login submission)
-  if (isInitialLoad && authState.isLoading) {
+
+  // Show loading only if we're checking authentication AND user might be authenticated
+  // Don't show loading if we're on login page and user is not authenticated
+  if (isInitialLoad && authState.isLoading && isAuthenticated) {
     return (
       <div className="min-h-screen bg-airvik-white dark:bg-gray-900 bg-pattern-subtle flex items-center justify-center">
         <div className="text-center">
@@ -55,6 +56,7 @@ const LoginPage: React.FC = () => {
       </div>
     );
   }
+
 
   // Don't render login page if already authenticated
   if (isAuthenticated) {

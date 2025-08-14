@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { AUTH_PATHS } from '../../lib/paths';
 
 export const Header: React.FC = () => {
   const { authState, logout } = useAuth();
@@ -15,7 +16,7 @@ export const Header: React.FC = () => {
     setIsLoggingOut(true);
     try {
       await logout(false); // Logout from current device only
-      router.push('/auth/login');
+      router.push(AUTH_PATHS.LOGIN);
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -28,7 +29,7 @@ export const Header: React.FC = () => {
     setIsLoggingOut(true);
     try {
       await logout(true); // Logout from all devices
-      router.push('/auth/login');
+      router.push(AUTH_PATHS.LOGIN);
     } catch (error) {
       console.error('Logout error:', error);
     } finally {

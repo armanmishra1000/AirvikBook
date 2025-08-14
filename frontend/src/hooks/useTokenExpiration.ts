@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { useToastHelpers } from '../components/common/Toast';
+import { AUTH_PATHS } from '../lib/paths';
 
 /**
  * Hook to handle token expiration consistently across the app
@@ -30,7 +31,7 @@ export const useTokenExpiration = () => {
     }
     
     // Redirect to login page
-    router.replace('/login');
+    router.replace(AUTH_PATHS.LOGIN);
   }, [logout, router, showError]);
 
   return {

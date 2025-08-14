@@ -32,6 +32,7 @@ import {
   isSuccessResponse,
   isErrorResponse
 } from '../types/passwordManagement.types';
+import { AUTH_PATHS } from '../lib/paths';
 
 // =====================================================
 // TOKEN STORAGE UTILITIES (Reused from userLogin.service.ts)
@@ -360,7 +361,7 @@ export class PasswordManagementService {
     
     return ApiClient.request<ForgotPasswordResponse>(
       'POST',
-      '/auth/forgot-password',
+      `/auth${AUTH_PATHS.FORGOT_PASSWORD}`,
       request,
       { requiresAuth: false }
     );
@@ -378,7 +379,7 @@ export class PasswordManagementService {
     
     return ApiClient.request<ResetPasswordResponse>(
       'POST',
-      '/auth/reset-password',
+      `/auth${AUTH_PATHS.RESET_PASSWORD}`,
       request,
       { requiresAuth: false }
     );
@@ -390,7 +391,7 @@ export class PasswordManagementService {
   static async verifyResetToken(token: string): Promise<ResetTokenValidationApiResponse> {
     return ApiClient.request<ResetTokenValidationResponse>(
       'GET',
-      `/auth/reset-token/${token}`,
+      `/auth${AUTH_PATHS.RESET_TOKEN}/${token}`,
       undefined,
       { requiresAuth: false }
     );
@@ -418,7 +419,7 @@ export class PasswordManagementService {
     
     return ApiClient.request<ChangePasswordResponse>(
       'PUT',
-      '/auth/password',
+      `/auth${AUTH_PATHS.PASSWORD}`,
       request,
       { requiresAuth: true }
     );
@@ -435,7 +436,7 @@ export class PasswordManagementService {
     
     return ApiClient.request<SetPasswordResponse>(
       'POST',
-      '/auth/set-password',
+      `/auth${AUTH_PATHS.SET_PASSWORD}`,
       request,
       { requiresAuth: true }
     );
@@ -452,7 +453,7 @@ export class PasswordManagementService {
     
     return ApiClient.request<RemovePasswordResponse>(
       'DELETE',
-      '/auth/password',
+      `/auth${AUTH_PATHS.PASSWORD}`,
       request,
       { requiresAuth: true }
     );
@@ -464,7 +465,7 @@ export class PasswordManagementService {
   static async getPasswordStatus(): Promise<PasswordStatusApiResponse> {
     return ApiClient.request<PasswordStatusResponse>(
       'GET',
-      '/auth/password-status',
+      `/auth${AUTH_PATHS.PASSWORD_STATUS}`,
       undefined,
       { requiresAuth: true }
     );
@@ -537,7 +538,7 @@ export class PasswordManagementService {
 
     if (this.isTokenExpired()) {
       // Try to refresh token
-      const refreshResult = await ApiClient.request('POST', '/auth/refresh', {
+      const refreshResult = await ApiClient.request('POST', `/auth${AUTH_PATHS.REFRESH}`, {
         refreshToken: TokenStorage.getRefreshToken()
       });
       

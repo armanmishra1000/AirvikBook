@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { AUTH_PATHS } from '../lib/paths';
 
 export const useLogoutShortcut = () => {
   const { authState, logout } = useAuth();
@@ -17,7 +18,7 @@ export const useLogoutShortcut = () => {
         if (authState.isAuthenticated) {
           try {
             await logout(false);
-            router.push('/auth/login');
+            router.push(AUTH_PATHS.LOGIN);
           } catch (error) {
             console.error('Keyboard logout error:', error);
           }

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { AUTH_PATHS } from '../../lib/paths';
 
 interface LogoutButtonProps {
   variant?: 'primary' | 'secondary' | 'danger' | 'emergency';
@@ -29,7 +30,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({
     setIsLoggingOut(true);
     try {
       await logout(logoutAllDevices);
-      router.push('/auth/login');
+      router.push(AUTH_PATHS.LOGIN);
     } catch (error) {
       console.error('Logout error:', error);
     } finally {

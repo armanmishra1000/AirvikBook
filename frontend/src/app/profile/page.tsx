@@ -118,7 +118,7 @@ export default function ProfilePage() {
     setIsLoggingOut(true);
     try {
       await logout(false);
-      router.push('/auth/login');
+      router.push(`/auth${AUTH_PATHS.LOGIN}`);
     } catch (error) {
       console.error('Logout error:', error);
       showError('Failed to logout. Please try again.');
@@ -131,7 +131,7 @@ export default function ProfilePage() {
     setIsLoggingOut(true);
     try {
       await logout(true);
-      router.push('/auth/login');
+      router.push(`/auth${AUTH_PATHS.LOGIN}`);
     } catch (error) {
       console.error('Logout error:', error);
       showError('Failed to logout. Please try again.');

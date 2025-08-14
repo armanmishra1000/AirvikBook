@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { PasswordManagementController } from '../controllers/auth/passwordManagement.controller';
 import { PasswordResetController } from '../controllers/auth/passwordReset.controller';
 import { AuthMiddleware } from '../middleware/auth.middleware';
+import { AUTH_PATHS } from '../lib/paths';
 
 const router = Router();
 
@@ -22,7 +23,7 @@ const router = Router();
  * Rate Limited: 5 attempts per 15 minutes per user
  */
 router.put(
-  '/password',
+  AUTH_PATHS.PASSWORD,
   AuthMiddleware.verifyToken,
   AuthMiddleware.requireActiveUser,
   AuthMiddleware.createUserRateLimit({
@@ -41,7 +42,7 @@ router.put(
  * Rate Limited: 3 attempts per 30 minutes per user
  */
 router.post(
-  '/set-password',
+  AUTH_PATHS.SET_PASSWORD,
   AuthMiddleware.verifyToken,
   AuthMiddleware.requireActiveUser,
   AuthMiddleware.createUserRateLimit({
@@ -60,7 +61,7 @@ router.post(
  * Rate Limited: 3 attempts per 30 minutes per user
  */
 router.delete(
-  '/password',
+  AUTH_PATHS.PASSWORD,
   AuthMiddleware.verifyToken,
   AuthMiddleware.requireActiveUser,
   AuthMiddleware.createUserRateLimit({
@@ -79,7 +80,7 @@ router.delete(
  * No rate limiting (read-only operation)
  */
 router.get(
-  '/password-status',
+  AUTH_PATHS.PASSWORD_STATUS,
   AuthMiddleware.verifyToken,
   AuthMiddleware.requireActiveUser,
   PasswordManagementController.getPasswordStatus
@@ -93,7 +94,7 @@ router.get(
  * Rate Limited: 1 request per 5 minutes per IP/email
  */
 router.post(
-  '/forgot-password',
+  AUTH_PATHS.FORGOT_PASSWORD,
   // Rate limiting is handled internally by the service for email-based limiting
   PasswordResetController.validateForgotPassword,
   PasswordResetController.forgotPassword
@@ -105,7 +106,7 @@ router.post(
  * Rate Limited: 5 attempts per 15 minutes per IP
  */
 router.post(
-  '/reset-password',
+  AUTH_PATHS.RESET_PASSWORD,
   AuthMiddleware.createUserRateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     maxRequests: 5,
@@ -121,7 +122,7 @@ router.post(
  * Rate Limited: 10 requests per minute per IP
  */
 router.get(
-  '/reset-token/:token',
+  `${AUTH_PATHS.RESET_TOKEN}/:token`,
   AuthMiddleware.createUserRateLimit({
     windowMs: 60 * 1000, // 1 minute
     maxRequests: 10,
@@ -139,7 +140,7 @@ router.get(
  * Requires: Admin authentication
  */
 router.get(
-  '/reset-statistics',
+  AUTH_PATHS.RESET_STATISTICS,
   AuthMiddleware.verifyToken,
   AuthMiddleware.requireActiveUser,
   AuthMiddleware.requireRole(['ADMIN', 'OWNER']),
@@ -152,7 +153,7 @@ router.get(
  * Requires: Admin authentication
  */
 router.post(
-  '/cleanup-reset-tokens',
+  AUTH_PATHS.CLEANUP_RESET_TOKENS,
   AuthMiddleware.verifyToken,
   AuthMiddleware.requireActiveUser,
   AuthMiddleware.requireRole(['ADMIN', 'OWNER']),

@@ -15,6 +15,18 @@ export const AUTH_PATHS = {
   SUCCESS: '/success',
   ERROR: '/error',
   CALLBACK_SUCCESS: '/callback/success',
+  SESSIONS: '/sessions',
+  LOGOUT: '/logout',
+  LINK_GOOGLE: '/link-google',
+  REFRESH: '/refresh',
+  GOOGLE_LOGIN: '/google-login',
+  GOOGLE_AUTH: '/google',
+  PASSWORD: '/password',
+  SET_PASSWORD: '/set-password',
+  PASSWORD_STATUS: '/password-status',
+  RESET_TOKEN: '/reset-token',
+  RESEND_VERIFICATION: '/resend-verification',
+  LINK_ACCOUNT: '/link-account',
 } as const;
 
 // Helper functions for dynamic paths

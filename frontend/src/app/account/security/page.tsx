@@ -101,7 +101,7 @@ const SecurityPage: React.FC = () => {
     setIsLoggingOut(true);
     try {
       await logout(false);
-      router.push('/auth/login');
+      router.push(`/auth${AUTH_PATHS.LOGIN}`);
     } catch (error) {
       console.error('Logout error:', error);
       setError('Failed to logout. Please try again.');
@@ -114,7 +114,7 @@ const SecurityPage: React.FC = () => {
     setIsLoggingOut(true);
     try {
       await logout(true);
-      router.push('/auth/login');
+      router.push(`/auth${AUTH_PATHS.LOGIN}`);
     } catch (error) {
       console.error('Logout error:', error);
       setError('Failed to logout. Please try again.');

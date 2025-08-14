@@ -32,6 +32,7 @@ import {
   isErrorResponse,
   LOGIN_ERROR_CODES
 } from '../types/userLogin.types';
+import { AUTH_PATHS } from '../lib/paths';
 
 // =====================================================
 // TOKEN STORAGE UTILITIES
@@ -366,7 +367,7 @@ class ApiClient {
 
     const response = await this.request<RefreshApiResponse['data']>(
       'POST',
-      '/auth/refresh',
+      `/auth${AUTH_PATHS.REFRESH}`,
       { refreshToken },
       { skipAuthRefresh: true }
     );
@@ -412,7 +413,7 @@ export class UserLoginService {
 
       const response = await ApiClient.request<LoginApiResponse['data']>(
         'POST',
-        '/auth/login',
+        `/auth${AUTH_PATHS.LOGIN}`,
         requestData
       );
 
@@ -452,7 +453,7 @@ export class UserLoginService {
 
       const response = await ApiClient.request<GoogleLoginApiResponse['data']>(
         'POST',
-        '/auth/google-login',
+        `/auth${AUTH_PATHS.GOOGLE_LOGIN}`,
         requestData
       );
 
@@ -493,7 +494,7 @@ export class UserLoginService {
 
     const response = await ApiClient.request<RefreshApiResponse['data']>(
       'POST',
-      '/auth/refresh',
+      `/auth${AUTH_PATHS.REFRESH}`,
       { refreshToken }
     );
     return response as RefreshApiResponse;
@@ -524,7 +525,7 @@ export class UserLoginService {
       if (allDevices) {
         const apiResponse = await ApiClient.request<LogoutApiResponse['data']>(
           'DELETE',
-          '/auth/sessions',
+          `/auth${AUTH_PATHS.SESSIONS}`,
           undefined,
           { requiresAuth: true }
         );
@@ -532,7 +533,7 @@ export class UserLoginService {
       } else {
         const apiResponse = await ApiClient.request<LogoutApiResponse['data']>(
           'POST',
-          '/auth/logout',
+          `/auth${AUTH_PATHS.LOGOUT}`,
           { refreshToken, logoutFromAllDevices: false },
           { requiresAuth: true }
         );
@@ -566,7 +567,7 @@ export class UserLoginService {
     const refreshToken = TokenStorage.getRefreshToken();
     const response = await ApiClient.request<SessionsApiResponse['data']>(
       'GET',
-      '/auth/sessions',
+      `/auth${AUTH_PATHS.SESSIONS}`,
       undefined,
       { 
         requiresAuth: true,
@@ -582,7 +583,7 @@ export class UserLoginService {
   static async logoutFromDevice(sessionId: string): Promise<LogoutApiResponse> {
     const response = await ApiClient.request<LogoutApiResponse['data']>(
       'DELETE',
-      `/auth/sessions/${sessionId}`,
+      `/auth${AUTH_PATHS.SESSIONS}/${sessionId}`,
       undefined,
       { requiresAuth: true }
     );
@@ -595,7 +596,7 @@ export class UserLoginService {
   static async linkGoogleAccount(googleToken: string): Promise<LinkAccountApiResponse> {
     const response = await ApiClient.request<LinkAccountApiResponse['data']>(
       'POST',
-      '/auth/link-google',
+      `/auth${AUTH_PATHS.LINK_GOOGLE}`,
       { googleToken },
       { requiresAuth: true }
     );
@@ -608,7 +609,7 @@ export class UserLoginService {
   static async forgotPassword(email: string): Promise<ForgotPasswordApiResponse> {
     const response = await ApiClient.request<ForgotPasswordApiResponse['data']>(
       'POST',
-      '/auth/forgot-password',
+      `/auth${AUTH_PATHS.FORGOT_PASSWORD}`,
       { email }
     );
     return response as ForgotPasswordApiResponse;
@@ -620,7 +621,7 @@ export class UserLoginService {
   static async resetPassword(token: string, newPassword: string): Promise<ResetPasswordApiResponse> {
     const response = await ApiClient.request<ResetPasswordApiResponse['data']>(
       'POST',
-      '/auth/reset-password',
+      `/auth${AUTH_PATHS.RESET_PASSWORD}`,
       { token, newPassword }
     );
     return response as ResetPasswordApiResponse;

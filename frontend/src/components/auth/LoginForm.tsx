@@ -247,11 +247,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             disabled:bg-gray-100 dark:disabled:bg-gray-200 
             disabled:text-gray-500 dark:disabled:text-gray-400
             disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
-              ${
-                errors.email
+              ${errors.email
                   ? "border-error focus:ring-1 focus:ring-error"
                   : "border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
-              }`}
+                }`}
               placeholder="Enter your email address"
               disabled={isSubmitting}
               autoComplete="email"
@@ -288,11 +287,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             disabled:bg-gray-100 dark:disabled:bg-gray-200 
             disabled:text-gray-500 dark:disabled:text-gray-400
             disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
-                ${
-                  errors.password
+                ${errors.password
                     ? "border-error focus:ring-1 focus:ring-error"
                     : "border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
-                }`}
+                  }`}
                 placeholder="Enter your password"
                 disabled={isSubmitting}
                 autoComplete="current-password"
@@ -321,12 +319,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting || authState.isLoading}
-            className="w-full font-medium transition-all duration-100 ease-linear bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+            disabled={isSubmitting}
+            className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
           >
-            {isSubmitting || authState.isLoading ? (
+            {isSubmitting ? (
               <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 animate-spin border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
+                <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
                 Signing In...
               </div>
             ) : (
