@@ -23,8 +23,8 @@ interface SessionManagerProps {
 export const SessionManager: React.FC<SessionManagerProps> = ({
   className = '',
   showCurrentSessionFirst = true,
-  autoRefresh = true,
-  refreshInterval = 30000 // 30 seconds
+  autoRefresh = false, // Changed default to false to prevent rate limiting
+  refreshInterval = 300000 // Changed default to 5 minutes (300 seconds)
 }) => {
   const { getSessions, logoutFromDevice, logoutFromAllDevices, authState } = useAuth();
   const [sessions, setSessions] = useState<ActiveSession[]>([]);
@@ -33,6 +33,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
   const [isLogoutLoading, setIsLogoutLoading] = useState<string | null>(null);
   const [showLogoutAllConfirm, setShowLogoutAllConfirm] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(autoRefresh);
   const autoRefreshRef = useRef<NodeJS.Timeout | null>(null);
   const mountedRef = useRef(true);
 
@@ -89,6 +90,13 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
           setError('Unable to connect to server. Please check your internet connection and try again.');
         } else if (result.code === 'SESSION_EXPIRED') {
           setError('Your session has expired. Please log in again.');
+        } else if (result.code === 'SESSION_RATE_LIMIT_EXCEEDED' || result.code === 'RATE_LIMIT_EXCEEDED') {
+          setError('Too many requests. Please wait a moment and try again.');
+          // Disable auto-refresh temporarily for rate limit errors
+          if (autoRefreshRef.current) {
+            clearInterval(autoRefreshRef.current);
+            autoRefreshRef.current = null;
+          }
         } else {
           setError(result.error || 'Failed to load sessions');
         }
@@ -119,7 +127,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
 
   // Auto-refresh setup
   useEffect(() => {
-    if (autoRefresh && refreshInterval > 0 && authState.isAuthenticated) {
+    if (autoRefreshEnabled && refreshInterval > 0 && authState.isAuthenticated) {
       // Initial load
       loadSessions();
       
@@ -132,7 +140,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
         }
       };
     }
-  }, [autoRefresh, refreshInterval, authState.isAuthenticated]);
+  }, [autoRefreshEnabled, refreshInterval, authState.isAuthenticated]);
 
   // =====================================================
   // SESSION ACTIONS
@@ -261,14 +269,40 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
           </h2>
           <p className="text-gray-600 text-body dark:text-gray-400 mt-space-1">
             Manage your active sessions across devices
+            {autoRefreshEnabled && (
+              <span className="text-sm text-gray-500 ml-space-2">
+                (Auto-refresh every {Math.round(refreshInterval / 1000 / 60)} minutes)
+              </span>
+            )}
           </p>
         </div>
         
         <div className="flex items-center space-x-space-4">
+          {/* Auto-refresh toggle */}
+          <div className="flex items-center space-x-space-2">
+            <label className="text-sm text-gray-600 dark:text-gray-400 font-sf-pro">
+              Auto-refresh
+            </label>
+            <button
+              onClick={() => setAutoRefreshEnabled(!autoRefreshEnabled)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-radius-full transition-colors focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 ${
+                autoRefreshEnabled 
+                  ? 'bg-airvik-blue' 
+                  : 'bg-gray-200 dark:bg-gray-700'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-radius-full bg-white transition-transform ${
+                  autoRefreshEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+          
           <button
             onClick={handleManualRefresh}
             disabled={isLoading}
-            className="transition-colors px-space-3 py-space-2 border border-gray-300 dark:border-gray-600 rounded-radius-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed duration-normal font-sf-pro text-button"
+            className="text-gray-700 transition-colors border border-gray-300 px-space-3 py-space-2 dark:border-gray-600 rounded-radius-md dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed duration-normal font-sf-pro text-button"
           >
             {isLoading ? (
               <div className="flex items-center">
