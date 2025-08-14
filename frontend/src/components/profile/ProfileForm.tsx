@@ -39,6 +39,20 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 }) => {
   const { authState } = useAuth();
   const { showSuccess, showError } = useToastHelpers();
+  // Country data for phone number dropdown
+  const countries = [
+    { code: 'US', name: 'United States', dialCode: '+1', format: '+1 (XXX) XXX-XXXX' },
+    { code: 'CA', name: 'Canada', dialCode: '+1', format: '+1 (XXX) XXX-XXXX' },
+    { code: 'GB', name: 'United Kingdom', dialCode: '+44', format: '+44 XXXX XXXXXX' },
+    { code: 'AU', name: 'Australia', dialCode: '+61', format: '+61 X XXX XXX XXX' },
+    { code: 'DE', name: 'Germany', dialCode: '+49', format: '+49 XXX XXXXXXX' },
+    { code: 'FR', name: 'France', dialCode: '+33', format: '+33 X XX XX XX XX' },
+    { code: 'IN', name: 'India', dialCode: '+91', format: '+91 XXXXX XXXXX' },
+    { code: 'JP', name: 'Japan', dialCode: '+81', format: '+81 XX XXXX XXXX' },
+    { code: 'BR', name: 'Brazil', dialCode: '+55', format: '+55 XX XXXXX XXXX' },
+    { code: 'MX', name: 'Mexico', dialCode: '+52', format: '+52 XXX XXX XXXX' }
+  ];
+
   const [formData, setFormData] = useState<ProfileFormData>({
     fullName: '',
     mobileNumber: '',
@@ -50,6 +64,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     website: '',
     location: ''
   });
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [errors, setErrors] = useState<ProfileFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,6 +93,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
   useEffect(() => {
     if (initialData) {
+      // Parse mobile number to separate country code and phone number
+      const { country, phoneNumber: parsedPhoneNumber } = parseMobileNumber(initialData.mobileNumber || '');
+      
       setFormData({
         fullName: initialData.fullName || '',
         mobileNumber: initialData.mobileNumber || '',
@@ -88,6 +107,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         website: initialData.website || '',
         location: initialData.location || ''
       });
+      
+      setSelectedCountry(country);
+      setPhoneNumber(parsedPhoneNumber);
+      
       // Notify parent with initial values for live preview
       onChange?.({
         fullName: initialData.fullName || '',
@@ -111,6 +134,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       const response = await UserProfileService.getProfile();
       if (isSuccessResponse(response)) {
         const profile = response.data;
+        
+        // Parse mobile number to separate country code and phone number
+        const { country, phoneNumber: parsedPhoneNumber } = parseMobileNumber(profile.mobileNumber || '');
+        
         setFormData({
           fullName: profile.fullName || '',
           mobileNumber: profile.mobileNumber || '',
@@ -122,6 +149,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           website: profile.website || '',
           location: profile.location || ''
         });
+        
+        setSelectedCountry(country);
+        setPhoneNumber(parsedPhoneNumber);
+        
         onChange?.({
           fullName: profile.fullName || '',
           mobileNumber: profile.mobileNumber || '',
@@ -186,6 +217,65 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         [name]: undefined
       }));
     }
+  };
+
+  // Function to parse existing mobile number and extract country code and phone number
+  const parseMobileNumber = (mobileNumber: string) => {
+    if (!mobileNumber) return { country: countries[0], phoneNumber: '' };
+    
+    // Find country by dial code
+    const country = countries.find(c => mobileNumber.startsWith(c.dialCode));
+    if (country) {
+      const phoneNumber = mobileNumber.replace(country.dialCode, '').trim();
+      return { country, phoneNumber };
+    }
+    
+    return { country: countries[0], phoneNumber: mobileNumber };
+  };
+
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const countryCode = e.target.value;
+    const country = countries.find(c => c.code === countryCode) || countries[0];
+    setSelectedCountry(country);
+    
+    // Update the full mobile number when country changes
+    const fullMobileNumber = phoneNumber ? `${country.dialCode}${phoneNumber}` : '';
+    setFormData(prev => ({
+      ...prev,
+      mobileNumber: fullMobileNumber
+    }));
+
+    // Notify parent of changes
+    onChange?.({
+      ...formData,
+      mobileNumber: fullMobileNumber
+    });
+  };
+
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); // Only allow digits
+    setPhoneNumber(value);
+    
+    // Update the full mobile number for form submission
+    const fullMobileNumber = value ? `${selectedCountry.dialCode}${value}` : '';
+    setFormData(prev => ({
+      ...prev,
+      mobileNumber: fullMobileNumber
+    }));
+
+    // Clear mobile number error
+    if (errors.mobileNumber) {
+      setErrors(prev => ({
+        ...prev,
+        mobileNumber: undefined
+      }));
+    }
+
+    // Notify parent of changes
+    onChange?.({
+      ...formData,
+      mobileNumber: fullMobileNumber
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -263,7 +353,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
   if (isLoading) {
     return (
-      <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm p-space-6 ${className}`}>
+      <div className={`bg-airvik-white-pure dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm p-space-6 ${className}`}>
         <div className="flex items-center justify-center py-space-12">
           <svg className="w-8 h-8 animate-spin text-airvik-blue" viewBox="0 0 24 24">
             <circle
@@ -290,7 +380,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   }
 
   return (
-    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
+    <div className={`bg-airvik-white-pure dark:bg-airvik-midnight rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
       <form onSubmit={handleSubmit} className="p-space-4 lg:p-space-8 space-y-space-8 lg:space-y-space-6 ">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4">
@@ -336,20 +426,37 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           <label htmlFor="mobileNumber" className="block text-label font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
             Mobile Number
           </label>
-          <input
-            type="tel"
-            id="mobileNumber"
-            name="mobileNumber"
-            value={formData.mobileNumber}
-            onChange={handleInputChange}
-            className={`w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
-              ${errors.mobileNumber 
-                ? 'border-error focus:ring-1 focus:ring-error' 
-                : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400'
-              }`}
-            placeholder="+1 (555) 123-4567"
-            disabled={isSubmitting}
-          />
+          <div className="flex space-x-space-2">
+            {/* Country Dropdown */}
+            <select
+              value={selectedCountry.code}
+              onChange={handleCountryChange}
+              disabled={isSubmitting}
+              className="px-space-3 py-space-3 text-body font-sf-pro bg-airvik-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-radius-md text-airvik-black dark:text-airvik-white focus:outline-none focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed hover:border-gray-400"
+            >
+              {countries.map((country) => (
+                <option key={country.code} value={country.code}>
+                  {country.dialCode} {country.name}
+                </option>
+              ))}
+            </select>
+            
+            {/* Phone Number Input */}
+            <input
+              type="tel"
+              id="mobileNumber"
+              name="mobileNumber"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              className={`flex-1 px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-800 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
+                ${errors.mobileNumber 
+                  ? 'border-error focus:ring-1 focus:ring-error' 
+                  : 'border-gray-300 dark:border-gray-600 text-airvik-black dark:text-airvik-white hover:border-gray-400'
+                }`}
+              placeholder="Enter phone number"
+              disabled={isSubmitting}
+            />
+          </div>
           {errors.mobileNumber && (
             <p className="mt-space-1 text-caption text-error">
               {errors.mobileNumber}

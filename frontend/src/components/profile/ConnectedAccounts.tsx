@@ -96,7 +96,7 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
 
   if (isLoading) {
     return (
-      <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm p-space-6 ${className}`}>
+      <div className={`bg-airvik-white-pure dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm p-space-6 ${className}`}>
         <div className="flex items-center justify-center py-space-12">
           <svg className="w-8 h-8 animate-spin text-airvik-blue" viewBox="0 0 24 24">
             <circle
@@ -127,7 +127,7 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
   const connectedAt = profileData?.connectedAccounts?.google?.connectedAt;
 
   return (
-    <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
+    <div className={`bg-airvik-white-pure dark:bg-airvik-midnight rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm ${className}`}>
       <div className="p-space-4 lg:p-space-8 space-y-space-8 lg:space-y-space-6">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4">
@@ -154,7 +154,7 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
               <h4 className="text-h6 lg:text-h5 text-airvik-black dark:text-airvik-white">
                 Google Account
               </h4>
-              <p className="text-gray-600 text-caption dark:text-gray-400">
+              <p className="text-gray-600 text-body-sm dark:text-gray-400">
                 Connect your Google account for profile syncing
               </p>
             </div>
@@ -173,7 +173,7 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
                   <h5 className="font-medium text-green-800 text-body dark:text-green-200">
                     Connected
                   </h5>
-                  <p className="text-green-700 text-caption dark:text-green-300">
+                  <p className="text-green-700 text-body-sm dark:text-green-300">
                     {googleEmail && `Connected to ${googleEmail}`}
                     {connectedAt && ` • Connected on ${new Date(connectedAt).toLocaleDateString()}`}
                   </p>
@@ -192,7 +192,7 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
                   <h5 className="font-medium text-gray-800 text-body dark:text-gray-200">
                     Not Connected
                   </h5>
-                  <p className="text-gray-600 text-caption dark:text-gray-400">
+                  <p className="text-gray-600 text-body-sm dark:text-gray-400">
                     Connect your Google account to sync profile data and pictures
                   </p>
                 </div>
@@ -237,7 +237,7 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
               <GoogleOAuthRedirectButton
                 type="login"
                 redirectTo="/profile/connections"
-                className="transition-all px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal hover:bg-airvik-purple hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
+                className="px-space-4 py-space-2 bg-white text-airvik-black rounded-radius-md font-sf-pro text-button border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
               >
                 Connect Google Account
               </GoogleOAuthRedirectButton>
@@ -257,7 +257,7 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
               <h5 className="font-medium text-body-sm lg:text-body text-airvik-black dark:text-airvik-white">
                 Benefits of Connecting
               </h5>
-              <ul className="text-gray-600 text-caption dark:text-gray-400 mt-space-1 space-y-space-1">
+              <ul className="text-gray-600 text-body-sm dark:text-gray-400 mt-space-1 space-y-space-1">
                 <li>• Automatically sync your profile picture from Google</li>
                 <li>• Keep your profile information up to date</li>
                 <li>• Faster login with Google OAuth</li>
@@ -279,7 +279,7 @@ export const ConnectedAccounts: React.FC<ConnectedAccountsProps> = ({
               <h5 className="font-medium text-yellow-800 text-body-sm lg:text-body dark:text-yellow-200">
                 Security Notice
               </h5>
-              <p className="text-yellow-700 text-caption dark:text-yellow-300 mt-space-1">
+              <p className="text-yellow-700 text-body-sm dark:text-yellow-300 mt-space-1">
                 We only access your basic profile information and profile picture. We never access your emails, contacts, or other private Google data. You can disconnect your account at any time.
               </p>
             </div>

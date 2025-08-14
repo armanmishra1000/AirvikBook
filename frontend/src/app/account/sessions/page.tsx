@@ -45,7 +45,7 @@ const SessionsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-airvik-white dark:bg-gray-800 shadow-sm">
+              <div className="bg-airvik-white dark:bg-gray-800 shadow-shadow-sm">
         <div className="max-w-7xl mx-auto px-space-4 sm:px-space-6 lg:px-space-8">
           <div className="flex items-center justify-between py-space-6">
             <div className="flex items-center">
@@ -108,7 +108,7 @@ const SessionsPage: React.FC = () => {
           {/* Sidebar */}
           <div className="space-y-space-6">
             {/* Security Tips */}
-            <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6 shadow-sm">
+            <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6 shadow-shadow-sm">
               <h3 className="text-h5 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-4">
                 Security Tips
               </h3>
@@ -165,7 +165,7 @@ const SessionsPage: React.FC = () => {
             </div>
 
             {/* Account Actions */}
-            <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6 shadow-sm">
+            <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6 shadow-shadow-sm">
               <h3 className="text-h5 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-4">
                 Account Actions
               </h3>

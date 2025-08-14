@@ -78,7 +78,7 @@ export default function ProfilePicturePage() {
 
   if (authState.isLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-airvik-blue/5 via-transparent to-transparent dark:from-airvik-blue/10 dark:bg-airvik-midnight">
+      <div className="min-h-screen bg-white dark:bg-airvik-midnight">
         <div className="container mx-auto px-space-4 pt-space-10 pb-space-6">
           <div className="w-64 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
           <div className="h-5 bg-gray-200 mt-space-2 w-96 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
@@ -134,13 +134,9 @@ export default function ProfilePicturePage() {
   // =====================================================
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-airvik-blue/5 via-transparent to-transparent dark:from-airvik-blue/10 dark:bg-airvik-midnight">
+    <div className="min-h-screen bg-white dark:bg-airvik-midnight">
       {/* Hero */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 opacity-30 blur-3xl">
-          <div className="absolute top-[-4rem] left-1/3 h-64 w-64 rounded-full bg-airvik-blue" />
-          <div className="absolute top-[6rem] left-[10%] h-40 w-40 rounded-full bg-airvik-purple" />
-        </div>
         <div className="container mx-auto px-space-4 pt-space-10 pb-space-6">
           <nav className="flex items-center text-gray-500 space-x-space-2 mb-space-4 dark:text-gray-400">
             <Link href="/profile" className="hover:text-airvik-blue">Profile</Link>
@@ -149,17 +145,9 @@ export default function ProfilePicturePage() {
             </svg>
             <span className="font-medium text-airvik-blue dark:text-airvik-white">Profile Picture</span>
           </nav>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-4">
-            <div>
-              <h1 className="font-bold text-h3 lg:text-h2 text-airvik-black dark:text-airvik-white">Profile Picture</h1>
-              <p className="text-gray-600 mt-space-2 text-body-sm lg:text-body dark:text-gray-400">Upload or sync your profile picture</p>
-            </div>
-            <Link href="/profile" className="group inline-flex items-center gap-space-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal active:translate-y-0 border border-gray-200 dark:border-gray-700 self-start sm:self-auto">
-              <svg className="w-5 h-5 transition-transform " viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-              </svg>
-              Back to Profile
-            </Link>
+          <div>
+            <h1 className="font-bold text-h3 lg:text-h2 text-airvik-black dark:text-airvik-white">Profile Picture</h1>
+            <p className="text-gray-600 mt-space-2 text-body-sm lg:text-body dark:text-gray-400">Upload or sync your profile picture</p>
           </div>
         </div>
       </div>
@@ -180,7 +168,7 @@ export default function ProfilePicturePage() {
           <aside className="space-y-space-4 lg:space-y-space-6">
             <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
               <h3 className="text-h6 mb-space-2 text-airvik-black dark:text-airvik-white">File Requirements</h3>
-              <ul className="text-gray-600 text-caption dark:text-gray-400 space-y-space-1">
+              <ul className="text-gray-600 text-body-sm dark:text-gray-400 space-y-space-1">
                 <li>• Max size: 5MB</li>
                 <li>• Formats: JPG, PNG, WebP</li>
                 <li>• 100×100 to 2000×2000 px</li>
@@ -188,7 +176,7 @@ export default function ProfilePicturePage() {
             </div>
             <div className="border border-green-200 rounded-radius-lg dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-space-4 lg:p-space-5">
               <h3 className="text-green-800 text-h6 mb-space-2 dark:text-green-200">Pro Tips</h3>
-              <ul className="text-green-700 text-caption dark:text-green-300 space-y-space-1">
+              <ul className="text-green-700 text-body-sm dark:text-green-300 space-y-space-1">
                 <li>• Use a recent, clear headshot</li>
                 <li>• Prefer square images for best fit</li>
                 <li>• Sync from Google for auto-updates</li>

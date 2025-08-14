@@ -219,7 +219,7 @@ export default function GoogleOAuthButton({
       onClick={handleGoogleSignIn}
       disabled={disabled || isLoading || !isGoogleLoaded}
       className={`
-        w-full flex justify-center items-center px-space-4 py-space-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm
+                        w-full flex justify-center items-center px-space-4 py-space-2 border border-gray-300 dark:border-gray-600 rounded-radius-md shadow-shadow-sm
         bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200
         hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
         disabled:opacity-50 disabled:cursor-not-allowed

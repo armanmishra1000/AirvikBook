@@ -66,7 +66,7 @@ export default function SuccessPage() {
         </div>
 
         {/* Welcome Message */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-space-8 mb-space-6">
+        <div className="bg-white dark:bg-gray-800 rounded-radius-lg shadow-shadow-lg p-space-8 mb-space-6">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-space-4">
             Welcome to AirVikBook!
           </h1>

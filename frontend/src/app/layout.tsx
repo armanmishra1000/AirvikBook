@@ -20,7 +20,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <ToastProvider>
             <AuthProvider>
-              <main className="min-h-screen bg-gray-50">
+              <main className="min-h-screen bg-white dark:bg-airvik-midnight">
                 {children}
               </main>
             </AuthProvider>

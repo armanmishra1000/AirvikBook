@@ -224,7 +224,7 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 py-space-12 px-space-4 sm:px-space-6 lg:px-space-8">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg dark:bg-gray-800 p-space-8">
+              <div className="w-full max-w-md bg-white rounded-radius-lg shadow-shadow-lg dark:bg-gray-800 p-space-8">
         {/* Header - Dynamic based on verification status */}
         <div className="text-center mb-space-8">
           {isVerifying ? (

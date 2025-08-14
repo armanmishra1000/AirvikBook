@@ -10,17 +10,17 @@ export default function Home() {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="p-6 bg-white rounded-lg shadow-md">
+          <div className="p-6 bg-white rounded-radius-lg shadow-shadow-md">
             <h2 className="text-xl font-semibold mb-2">🏨 Property Management</h2>
             <p className="text-gray-600">Manage rooms, rates, and availability</p>
           </div>
           
-          <div className="p-6 bg-white rounded-lg shadow-md">
+          <div className="p-6 bg-white rounded-radius-lg shadow-shadow-md">
             <h2 className="text-xl font-semibold mb-2">📅 Booking Engine</h2>
             <p className="text-gray-600">Online reservations and guest management</p>
           </div>
           
-          <div className="p-6 bg-white rounded-lg shadow-md">
+          <div className="p-6 bg-white rounded-radius-lg shadow-shadow-md">
             <h2 className="text-xl font-semibold mb-2">💳 Payment Processing</h2>
             <p className="text-gray-600">Secure payments and financial reporting</p>
           </div>

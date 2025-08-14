@@ -153,7 +153,7 @@ export default function BrandTest() {
         <section className="space-y-space-6">
           <h3 className="text-h3">Shadows & Effects</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-space-4">
-            <div className="bg-airvik-white dark:bg-gray-900 p-space-6 rounded-radius-lg shadow-sm">
+            <div className="bg-airvik-white dark:bg-gray-900 p-space-6 rounded-radius-lg shadow-shadow-sm">
               <h5 className="text-h5 mb-space-2">Shadow SM</h5>
               <p className="text-body-sm text-gray-600 dark:text-gray-400">Subtle elevation</p>
             </div>
