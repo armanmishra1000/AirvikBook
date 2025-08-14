@@ -240,7 +240,7 @@ class ApiClient {
     const { requiresAuth = false, skipAuthRefresh = false, retryCount = 0, customHeaders = {} } = options;
 
     try {
-      const url = `${this.BASE_URL}${this.API_PREFIX}${endpoint}`;
+      const url = `${this.BASE_URL}${this.API_PREFIX}/auth${endpoint}`;
       
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -302,6 +302,15 @@ class ApiClient {
 
       // Handle network errors with retry logic
       if (!response.ok && retryCount < this.MAX_RETRY_ATTEMPTS) {
+        // Don't retry on rate limit errors (429)
+        if (response.status === 429) {
+          return {
+            success: false,
+            error: 'Too many requests. Please try again later.',
+            code: 'RATE_LIMIT_EXCEEDED'
+          };
+        }
+        
         await this.delay(this.RETRY_DELAY * (retryCount + 1));
         return this.request<T>(method, endpoint, data, {
           ...options,
@@ -367,7 +376,7 @@ class ApiClient {
 
     const response = await this.request<RefreshApiResponse['data']>(
       'POST',
-      `/auth${AUTH_PATHS.REFRESH}`,
+      AUTH_PATHS.REFRESH,
       { refreshToken },
       { skipAuthRefresh: true }
     );
@@ -413,7 +422,7 @@ export class UserLoginService {
 
       const response = await ApiClient.request<LoginApiResponse['data']>(
         'POST',
-        `/auth${AUTH_PATHS.LOGIN}`,
+        AUTH_PATHS.LOGIN,
         requestData
       );
 
@@ -453,7 +462,7 @@ export class UserLoginService {
 
       const response = await ApiClient.request<GoogleLoginApiResponse['data']>(
         'POST',
-        `/auth${AUTH_PATHS.GOOGLE_LOGIN}`,
+        AUTH_PATHS.GOOGLE_LOGIN,
         requestData
       );
 
@@ -494,7 +503,7 @@ export class UserLoginService {
 
     const response = await ApiClient.request<RefreshApiResponse['data']>(
       'POST',
-      `/auth${AUTH_PATHS.REFRESH}`,
+      AUTH_PATHS.REFRESH,
       { refreshToken }
     );
     return response as RefreshApiResponse;
@@ -525,7 +534,7 @@ export class UserLoginService {
       if (allDevices) {
         const apiResponse = await ApiClient.request<LogoutApiResponse['data']>(
           'DELETE',
-          `/auth${AUTH_PATHS.SESSIONS}`,
+          AUTH_PATHS.SESSIONS,
           undefined,
           { requiresAuth: true }
         );
@@ -533,7 +542,7 @@ export class UserLoginService {
       } else {
         const apiResponse = await ApiClient.request<LogoutApiResponse['data']>(
           'POST',
-          `/auth${AUTH_PATHS.LOGOUT}`,
+          AUTH_PATHS.LOGOUT,
           { refreshToken, logoutFromAllDevices: false },
           { requiresAuth: true }
         );
@@ -577,7 +586,7 @@ export class UserLoginService {
 
       const response = await ApiClient.request<SessionsApiResponse['data']>(
         'GET',
-        `/auth${AUTH_PATHS.SESSIONS}`,
+        AUTH_PATHS.SESSIONS,
         undefined,
         { 
           requiresAuth: true,
@@ -603,7 +612,7 @@ export class UserLoginService {
     try {
       const response = await ApiClient.request<LogoutApiResponse['data']>(
         'DELETE',
-        `/auth${AUTH_PATHS.SESSIONS}`,
+        AUTH_PATHS.SESSIONS,
         undefined,
         { requiresAuth: true }
       );
@@ -633,7 +642,7 @@ export class UserLoginService {
   static async logoutFromDevice(sessionId: string): Promise<LogoutApiResponse> {
     const response = await ApiClient.request<LogoutApiResponse['data']>(
       'DELETE',
-      `/auth${AUTH_PATHS.SESSIONS}/${sessionId}`,
+      `${AUTH_PATHS.SESSIONS}/${sessionId}`,
       undefined,
       { requiresAuth: true }
     );
@@ -646,7 +655,7 @@ export class UserLoginService {
   static async linkGoogleAccount(googleToken: string): Promise<LinkAccountApiResponse> {
     const response = await ApiClient.request<LinkAccountApiResponse['data']>(
       'POST',
-      `/auth${AUTH_PATHS.LINK_GOOGLE}`,
+      AUTH_PATHS.LINK_GOOGLE,
       { googleToken },
       { requiresAuth: true }
     );
@@ -659,7 +668,7 @@ export class UserLoginService {
   static async forgotPassword(email: string): Promise<ForgotPasswordApiResponse> {
     const response = await ApiClient.request<ForgotPasswordApiResponse['data']>(
       'POST',
-      `/auth${AUTH_PATHS.FORGOT_PASSWORD}`,
+      AUTH_PATHS.FORGOT_PASSWORD,
       { email }
     );
     return response as ForgotPasswordApiResponse;
@@ -671,7 +680,7 @@ export class UserLoginService {
   static async resetPassword(token: string, newPassword: string): Promise<ResetPasswordApiResponse> {
     const response = await ApiClient.request<ResetPasswordApiResponse['data']>(
       'POST',
-      `/auth${AUTH_PATHS.RESET_PASSWORD}`,
+      AUTH_PATHS.RESET_PASSWORD,
       { token, newPassword }
     );
     return response as ResetPasswordApiResponse;

@@ -79,7 +79,7 @@ export class UserRegistrationService {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = `${this.API_BASE_URL}${this.API_PREFIX}${endpoint}`;
+    const url = `${this.API_BASE_URL}${this.API_PREFIX}/auth${endpoint}`;
     
     const requestOptions: RequestInit = {
       headers: this.getAuthHeaders(),
@@ -117,7 +117,7 @@ export class UserRegistrationService {
    * Register new user with email/password
    */
   static async register(userData: UserRegistrationRequest): Promise<ApiResponse<RegistrationResponse>> {
-    const response = await this.makeRequest<RegistrationResponse>(`/auth${AUTH_PATHS.REGISTER}`, {
+    const response = await this.makeRequest<RegistrationResponse>(AUTH_PATHS.REGISTER, {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -137,7 +137,7 @@ export class UserRegistrationService {
   static async registerWithGoogle(
     googleData: GoogleAuthRequest
   ): Promise<ApiResponse<RegistrationResponse>> {
-    const response = await this.makeRequest<RegistrationResponse>(`/auth${AUTH_PATHS.GOOGLE_AUTH}`, {
+    const response = await this.makeRequest<RegistrationResponse>(AUTH_PATHS.GOOGLE_AUTH, {
       method: 'POST',
       body: JSON.stringify(googleData),
     });
@@ -157,7 +157,7 @@ export class UserRegistrationService {
   static async verifyEmail(
     verificationData: EmailVerificationRequest
   ): Promise<ApiResponse<EmailVerificationResponse>> {
-    const response = await this.makeRequest<EmailVerificationResponse>(`/auth${AUTH_PATHS.VERIFY_EMAIL}`, {
+    const response = await this.makeRequest<EmailVerificationResponse>(AUTH_PATHS.VERIFY_EMAIL, {
       method: 'POST',
       body: JSON.stringify(verificationData),
     });
@@ -182,7 +182,7 @@ export class UserRegistrationService {
   static async resendVerification(
     resendData: ResendVerificationRequest
   ): Promise<ApiResponse<ResendVerificationResponse>> {
-    return this.makeRequest<ResendVerificationResponse>(`/auth${AUTH_PATHS.RESEND_VERIFICATION}`, {
+    return this.makeRequest<ResendVerificationResponse>(AUTH_PATHS.RESEND_VERIFICATION, {
       method: 'POST',
       body: JSON.stringify(resendData),
     });
@@ -193,7 +193,7 @@ export class UserRegistrationService {
    */
   static async checkEmailAvailability(email: string): Promise<ApiResponse<EmailAvailabilityResponse>> {
     const encodedEmail = encodeURIComponent(email);
-    return this.makeRequest<EmailAvailabilityResponse>(`/auth/check-email/${encodedEmail}`, {
+    return this.makeRequest<EmailAvailabilityResponse>(`/check-email/${encodedEmail}`, {
       method: 'GET',
     });
   }
@@ -209,7 +209,7 @@ export class UserRegistrationService {
     }
 
     try {
-      const response = await this.makeRequest<{ accessToken: string }>(`/auth${AUTH_PATHS.REFRESH}`, {
+      const response = await this.makeRequest<{ accessToken: string }>(AUTH_PATHS.REFRESH, {
         method: 'POST',
         body: JSON.stringify({ refreshToken }),
       });
@@ -243,7 +243,7 @@ export class UserRegistrationService {
     // Optionally notify server to blacklist token
     if (refreshToken) {
       try {
-        await this.makeRequest(`/auth${AUTH_PATHS.LOGOUT}`, {
+        await this.makeRequest(AUTH_PATHS.LOGOUT, {
           method: 'POST',
           body: JSON.stringify({ refreshToken }),
         });

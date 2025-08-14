@@ -31,7 +31,7 @@ export class LoginController {
    */
   static sessionLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 minute
-    max: 20, // Maximum 20 session operations per minute
+    max: 60, // Increased from 20 to 60 session operations per minute
     message: {
       success: false,
       error: 'Too many session requests, please try again later',

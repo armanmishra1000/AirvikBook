@@ -194,7 +194,7 @@ class ApiClient {
       }
 
       // Make the request
-      const response = await fetch(`${this.BASE_URL}${this.API_PREFIX}${endpoint}`, config);
+      const response = await fetch(`${this.BASE_URL}${this.API_PREFIX}/auth${endpoint}`, config);
 
       // Handle response
       const responseData = await response.json();
@@ -361,7 +361,7 @@ export class PasswordManagementService {
     
     return ApiClient.request<ForgotPasswordResponse>(
       'POST',
-      `/auth${AUTH_PATHS.FORGOT_PASSWORD}`,
+      AUTH_PATHS.FORGOT_PASSWORD,
       request,
       { requiresAuth: false }
     );
@@ -379,7 +379,7 @@ export class PasswordManagementService {
     
     return ApiClient.request<ResetPasswordResponse>(
       'POST',
-      `/auth${AUTH_PATHS.RESET_PASSWORD}`,
+      AUTH_PATHS.RESET_PASSWORD,
       request,
       { requiresAuth: false }
     );
@@ -391,7 +391,7 @@ export class PasswordManagementService {
   static async verifyResetToken(token: string): Promise<ResetTokenValidationApiResponse> {
     return ApiClient.request<ResetTokenValidationResponse>(
       'GET',
-      `/auth${AUTH_PATHS.RESET_TOKEN}/${token}`,
+      `${AUTH_PATHS.RESET_TOKEN}/${token}`,
       undefined,
       { requiresAuth: false }
     );
@@ -419,7 +419,7 @@ export class PasswordManagementService {
     
     return ApiClient.request<ChangePasswordResponse>(
       'PUT',
-      `/auth${AUTH_PATHS.PASSWORD}`,
+      AUTH_PATHS.PASSWORD,
       request,
       { requiresAuth: true }
     );
@@ -436,7 +436,7 @@ export class PasswordManagementService {
     
     return ApiClient.request<SetPasswordResponse>(
       'POST',
-      `/auth${AUTH_PATHS.SET_PASSWORD}`,
+      AUTH_PATHS.SET_PASSWORD,
       request,
       { requiresAuth: true }
     );
@@ -453,19 +453,19 @@ export class PasswordManagementService {
     
     return ApiClient.request<RemovePasswordResponse>(
       'DELETE',
-      `/auth${AUTH_PATHS.PASSWORD}`,
+      AUTH_PATHS.PASSWORD,
       request,
       { requiresAuth: true }
     );
   }
 
   /**
-   * Get current password status and recommendations
+   * Get password status for current user
    */
   static async getPasswordStatus(): Promise<PasswordStatusApiResponse> {
     return ApiClient.request<PasswordStatusResponse>(
       'GET',
-      `/auth${AUTH_PATHS.PASSWORD_STATUS}`,
+      AUTH_PATHS.PASSWORD_STATUS,
       undefined,
       { requiresAuth: true }
     );

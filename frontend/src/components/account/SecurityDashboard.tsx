@@ -77,8 +77,9 @@ export const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
         </h2>
         <SessionManager 
           showCurrentSessionFirst={true}
-          autoRefresh={true}
-          refreshInterval={30000}
+
+          autoRefresh={false} // Disabled by default to prevent rate limiting
+          refreshInterval={300000} // 5 minutes instead of 30 seconds
         />
       </div>
     </div>
