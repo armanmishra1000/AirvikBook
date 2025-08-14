@@ -35,6 +35,7 @@ import {
 
 // Import UserLoginService for API client functionality
 import { UserLoginService } from './userLogin.service';
+import TokenRefreshInterceptor from '../utils/tokenRefreshInterceptor';
 
 // =====================================================
 // SHARED API CLIENT (following userLogin patterns)
@@ -189,37 +190,39 @@ class ProfileApiClient {
 
 export class UserProfileService {
   /**
-   * Get user profile
+   * Get user profile with automatic token refresh
    * Endpoint: GET /user/profile
    */
   static async getProfile(cacheBust?: boolean): Promise<GetProfileApiResponse> {
-    try {
-      // Add cache-busting parameter if requested
-      const endpoint = cacheBust 
-        ? `/user/profile?_t=${Date.now()}` 
-        : '/user/profile';
+    return TokenRefreshInterceptor.interceptRequest(async () => {
+      try {
+        // Add cache-busting parameter if requested
+        const endpoint = cacheBust 
+          ? `/user/profile?_t=${Date.now()}` 
+          : '/user/profile';
 
-      const response = await ProfileApiClient.request<UserProfile>(
-        'GET',
-        endpoint,
-        undefined,
-        { requiresAuth: true }
-      );
+        const response = await ProfileApiClient.request<UserProfile>(
+          'GET',
+          endpoint,
+          undefined,
+          { requiresAuth: true }
+        );
 
-      // MANDATORY: Use type guards for safe response handling
-      if (isSuccessResponse(response)) {
+        // MANDATORY: Use type guards for safe response handling
+        if (isSuccessResponse(response)) {
+          return response as GetProfileApiResponse;
+        }
+
         return response as GetProfileApiResponse;
+      } catch (error) {
+        console.error('Failed to get profile:', error);
+        return {
+          success: false,
+          error: 'Failed to load profile',
+          code: 'PROFILE_LOAD_FAILED'
+        };
       }
-
-      return response as GetProfileApiResponse;
-    } catch (error) {
-      console.error('Failed to get profile:', error);
-      return {
-        success: false,
-        error: 'Failed to load profile',
-        code: 'PROFILE_LOAD_FAILED'
-      };
-    }
+    });
   }
 
   /**

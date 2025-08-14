@@ -8,6 +8,7 @@ import ProfileService from '../../services/user/profile.service';
 export class ProfilePictureController {
   /**
    * Rate limiting middleware for profile picture uploads
+   * DISABLED IN DEVELOPMENT
    */
   static pictureUploadLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -19,10 +20,15 @@ export class ProfilePictureController {
     },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (_req: Request) => {
+      // Skip rate limiting for development
+      return process.env.NODE_ENV === 'development';
+    }
   });
 
   /**
    * Rate limiting for Google sync operations
+   * DISABLED IN DEVELOPMENT
    */
   static googleSyncLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -34,6 +40,10 @@ export class ProfilePictureController {
     },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (_req: Request) => {
+      // Skip rate limiting for development
+      return process.env.NODE_ENV === 'development';
+    }
   });
 
   /**

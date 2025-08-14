@@ -12,6 +12,7 @@ import { JwtService } from '../services/jwt.service';
 export class AuthController {
   /**
    * Rate limiting middleware for registration endpoints
+   * DISABLED IN DEVELOPMENT
    */
   static registrationLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -23,10 +24,15 @@ export class AuthController {
     },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (_req: Request) => {
+      // Skip rate limiting for development
+      return process.env.NODE_ENV === 'development';
+    }
   });
 
   /**
    * Rate limiting for verification email resend
+   * DISABLED IN DEVELOPMENT
    */
   static verificationLimiter = rateLimit({
     windowMs: 5 * 60 * 1000, // 5 minutes
@@ -38,6 +44,10 @@ export class AuthController {
     },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (_req: Request) => {
+      // Skip rate limiting for development
+      return process.env.NODE_ENV === 'development';
+    }
   });
 
   /**

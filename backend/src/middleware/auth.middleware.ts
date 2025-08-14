@@ -187,6 +187,7 @@ export class AuthMiddleware {
 
   /**
    * Rate limiting by user ID (for authenticated users)
+   * DISABLED IN DEVELOPMENT
    */
   static createUserRateLimit(options: {
     windowMs: number;
@@ -196,6 +197,11 @@ export class AuthMiddleware {
     const userRequests = new Map<string, { count: number; resetTime: number }>();
 
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      // Skip rate limiting for development
+      if (process.env.NODE_ENV === 'development') {
+        return next();
+      }
+
       if (!req.user) {
         return next(); // Skip rate limiting for unauthenticated users
       }

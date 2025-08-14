@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { UserLoginService } from '../services/userLogin.service';
 import { AUTH_PATHS } from '../lib/paths';
+import { AUTH_CONFIG } from '../lib/config';
 import { PasswordManagementService } from '../services/passwordManagement.service';
 import { useToastHelpers } from '../components/common/Toast';
 import {
@@ -274,45 +275,83 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       clearTimeout(tokenRefreshTimeoutRef.current);
     }
 
-    // Setup automatic refresh 2 minutes before expiration (13 minutes)
-    const refreshTimeout = 13 * 60 * 1000; // 13 minutes
+    // Check if token is already expired or expiring soon
+    const isExpired = UserLoginService.isTokenExpired();
+    const timeUntilExpiration = getTimeUntilExpiration();
+    
+    if (isExpired) {
+      console.log('Token already expired, attempting immediate refresh...');
+      // Try immediate refresh
+      handleImmediateTokenRefresh();
+      return;
+    }
+
+    // If token expires in less than 5 minutes, refresh immediately
+    if (timeUntilExpiration !== null && timeUntilExpiration <= (AUTH_CONFIG.IMMEDIATE_REFRESH_THRESHOLD / 60000)) {
+      console.log('Token expiring soon, refreshing immediately...');
+      handleImmediateTokenRefresh();
+      return;
+    }
+
+    // Setup automatic refresh 3 minutes before expiration
+    const refreshTimeout = Math.max((timeUntilExpiration || 20) - (AUTH_CONFIG.REFRESH_BUFFER / 60000), 1) * 60 * 1000;
     
     console.log(`Setting up token refresh in ${refreshTimeout / 1000 / 60} minutes`);
     
     tokenRefreshTimeoutRef.current = setTimeout(async () => {
-      try {
-        console.log('Executing automatic token refresh...');
-        const refreshResult = await UserLoginService.refreshToken();
-        
-        if (isSuccessResponse(refreshResult)) {
-          console.log('Automatic token refresh successful');
-          dispatch({
-            type: 'TOKEN_REFRESH',
-            payload: {
-              accessToken: refreshResult.data.accessToken,
-              user: refreshResult.data.user
-            }
-          });
-          
-          // Setup next refresh
-          setupTokenRefresh();
-        } else {
-          console.log('Automatic token refresh failed:', refreshResult.error);
-          // Refresh failed, logout user
-          await handleLogout();
-          // Redirect to login using router if available, otherwise fallback to window.location
-          if (typeof window !== 'undefined') {
-            window.location.href = AUTH_PATHS.LOGIN;
+      await handleImmediateTokenRefresh();
+    }, refreshTimeout);
+  };
+
+  const handleImmediateTokenRefresh = async () => {
+    try {
+      console.log('Executing token refresh...');
+      const refreshResult = await UserLoginService.refreshToken();
+      
+      if (isSuccessResponse(refreshResult)) {
+        console.log('Token refresh successful');
+        dispatch({
+          type: 'TOKEN_REFRESH',
+          payload: {
+            accessToken: refreshResult.data.accessToken,
+            user: refreshResult.data.user
           }
-        }
-      } catch (error) {
-        console.error('Token refresh error:', error);
+        });
+        
+        // Setup next refresh
+        setupTokenRefresh();
+      } else {
+        console.log('Token refresh failed:', refreshResult.error);
+        // Refresh failed, logout user
         await handleLogout();
+        // Redirect to login
         if (typeof window !== 'undefined') {
           window.location.href = AUTH_PATHS.LOGIN;
         }
       }
-    }, refreshTimeout);
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      await handleLogout();
+      if (typeof window !== 'undefined') {
+        window.location.href = AUTH_PATHS.LOGIN;
+      }
+    }
+  };
+
+  // Add utility function to get time until expiration
+  const getTimeUntilExpiration = (): number | null => {
+    try {
+      const token = sessionStorage.getItem('airvik_access_token');
+      if (!token) return null;
+
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp * 1000; // Convert to milliseconds
+      const now = Date.now();
+      const timeUntilExpiration = exp - now;
+      return Math.ceil(timeUntilExpiration / (1000 * 60)); // Convert to minutes
+    } catch {
+      return null;
+    }
   };
 
   // Clear timeout on unmount

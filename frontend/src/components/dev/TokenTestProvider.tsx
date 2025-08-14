@@ -1,25 +1,26 @@
 'use client';
 
 import { useEffect } from 'react';
+import { TokenTestUtils } from '../../utils/tokenTestUtils';
 
-// =====================================================
-// TOKEN TEST PROVIDER
-// =====================================================
-// Client-side component to setup test utilities in development
+interface TokenTestProviderProps {
+  children: React.ReactNode;
+}
 
-export function TokenTestProvider() {
+/**
+ * Development component that sets up token testing utilities
+ * Only active in development mode
+ */
+export const TokenTestProvider: React.FC<TokenTestProviderProps> = ({ children }) => {
   useEffect(() => {
-    // Only import and setup test utilities in development
+    // Only setup test environment in development
     if (process.env.NODE_ENV === 'development') {
-      import('../../utils/tokenTestUtils').then(({ TokenTestUtils }) => {
-        TokenTestUtils.setupTestEnvironment();
-      }).catch((error) => {
-        console.warn('Failed to setup token test utilities:', error);
-      });
+      console.log('🔧 Development mode detected - setting up token test environment');
+      TokenTestUtils.setupEnhancedTestEnvironment();
     }
   }, []);
 
-  return null; // This component doesn't render anything
-}
+  return <>{children}</>;
+};
 
 export default TokenTestProvider;

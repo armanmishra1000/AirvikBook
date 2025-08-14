@@ -22,10 +22,11 @@ export default function RootLayout({
         <ErrorBoundary>
           <ToastProvider>
             <AuthProvider>
-              <TokenTestProvider />
-              <LayoutWrapper>
-                {children}
-              </LayoutWrapper>
+              <TokenTestProvider>
+                <LayoutWrapper>
+                  {children}
+                </LayoutWrapper>
+              </TokenTestProvider>
             </AuthProvider>
           </ToastProvider>
         </ErrorBoundary>

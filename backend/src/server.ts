@@ -91,113 +91,114 @@ app.use(ApiVersioningMiddleware.addDeprecationWarning);
 // Apply enhanced request logging
 app.use(RequestLoggingMiddleware.logRequest);
 
-// Rate limiting configuration
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: {
-    success: false,
-    error: 'Too many requests from this IP',
-    code: 'RATE_LIMIT_EXCEEDED',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Rate limiting configuration - DISABLED IN DEVELOPMENT
+const isDevelopment = process.env.NODE_ENV === 'development';
 
-// Apply global limiter
-app.use(globalLimiter);
-
-// Specific limiters for sensitive endpoints
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 attempts per 15 minutes
-  message: {
-    success: false,
-    error: 'Too many authentication attempts',
-    code: 'AUTH_RATE_LIMIT_EXCEEDED',
-  },
-  skipSuccessfulRequests: true,
-});
-
-const registrationLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // 3 registration attempts per hour
-  message: {
-    success: false,
-    error: 'Too many registration attempts',
-    code: 'REGISTRATION_RATE_LIMIT_EXCEEDED',
-  },
-});
-
-const emailLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // 10 email requests per hour
-  message: {
-    success: false,
-    error: 'Too many email requests',
-    code: 'EMAIL_RATE_LIMIT_EXCEEDED',
-  },
-});
-
-// Secure file serving - requires authentication
-// Remove public static file serving for security
-// app.use('/uploads', express.static(...));
-
-// Add secure file serving route (will be implemented with authentication middleware)
-app.get('/uploads/:filename', (_req, res) => {
-  // TODO: Add authentication middleware here
-  // For now, return 403 to prevent unauthorized access
-  res.status(403).json({
-    success: false,
-    error: 'File access requires authentication',
-    code: 'AUTHENTICATION_REQUIRED',
-  });
-});
-
-// API prefix
+// API prefix - defined outside conditional blocks
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
 
-// Routes with rate limiting
-app.use(`${API_PREFIX}/email`, emailLimiter, emailRoutes);
-app.use(`${API_PREFIX}/auth`, authLimiter, authRoutes);
-app.use(`${API_PREFIX}/user`, profileRoutes);
-app.use(`${API_PREFIX}/storage`, storageRoutes);
-app.use(`${API_PREFIX}/security`, securityRoutes);
-
-// Apply registration limiter to specific registration endpoint
-app.use(`${API_PREFIX}/auth/register`, registrationLimiter);
-
-// Health check route with enhanced security
-app.get(`${API_PREFIX}/health`, rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 10, // 10 requests per minute
-  message: {
-    success: false,
-    error: 'Too many health check requests',
-    code: 'HEALTH_CHECK_RATE_LIMIT_EXCEEDED',
-  },
-}), (_req: Request, res: Response) => {
-  const isProduction = process.env.NODE_ENV === 'production';
+if (!isDevelopment) {
+  console.log('🔒 Rate limiting enabled for production/staging environment');
   
-  // Minimal response for production
-  if (isProduction) {
+  // Rate limiting configuration
+  const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: {
+      success: false,
+      error: 'Too many requests from this IP',
+      code: 'RATE_LIMIT_EXCEEDED',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  // Apply global limiter
+  app.use(globalLimiter);
+
+  // Specific limiters for sensitive endpoints
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 attempts per 15 minutes
+    message: {
+      success: false,
+      error: 'Too many authentication attempts',
+      code: 'AUTH_RATE_LIMIT_EXCEEDED',
+    },
+    skipSuccessfulRequests: true,
+  });
+
+  const registrationLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 3, // 3 registration attempts per hour
+    message: {
+      success: false,
+      error: 'Too many registration attempts',
+      code: 'REGISTRATION_RATE_LIMIT_EXCEEDED',
+    },
+  });
+
+  const emailLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10, // 10 email requests per hour
+    message: {
+      success: false,
+      error: 'Too many email requests',
+      code: 'EMAIL_RATE_LIMIT_EXCEEDED',
+    },
+  });
+
+  // Routes with rate limiting (PRODUCTION ONLY)
+  app.use(`${API_PREFIX}/email`, emailLimiter, emailRoutes);
+  app.use(`${API_PREFIX}/auth`, authLimiter, authRoutes);
+  app.use(`${API_PREFIX}/user`, profileRoutes);
+  app.use(`${API_PREFIX}/storage`, storageRoutes);
+  app.use(`${API_PREFIX}/security`, securityRoutes);
+
+  // Apply registration limiter to specific registration endpoint
+  app.use(`${API_PREFIX}/auth/register`, registrationLimiter);
+
+  // Health check route with enhanced security
+  app.get(`${API_PREFIX}/health`, rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 10, // 10 requests per minute
+    message: {
+      success: false,
+      error: 'Too many health check requests',
+      code: 'HEALTH_CHECK_RATE_LIMIT_EXCEEDED',
+    },
+  }), (_req: Request, res: Response) => {
     res.json({
       status: 'OK',
       timestamp: new Date().toISOString(),
     });
-  } else {
-    // Development response with more details
+  });
+
+} else {
+  console.log('🚀 Rate limiting DISABLED for development environment');
+
+  // Routes WITHOUT rate limiting (DEVELOPMENT ONLY)
+  app.use(`${API_PREFIX}/email`, emailRoutes);
+  app.use(`${API_PREFIX}/auth`, authRoutes);
+  app.use(`${API_PREFIX}/user`, profileRoutes);
+  app.use(`${API_PREFIX}/storage`, storageRoutes);
+  app.use(`${API_PREFIX}/security`, securityRoutes);
+
+  // Health check route without rate limiting
+  app.get(`${API_PREFIX}/health`, (_req: Request, res: Response) => {
     res.json({
       status: 'OK',
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
+      environment: 'development',
       version: process.env.npm_package_version || '1.0.0',
+      rateLimiting: 'DISABLED',
     });
-  }
-});
+  });
+}
 
 // Root route
 app.get('/', (_req: Request, res: Response) => {
+  const API_PREFIX = process.env.API_PREFIX || '/api/v1';
   res.json({
     success: true,
     data: {

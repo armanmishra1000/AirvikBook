@@ -506,6 +506,18 @@ export class UserLoginService {
       AUTH_PATHS.REFRESH,
       { refreshToken }
     );
+
+    // If refresh was successful, update stored tokens and user data
+    if (isSuccessResponse(response) && response.data) {
+      // Update stored access token
+      TokenStorage.setAccessToken(response.data.accessToken);
+      
+      // Update user data if provided
+      if (response.data.user) {
+        TokenStorage.setUserData(response.data.user);
+      }
+    }
+
     return response as RefreshApiResponse;
   }
 

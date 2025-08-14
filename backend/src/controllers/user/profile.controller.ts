@@ -8,6 +8,7 @@ import { ProfileData, PrivacySettings } from '../../services/user/profile.servic
 export class ProfileController {
   /**
    * Rate limiting middleware for profile updates
+   * DISABLED IN DEVELOPMENT
    */
   static profileUpdateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -19,10 +20,15 @@ export class ProfileController {
     },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (_req: Request) => {
+      // Skip rate limiting for development
+      return process.env.NODE_ENV === 'development';
+    }
   });
 
   /**
    * Rate limiting for Google account operations
+   * DISABLED IN DEVELOPMENT
    */
   static googleOperationLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -34,6 +40,10 @@ export class ProfileController {
     },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (_req: Request) => {
+      // Skip rate limiting for development
+      return process.env.NODE_ENV === 'development';
+    }
   });
 
   /**

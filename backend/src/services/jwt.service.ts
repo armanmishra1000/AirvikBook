@@ -223,6 +223,7 @@ export class JwtService {
   static async refreshAccessToken(refreshToken: string): Promise<{
     success: boolean;
     accessToken?: string;
+    user?: any;
     error?: string;
     code?: string;
   }> {
@@ -239,7 +240,20 @@ export class JwtService {
 
       // Check if user still exists and is active
       const user = await prisma.user.findUnique({
-        where: { id: validation.payload!.userId }
+        where: { id: validation.payload!.userId },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          role: true,
+          isActive: true,
+          isEmailVerified: true,
+          mobileNumber: true,
+          profilePicture: true,
+          googleId: true,
+          lastLoginAt: true,
+          createdAt: true
+        }
       });
 
       if (!user || !user.isActive) {
@@ -259,7 +273,20 @@ export class JwtService {
 
       return {
         success: true,
-        accessToken: newAccessToken
+        accessToken: newAccessToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          role: user.role,
+          isEmailVerified: user.isEmailVerified,
+          mobileNumber: user.mobileNumber,
+          profilePicture: user.profilePicture,
+          googleId: user.googleId,
+          lastLoginAt: user.lastLoginAt,
+          createdAt: user.createdAt,
+          isActive: user.isActive
+        }
       };
 
     } catch (error) {

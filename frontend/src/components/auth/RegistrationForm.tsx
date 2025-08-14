@@ -339,7 +339,7 @@ export default function RegistrationForm({
         <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
           Create Account
         </h1>
-        <p className="text-body text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600 text-body dark:text-gray-400">
           Join AirVikBook to start booking amazing hotels
         </p>
       </div>
@@ -383,16 +383,16 @@ export default function RegistrationForm({
 
               {/* Email checking indicator */}
               {isCheckingEmail && (
-                <div className="absolute right-space-3 top-1/2 transform -translate-y-1/2">
-                  <div className="animate-spin h-4 w-4 border-2 border-airvik-blue border-t-transparent rounded-radius-full" />
+                <div className="absolute transform -translate-y-1/2 right-space-3 top-1/2">
+                  <div className="w-4 h-4 border-2 animate-spin border-airvik-blue border-t-transparent rounded-radius-full" />
                 </div>
               )}
 
               {/* Email availability indicator */}
               {emailAvailable === true && (
-                <div className="absolute right-space-3 top-1/2 transform -translate-y-1/2">
+                <div className="absolute transform -translate-y-1/2 right-space-3 top-1/2">
                   <svg
-                    className="h-4 w-4 text-success"
+                    className="w-4 h-4 text-success"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -528,19 +528,13 @@ export default function RegistrationForm({
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-space-3 top-1/2 transform -translate-y-1/2
-              p-space-2 rounded-radius-sm
-              text-gray-500 dark:text-gray-400
-              hover:text-gray-700 dark:hover:text-gray-200
-              focus:outline-none
-              disabled:opacity-50 disabled:cursor-not-allowed
-              transition-colors duration-normal"
+                className="absolute text-gray-500 transition-colors transform -translate-y-1/2 right-space-3 top-1/2 p-space-2 rounded-radius-sm dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed duration-normal"
                 disabled={isLoading}
               >
                 {showPassword ? (
-                  <Eye className="h-5 w-5" />
+                  <Eye className="w-5 h-5" />
                 ) : (
-                  <EyeOff className="h-5 w-5" />
+                  <EyeOff className="w-5 h-5" />
                 )}
               </button>
             </div>
@@ -589,19 +583,13 @@ export default function RegistrationForm({
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-space-3 top-1/2 transform -translate-y-1/2
-              p-space-2 rounded-radius-sm
-              text-gray-500 dark:text-gray-400
-              hover:text-gray-700 dark:hover:text-gray-200
-              focus:outline-none
-              disabled:opacity-50 disabled:cursor-not-allowed
-              transition-colors duration-normal"
+                className="absolute text-gray-500 transition-colors transform -translate-y-1/2 right-space-3 top-1/2 p-space-2 rounded-radius-sm dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed duration-normal"
                 disabled={isLoading}
               >
                 {showConfirmPassword ? (
-                  <Eye className="h-5 w-5" />
+                  <Eye className="w-5 h-5" />
                 ) : (
-                  <EyeOff className="h-5 w-5" />
+                  <EyeOff className="w-5 h-5" />
                 )}
               </button>
             </div>
@@ -631,7 +619,7 @@ export default function RegistrationForm({
                     href="/terms"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-airvik-blue underline transition-colors duration-normal"
+                    className="underline transition-colors text-airvik-blue duration-normal"
                   >
                     Terms and Conditions
                   </a>{" "}
@@ -640,7 +628,7 @@ export default function RegistrationForm({
                     href="/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-airvik-blue underline transition-colors duration-normal"
+                    className="underline transition-colors text-airvik-blue duration-normal"
                   >
                     Privacy Policy
                   </a>
@@ -653,11 +641,11 @@ export default function RegistrationForm({
           <button
             type="submit"
             disabled={isLoading || emailAvailable === false}
-            className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
+            className="w-full font-medium transition-all duration-100 ease-linear bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
+                <div className="w-5 h-5 border-2 animate-spin border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
                 Creating Account...
               </div>
             ) : (
@@ -672,7 +660,7 @@ export default function RegistrationForm({
             <div className="w-full border-t border-gray-300 dark:border-gray-600" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-space-2 bg-airvik-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+            <span className="text-gray-500 px-space-2 bg-airvik-white dark:bg-gray-800 dark:text-gray-400">
               Or continue with email
             </span>
           </div>
@@ -691,12 +679,12 @@ export default function RegistrationForm({
 
 
         {/* Login Link */}
-        <div className="mt-space-4 text-center">
-          <p className="text-body text-gray-600 dark:text-gray-300">
+        <div className="text-center mt-space-4">
+          <p className="text-gray-600 text-body dark:text-gray-300">
             Already have an account?{" "}
             <a
-              href="/auth/login"
-              className="text-airvik-blue transition-colors duration-normal"
+              href="/login"
+              className="transition-colors text-airvik-blue duration-normal"
             >
               Sign in here
             </a>
