@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, useIsAuthenticated } from '../../../context/AuthContext';
+import { AUTH_PATHS } from '../../../lib/paths';
 import { PasswordManagementService } from '../../../services/passwordManagement.service';
 import { PasswordInput } from '../../../components/auth/PasswordInput';
 import { PasswordRequirements } from '../../../components/auth/PasswordRequirements';
@@ -63,7 +64,7 @@ const SecurityPage: React.FC = () => {
   useEffect(() => {
     // Redirect if not authenticated
     if (!isAuthenticated && !authState.isLoading) {
-      router.replace('/auth/login');
+      router.replace(AUTH_PATHS.LOGIN);
       return;
     }
 

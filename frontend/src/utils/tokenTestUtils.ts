@@ -4,6 +4,73 @@
 // =====================================================
 // Utilities to help test token refresh functionality during development
 
+import { UserLoginService } from '../services/userLogin.service';
+
+/**
+ * Utility functions for testing token expiration scenarios
+ * These functions help simulate and test token expiration handling
+ */
+
+/**
+ * Check if the current access token is expired
+ */
+export const isAccessTokenExpired = (): boolean => {
+  return UserLoginService.isTokenExpired();
+};
+
+/**
+ * Get token expiration time (for debugging)
+ */
+export const getTokenExpirationTime = (): Date | null => {
+  try {
+    const token = sessionStorage.getItem('airvik_access_token');
+    if (!token) return null;
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const exp = payload.exp * 1000; // Convert to milliseconds
+    return new Date(exp);
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Get time until token expires (in minutes)
+ */
+export const getTimeUntilExpiration = (): number | null => {
+  const expirationTime = getTokenExpirationTime();
+  if (!expirationTime) return null;
+
+  const now = new Date();
+  const timeUntilExpiration = expirationTime.getTime() - now.getTime();
+  return Math.ceil(timeUntilExpiration / (1000 * 60)); // Convert to minutes
+};
+
+/**
+ * Check if token will expire soon (within 5 minutes)
+ */
+export const isTokenExpiringSoon = (): boolean => {
+  const timeUntilExpiration = getTimeUntilExpiration();
+  return timeUntilExpiration !== null && timeUntilExpiration <= 5;
+};
+
+/**
+ * Log current token status for debugging
+ */
+export const logTokenStatus = (): void => {
+  const isExpired = isAccessTokenExpired();
+  const expirationTime = getTokenExpirationTime();
+  const timeUntilExpiration = getTimeUntilExpiration();
+  const isExpiringSoon = isTokenExpiringSoon();
+
+  console.log('=== Token Status ===');
+  console.log('Is Expired:', isExpired);
+  console.log('Expiration Time:', expirationTime);
+  console.log('Time Until Expiration (minutes):', timeUntilExpiration);
+  console.log('Is Expiring Soon:', isExpiringSoon);
+  console.log('===================');
+};
+
 export class TokenTestUtils {
   /**
    * Manually trigger token refresh for testing

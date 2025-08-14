@@ -2,9 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LoginForm } from '../../../components/auth/LoginForm';
-import GoogleOAuthRedirectButton from '../../../components/auth/GoogleOAuthRedirectButton';
-import { useAuth, useIsAuthenticated } from '../../../context/AuthContext';
+import { LoginForm } from '../../components/auth/LoginForm';
+import GoogleOAuthRedirectButton from '../../components/auth/GoogleOAuthRedirectButton';
+import { useAuth, useIsAuthenticated } from '../../context/AuthContext';
 
 // =====================================================
 // LOGIN PAGE COMPONENT

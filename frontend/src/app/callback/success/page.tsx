@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '../../../../context/AuthContext';
-import { UserLoginService } from '../../../../services/userLogin.service';
+import { useAuth } from '../../../context/AuthContext';
 
 // =====================================================
 // GOOGLE OAUTH CALLBACK SUCCESS PAGE
@@ -74,7 +73,7 @@ const GoogleOAuthCallbackSuccess: React.FC = () => {
         
         // Redirect to login page after error
         setTimeout(() => {
-          router.replace('/auth/login');
+          router.replace('/login');
         }, 3000);
       } finally {
         setIsProcessing(false);

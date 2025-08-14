@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { AUTH_PATHS } from '../../lib/paths';
 
 export default function ContactSupportPage() {
   const [selectedCategory, setSelectedCategory] = useState('general');
@@ -209,7 +210,7 @@ export default function ContactSupportPage() {
         {/* Back to Login */}
         <div className="mt-space-8 text-center">
           <Link 
-            href="/auth/login" 
+            href={AUTH_PATHS.LOGIN} 
             className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal font-medium"
           >
             ← Back to Login

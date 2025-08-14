@@ -9,7 +9,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import UserRegistrationService from '../../../services/userRegistration.service';
+import { AUTH_PATHS } from '../../lib/paths';
+import UserRegistrationService from '../../services/userRegistration.service';
 
 export default function SuccessPage() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function SuccessPage() {
       setUser(currentUser);
     } else {
       // If no user data, redirect to login
-      router.push('/auth/login');
+      router.push(AUTH_PATHS.LOGIN);
     }
   }, [router]);
 
@@ -60,14 +61,14 @@ export default function SuccessPage() {
           {/* Confetti Effect */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-6xl animate-pulse">🎉</div>
+              <div className="text-hero animate-pulse">🎉</div>
             </div>
           </div>
         </div>
 
         {/* Welcome Message */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-space-8 mb-space-6">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-space-4">
+          <h1 className="text-h1 text-gray-900 dark:text-white mb-space-4">
             Welcome to AirVikBook!
           </h1>
           

@@ -34,7 +34,7 @@ export class RegistrationEmailService {
   private static generateVerificationUrl(token: string, email: string): string {
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const encodedEmail = encodeURIComponent(email);
-    return `${baseUrl}/auth/verify-email?token=${token}&email=${encodedEmail}`;
+    return `${baseUrl}/verify-email?token=${token}&email=${encodedEmail}`;
   }
 
   /**
@@ -42,7 +42,7 @@ export class RegistrationEmailService {
    */
   private static generateLoginUrl(): string {
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    return `${baseUrl}/auth/login`;
+    return `${baseUrl}/login`;
   }
 
   /**
@@ -154,7 +154,7 @@ export class RegistrationEmailService {
 
       // Generate reset link (will be implemented in password reset feature)
       const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const resetLink = `${baseUrl}/auth/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+      const resetLink = `${baseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
       // Generate email template
       const template = EmailTemplatesService.generatePasswordResetTemplate({

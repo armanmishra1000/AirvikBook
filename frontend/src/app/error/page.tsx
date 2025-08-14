@@ -35,7 +35,7 @@ const AuthErrorPage: React.FC = () => {
         
         <div className="space-y-3">
           <button
-            onClick={() => router.push('/auth/login')}
+            onClick={() => router.push('/login')}
             className="w-full px-6 py-3 font-medium transition-colors duration-200 rounded-md bg-airvik-blue text-airvik-white hover:bg-airvik-bluehover focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2"
           >
             Try Again

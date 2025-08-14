@@ -64,7 +64,7 @@ export class GoogleOAuthRedirectController {
       
       // Redirect to frontend with error
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const errorUrl = `${frontendUrl}/auth/error?message=OAuth initialization failed`;
+      const errorUrl = `${frontendUrl}/error?message=OAuth initialization failed`;
       res.redirect(errorUrl);
     }
   }
@@ -82,14 +82,14 @@ export class GoogleOAuthRedirectController {
       // Handle OAuth error
       if (error) {
         console.error('Google OAuth error:', error);
-        const errorUrl = `${frontendUrl}/auth/error?message=Google OAuth was cancelled or failed`;
+        const errorUrl = `${frontendUrl}/error?message=Google OAuth was cancelled or failed`;
         return res.redirect(errorUrl);
       }
       
       // Validate required parameters
       if (!code || !state) {
         console.error('Missing code or state in OAuth callback');
-        const errorUrl = `${frontendUrl}/auth/error?message=Invalid OAuth callback`;
+        const errorUrl = `${frontendUrl}/error?message=Invalid OAuth callback`;
         return res.redirect(errorUrl);
       }
 
@@ -99,7 +99,7 @@ export class GoogleOAuthRedirectController {
         stateData = JSON.parse(state as string);
       } catch (err) {
         console.error('Invalid state parameter:', state);
-        const errorUrl = `${frontendUrl}/auth/error?message=Invalid OAuth state`;
+        const errorUrl = `${frontendUrl}/error?message=Invalid OAuth state`;
         return res.redirect(errorUrl);
       }
 
@@ -123,7 +123,7 @@ export class GoogleOAuthRedirectController {
       );
 
       if (!result.success) {
-        const errorUrl = `${frontendUrl}/auth/error?message=${encodeURIComponent(result.error || 'Authentication failed')}`;
+        const errorUrl = `${frontendUrl}/error?message=${encodeURIComponent(result.error || 'Authentication failed')}`;
         return res.redirect(errorUrl);
       }
 
@@ -153,7 +153,7 @@ export class GoogleOAuthRedirectController {
 
       // Redirect to frontend with success
       const redirectTo = stateData.redirectTo || '/dashboard';
-      const successUrl = `${frontendUrl}/auth/callback/success` +
+      const successUrl = `${frontendUrl}/callback/success` +
         `?access_token=${jwtTokens.accessToken}` +
         `&refresh_token=${jwtTokens.refreshToken}` +
         `&user=${encodeURIComponent(JSON.stringify(result.user))}` +
@@ -167,7 +167,7 @@ export class GoogleOAuthRedirectController {
       console.error('Error handling Google OAuth callback:', error);
       
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const errorUrl = `${frontendUrl}/auth/error?message=Authentication processing failed`;
+      const errorUrl = `${frontendUrl}/error?message=Authentication processing failed`;
       res.redirect(errorUrl);
     }
   }

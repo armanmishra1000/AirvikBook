@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { PasswordManagementService } from "../../../services/passwordManagement.service";
-import { PasswordInput } from "../../../components/auth/PasswordInput";
-import { PasswordStrengthIndicator } from "../../../components/auth/PasswordStrengthIndicator";
-import { useToastHelpers } from "../../../components/common/Toast";
+import { PasswordManagementService } from "../../services/passwordManagement.service";
+import { PasswordInput } from "../../components/auth/PasswordInput";
+import { PasswordStrengthIndicator } from "../../components/auth/PasswordStrengthIndicator";
+import { useToastHelpers } from "../../components/common/Toast";
 import {
   isSuccessResponse,
   PASSWORD_ERROR_CODES,
-} from "../../../types/passwordManagement.types";
+} from "../../types/passwordManagement.types";
 import { ArrowLeft } from "lucide-react";
+import { AUTH_PATHS } from "../../lib/paths";
 
 // =====================================================
 // RESET PASSWORD PAGE COMPONENT (Query Parameter Version)
@@ -78,8 +79,32 @@ const ResetPasswordPage: React.FC = () => {
   // FORM VALIDATION
   // =====================================================
 
+  // Enhanced password validation with specific error messages
   const validatePassword = (password: string): string | undefined => {
-    if (!password) return "Password is required";
+    if (!password) {
+      return "Password is required";
+    }
+    
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    
+    if (!/[a-z]/.test(password)) {
+      return "Password must contain at least one lowercase letter";
+    }
+    
+    if (!/\d/.test(password)) {
+      return "Password must contain at least one number";
+    }
+    
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      return "Password must contain at least one special character (!@#$%^&*()_+-=[]{}|;:,.<>?)";
+    }
+    
     return undefined;
   };
 
@@ -118,8 +143,8 @@ const ResetPasswordPage: React.FC = () => {
       newPassword: value,
     }));
 
-    // Clear password error on change if submit has been attempted
-    if (submitAttemptedRef.current && errors.newPassword) {
+    // Clear password error on change
+    if (errors.newPassword) {
       setErrors((prev) => ({
         ...prev,
         newPassword: undefined,
@@ -127,8 +152,8 @@ const ResetPasswordPage: React.FC = () => {
     }
 
     // Real-time validation for password
-    if (submitAttemptedRef.current) {
-      const passwordError = validatePassword(value);
+    const passwordError = validatePassword(value);
+    if (passwordError) {
       setErrors((prev) => ({
         ...prev,
         newPassword: passwordError,
@@ -163,9 +188,7 @@ const ResetPasswordPage: React.FC = () => {
     }
   };
 
-  const handleBackClick = () => {
-    router.push("/");
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -281,13 +304,13 @@ const ResetPasswordPage: React.FC = () => {
             {/* Action Buttons */}
             <div className="space-y-space-3">
               <button
-                onClick={() => router.push("/auth/forgot-password")}
-                className="w-full bg-airvik-blue hover:bg-airvik-bluehover text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid transition-all ease-linear duration-100 focus:outline-none"
+                onClick={() => router.push(AUTH_PATHS.FORGOT_PASSWORD)}
+                className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-all ease-linear duration-100 focus:outline-none"
               >
                 Request New Reset Link
               </button>
               <button
-                onClick={() => router.push("/auth/login")}
+                onClick={() => router.push(AUTH_PATHS.LOGIN)}
                 className="w-full bg-gray-200 text-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-colors duration-normal focus:outline-none"
               >
                 Back to Login
@@ -307,9 +330,9 @@ const ResetPasswordPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
         <div className="max-w-md w-full">
-          <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-lg p-space-8 text-center">
+          <div className="bg-airvik-white dark:bg-gray-800 text-center rounded-radius-lg sm:shadow-lg sm:p-space-6 sm:card-auth">
             {/* Success Icon */}
-            <div className="mx-auto w-16 h-16 bg-success text-airvik-white rounded-radius-full flex items-center justify-center mb-space-6">
+            <div className="mx-auto sm:size-16 size-12 bg-success text-airvik-white rounded-radius-full flex items-center justify-center mb-space-6">
               <svg
                 className="w-8 h-8"
                 fill="none"
@@ -326,7 +349,7 @@ const ResetPasswordPage: React.FC = () => {
             </div>
 
             {/* Success Message */}
-            <h1 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-4">
+            <h1 className="sm:text-h2 text-h4 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-4">
               Password Reset Complete
             </h1>
             <p className="text-body text-gray-600 dark:text-gray-400 mb-space-6">
@@ -336,8 +359,8 @@ const ResetPasswordPage: React.FC = () => {
 
             {/* Action Button */}
             <button
-              onClick={() => router.push("/auth/login")}
-              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid transition-colors duration-normal focus:outline-none"
+              onClick={() => router.push(AUTH_PATHS.LOGIN)}
+              className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-colors duration-normal focus:outline-none"
             >
               Continue to Login
             </button>
@@ -354,15 +377,6 @@ const ResetPasswordPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
       <div className="max-w-md w-full relative">
-        {/* Back Button */}
-        <button
-          type="button"
-          onClick={handleBackClick}
-          className="absolute hidden sm:block top-space-4 -left-10 p-1.5 border border-card-border dark:border-gray-600 rounded-full backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-normal focus:outline-none"
-          aria-label="Go back to homepage"
-        >
-          <ArrowLeft className="size-4" />
-        </button>
         {/* Header */}
         <div className="text-center mb-space-8">
           <h1 className="text-h1 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
@@ -386,15 +400,6 @@ const ResetPasswordPage: React.FC = () => {
                 error={errors.newPassword}
                 disabled={isSubmitting}
               />
-
-              {/* Password Strength Indicator */}
-              {formData.newPassword && (
-                <PasswordStrengthIndicator
-                  password={formData.newPassword}
-                  showRequirements={true}
-                  className="mt-space-4"
-                />
-              )}
             </div>
 
             {/* Confirm Password Input */}
@@ -413,7 +418,7 @@ const ResetPasswordPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
+              className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-all duration-100 ease-linear focus:outline-none"
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
@@ -429,13 +434,13 @@ const ResetPasswordPage: React.FC = () => {
           {/* Back to Login */}
           <div className="mt-space-4 text-center">
             <button
-              onClick={() => router.push("/auth/login")}
-              className="font-semibold tracking-normal font-sf-pro bg-gray-200 w-full py-2.5 text-airvik-blue hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none rounded-radius-sm"
+              onClick={() => router.push(AUTH_PATHS.LOGIN)}
+              className="font-medium font-sf-pro bg-gray-200 w-full py-space-3 text-gray-700 hover:text-airvik-blue-mid transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login
             </button>
           </div>
-        </div>
+        </div>  
       </div>
     </div>
   );

@@ -299,13 +299,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           console.log('Automatic token refresh failed:', refreshResult.error);
           // Refresh failed, logout user
           await handleLogout();
-          // Redirect to login
-          window.location.href = '/auth/login';
+          // Redirect to login using router if available, otherwise fallback to window.location
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
         }
       } catch (error) {
         console.error('Token refresh error:', error);
         await handleLogout();
-        window.location.href = '/auth/login';
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
       }
     }, refreshTimeout);
   };

@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth, useIsAuthenticated } from '../../context/AuthContext';
+import { AUTH_PATHS } from '../../lib/paths';
 import { useToastHelpers } from '../../components/common/Toast';
+import { useTokenExpiration } from '../../hooks/useTokenExpiration';
 import { ProfileCard } from '../../components/profile/ProfileCard';
 import { ProfileErrorBoundary } from '../../components/profile/ProfileErrorBoundary';
 import { UserProfile, isSuccessResponse } from '../../types/userProfile.types';
@@ -21,6 +23,7 @@ export default function ProfilePage() {
   const { authState, logout } = useAuth();
   const isAuthenticated = useIsAuthenticated();
   const { showError } = useToastHelpers();
+  const { handleTokenExpiration } = useTokenExpiration();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -32,7 +35,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!authState.isLoading && !isAuthenticated) {
-      router.replace('/auth/login');
+      router.replace(AUTH_PATHS.LOGIN);
       return;
     }
 
@@ -65,9 +68,7 @@ export default function ProfilePage() {
       } else {
         // Handle specific error codes
         if (response.code === 'SESSION_EXPIRED') {
-          console.log('Session expired, redirecting to login...');
-          showError('Your session has expired. Please log in again.');
-          router.replace('/auth/login');
+          await handleTokenExpiration('SESSION_EXPIRED');
           return;
         }
         
@@ -83,9 +84,8 @@ export default function ProfilePage() {
               return;
             }
           } else {
-            // Refresh failed, redirect to login
-            showError('Session expired. Please log in again.');
-            router.replace('/auth/login');
+            // Refresh failed, properly logout the user
+            await handleTokenExpiration('TOKEN_EXPIRED');
             return;
           }
         }
