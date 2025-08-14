@@ -74,23 +74,100 @@ export default function ProfilePicturePage() {
   };
 
   // =====================================================
-  // LOADING STATE
+  // MODERN SKELETON LOADER
   // =====================================================
 
   if (authState.isLoading || isLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-airvik-midnight">
-        <div className="container mx-auto px-space-4 pt-space-10 pb-space-6">
-          <div className="w-64 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
-          <div className="h-5 bg-gray-200 mt-space-2 w-96 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
-        </div>
-        <div className="container mx-auto px-space-4 pb-space-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-space-6">
-            <div className="lg:col-span-2 space-y-space-4">
-              <div className="bg-white border border-gray-200 h-72 dark:bg-gray-800 dark:border-gray-700 rounded-radius-lg animate-pulse" />
+        {/* Header Skeleton */}
+        <div className="relative overflow-hidden">
+          <div className="container mx-auto px-space-4 pt-space-10 pb-space-6">
+            {/* Navigation Skeleton */}
+            <div className="flex items-center space-x-space-2 mb-space-4">
+              <div className="h-4 bg-gray-200 w-16 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+              <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+              <div className="h-4 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-md animate-pulse" />
             </div>
-            <div className="space-y-space-4">
-              <div className="h-40 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-radius-lg animate-pulse" />
+          </div>
+        </div>
+
+        {/* Content Skeleton */}
+        <div className="container mx-auto px-space-4 pb-space-12">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-space-6">
+            {/* Upload Card Skeleton */}
+            <div className="xl:col-span-2">
+              <div className="bg-white dark:bg-gray-800 rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm p-space-4 lg:p-space-6">
+                {/* Upload Card Header Skeleton */}
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4 mb-space-6">
+                  <div className="h-6 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
+                  <div className="h-4 bg-gray-200 w-80 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
+                
+                {/* Current Picture Section Skeleton */}
+                <div className="space-y-space-6">
+                  <div className="flex items-center space-x-space-4">
+                    <div className="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded-radius-full animate-pulse" />
+                    <div className="space-y-space-2">
+                      <div className="h-5 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                      <div className="h-4 bg-gray-200 w-24 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  {/* Upload Area Skeleton */}
+                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-radius-lg p-space-6 lg:p-space-8">
+                    <div className="text-center space-y-space-4">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 dark:bg-gray-700 rounded-radius-full animate-pulse mx-auto" />
+                      <div className="space-y-space-2">
+                        <div className="h-4 bg-gray-200 w-64 dark:bg-gray-700 rounded-radius-sm animate-pulse mx-auto" />
+                        <div className="h-3 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-sm animate-pulse mx-auto" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Action Buttons Skeleton */}
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-space-3 border-t border-gray-200 dark:border-gray-700 pt-space-4">
+                    <div className="w-32 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    <div className="w-40 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    <div className="w-36 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar Skeleton */}
+            <div className="space-y-space-4 lg:space-y-space-6">
+              {/* File Requirements Skeleton */}
+              <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
+                <div className="h-5 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
+                <div className="space-y-space-1">
+                  <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-3/4 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-2/3 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
+              </div>
+              
+              {/* Pro Tips Skeleton */}
+              <div className="border border-green-200 rounded-radius-lg dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-space-4 lg:p-space-5">
+                <div className="h-5 bg-green-200 w-20 dark:bg-green-700 rounded-radius-md animate-pulse mb-space-2" />
+                <div className="space-y-space-1">
+                  <div className="h-3 bg-green-200 w-full dark:bg-green-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-green-200 w-3/4 dark:bg-green-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-green-200 w-2/3 dark:bg-green-700 rounded-radius-sm animate-pulse" />
+                </div>
+              </div>
+              
+              {/* Current Picture Info Skeleton */}
+              <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5">
+                <div className="h-5 bg-gray-200 w-36 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
+                <div className="flex items-center space-x-space-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 dark:bg-gray-700 rounded-radius-full animate-pulse" />
+                  <div className="space-y-space-1">
+                    <div className="h-3 bg-gray-200 w-24 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                    <div className="h-3 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -146,10 +223,10 @@ export default function ProfilePicturePage() {
             </svg>
             <span className="font-medium text-airvik-blue dark:text-airvik-white">Profile Picture</span>
           </nav>
-          <div>
+          {/* <div>
             <h1 className="font-bold text-h3 lg:text-h2 text-airvik-black dark:text-airvik-white">Profile Picture</h1>
             <p className="text-gray-600 mt-space-2 text-body-sm lg:text-body dark:text-gray-400">Upload or sync your profile picture</p>
-          </div>
+          </div> */}
         </div>
       </div>
 

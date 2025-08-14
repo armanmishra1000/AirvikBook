@@ -74,20 +74,123 @@ export default function PrivacyPage() {
   };
 
   // =====================================================
-  // LOADING STATE
+  // MODERN SKELETON LOADER
   // =====================================================
 
   if (authState.isLoading || isLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-airvik-midnight">
-        <div className="container mx-auto px-space-4 pt-space-10 pb-space-6">
-          <div className="w-64 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
-          <div className="h-5 bg-gray-200 mt-space-2 w-96 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+        {/* Header Skeleton */}
+        <div className="relative overflow-hidden">
+          <div className="container mx-auto px-space-4 pt-space-10 pb-space-6">
+            {/* Navigation Skeleton */}
+            <div className="flex items-center space-x-space-2 mb-space-4">
+              <div className="h-4 bg-gray-200 w-16 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+              <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+              <div className="h-4 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+            </div>
+          </div>
         </div>
+
+        {/* Content Skeleton */}
         <div className="container mx-auto px-space-4 pb-space-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-space-6">
-            <div className="bg-white border border-gray-200 lg:col-span-2 h-72 dark:bg-gray-800 dark:border-gray-700 rounded-radius-lg animate-pulse" />
-            <div className="h-40 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-radius-lg animate-pulse" />
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-space-6">
+            {/* Privacy Settings Form Skeleton */}
+            <div className="xl:col-span-2">
+              <div className="bg-white dark:bg-gray-800 rounded-radius-lg border border-gray-200 dark:border-gray-400 shadow-shadow-sm p-space-4 lg:p-space-6">
+                {/* Form Header Skeleton */}
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-space-4 mb-space-6">
+                  <div className="h-6 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
+                  <div className="h-4 bg-gray-200 w-80 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
+                
+                {/* Profile Visibility Section Skeleton */}
+                <div className="space-y-space-6">
+                  <div>
+                    <div className="h-5 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
+                    <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                  </div>
+                  
+                  {/* Contact Information Section Skeleton */}
+                  <div>
+                    <div className="h-5 bg-gray-200 w-44 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-3" />
+                    <div className="space-y-space-4">
+                      {/* Show Email Toggle Skeleton */}
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-space-1">
+                          <div className="h-4 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                          <div className="h-3 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                        </div>
+                        <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-radius-full animate-pulse" />
+                      </div>
+                      
+                      {/* Show Phone Toggle Skeleton */}
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-space-1">
+                          <div className="h-4 bg-gray-200 w-36 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                          <div className="h-3 bg-gray-200 w-52 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                        </div>
+                        <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-radius-full animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Google Integration Section Skeleton */}
+                  <div>
+                    <div className="h-5 bg-gray-200 w-36 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-3" />
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-space-1">
+                        <div className="h-4 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-gray-200 w-56 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                      </div>
+                      <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-radius-full animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  {/* Privacy Information Section Skeleton */}
+                  <div className="bg-airvik-blue-light/20 dark:bg-airvik-blue/10 rounded-radius-md p-space-4">
+                    <div className="flex items-start space-x-space-3">
+                      <div className="w-5 h-5 bg-airvik-blue rounded-radius-sm animate-pulse" />
+                      <div className="space-y-space-1">
+                        <div className="h-4 bg-airvik-blue w-40 dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
+                        <div className="h-3 bg-airvik-blue w-full dark:bg-airvik-blue rounded-radius-sm animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Submit Button Skeleton */}
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-space-4">
+                    <div className="flex flex-col sm:flex-row sm:justify-end">
+                      <div className="w-40 h-10 bg-gray-200 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar Skeleton */}
+            <div className="space-y-space-4 lg:space-y-space-6">
+              {/* Visibility Levels Skeleton */}
+              <div className="border border-yellow-200 rounded-radius-lg dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 p-space-4 lg:p-space-5">
+                <div className="h-5 bg-yellow-200 w-36 dark:bg-yellow-700 rounded-radius-md animate-pulse mb-space-2" />
+                <div className="space-y-space-1">
+                  <div className="h-3 bg-yellow-200 w-full dark:bg-yellow-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-yellow-200 w-3/4 dark:bg-yellow-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-yellow-200 w-2/3 dark:bg-yellow-700 rounded-radius-sm animate-pulse" />
+                </div>
+              </div>
+              
+              {/* Current Status Skeleton */}
+              <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
+                <div className="h-5 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-md animate-pulse mb-space-2" />
+                <div className="space-y-space-1">
+                  <div className="h-3 bg-gray-200 w-full dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-3/4 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-2/3 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  <div className="h-3 bg-gray-200 w-1/2 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -142,10 +245,10 @@ export default function PrivacyPage() {
             </svg>
             <span className="font-medium text-airvik-blue dark:text-airvik-white">Privacy Settings</span>
           </nav>
-          <div>
+          {/* <div>
             <h1 className="font-bold text-h3 lg:text-h2 text-airvik-black dark:text-airvik-white">Privacy Settings</h1>
             <p className="text-gray-600 mt-space-2 text-body-sm lg:text-body dark:text-gray-400">Control who can see your profile information</p>
-          </div>
+          </div> */}
         </div>
       </div>
 

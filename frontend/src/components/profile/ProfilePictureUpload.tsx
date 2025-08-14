@@ -12,7 +12,7 @@ import { UserProfileService } from '../../services/userProfile.service';
 // BRAND-COMPLIANT PROFILE PICTURE UPLOAD COMPONENT
 // =====================================================
 // Using ONLY brand tokens: airvik-*, space-*, text-*
-// NO hardcoded colors, spacing, or typography
+// NO hardcoded colors, spacing, or typographyx
 
 interface ProfilePictureUploadProps {
   onSuccess?: () => void;
