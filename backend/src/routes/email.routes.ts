@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { EmailController } from '../controllers/email.controller';
+import { EMAIL_PATHS } from '../lib/paths';
 
 const router = Router();
 
@@ -24,7 +25,7 @@ router.post('/booking-confirmation', EmailController.sendBookingConfirmation);
 router.post('/password-reset', EmailController.sendPasswordResetEmail);
 
 // Send email verification
-router.post('/verify-email', EmailController.sendEmailVerification);
+router.post(EMAIL_PATHS.VERIFY_EMAIL, EmailController.sendEmailVerification);
 
 // Send custom email
 router.post('/send', EmailController.sendCustomEmail);

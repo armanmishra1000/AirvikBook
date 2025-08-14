@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { AUTH_PATHS } from '../lib/paths';
 
 export class SanitizationMiddleware {
   /**
@@ -19,7 +20,7 @@ export class SanitizationMiddleware {
     // an exact `state` value round-trip. Encoding characters (e.g. quotes or slashes)
     // breaks the JSON state payload and causes "Invalid OAuth state".
     const path = req.path || '';
-    if (path.includes('/auth/google')) {
+    if (path.includes(`/auth${AUTH_PATHS.GOOGLE_AUTH}`)) {
       return next();
     }
 

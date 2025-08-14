@@ -2,12 +2,14 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { PasswordManagementService } from "../../../services/passwordManagement.service";
+import { PasswordManagementService } from "../../services/passwordManagement.service";
 import {
   isSuccessResponse,
   PASSWORD_ERROR_CODES,
-} from "../../../types/passwordManagement.types";
-import { useToastHelpers } from "../../../components/common/Toast";
+} from "../../types/passwordManagement.types";
+import { useToastHelpers } from "../../components/common/Toast";
+import { ArrowLeft } from "lucide-react";
+import { AUTH_PATHS } from "../../lib/paths";
 
 // =====================================================
 // FORGOT PASSWORD PAGE COMPONENT
@@ -88,6 +90,8 @@ const ForgotPasswordPage: React.FC = () => {
     }
   };
 
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     submitAttemptedRef.current = true;
@@ -152,10 +156,10 @@ const ForgotPasswordPage: React.FC = () => {
       <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
         <div className="max-w-md w-full">
           {/* Success Card */}
-          <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-lg p-space-8 card-auth">
+          <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg sm:shadow-lg sm:p-space-8 p-space-0 sm:card-auth">
             <div className="text-center">
               {/* Success Icon */}
-              <div className="mx-auto w-16 h-16 bg-success text-airvik-white rounded-radius-full flex items-center justify-center mb-space-6">
+              <div className="mx-auto sm:size-16 size-12 bg-success text-airvik-white rounded-radius-full flex items-center justify-center mb-space-6">
                 <svg
                   className="w-8 h-8"
                   fill="none"
@@ -183,8 +187,8 @@ const ForgotPasswordPage: React.FC = () => {
               {/* Action Buttons */}
               <div className="space-y-space-3">
                 <button
-                  onClick={() => router.push("/auth/login")}
-                  className="w-full bg-airvik-blue hover:bg-airvik-bluehover text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-all duration-100 ease-linear focus:outline-none"
+                  onClick={() => router.push(AUTH_PATHS.LOGIN)}
+                  className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-all duration-100 ease-linear focus:outline-none"
                 >
                   Back to Login
                 </button>
@@ -208,7 +212,7 @@ const ForgotPasswordPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4">
-      <div className="max-w-md w-full">
+      <div className="max-w-md w-full relative">
         {/* Header */}
         <div className="text-center mb-space-8">
           <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
@@ -266,7 +270,7 @@ const ForgotPasswordPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-bluehover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
+              className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
@@ -282,8 +286,8 @@ const ForgotPasswordPage: React.FC = () => {
           {/* Back to Login */}
           <div className="mt-space-4 text-center">
             <button
-              onClick={() => router.push("/auth/login")}
-              className="text-body font-sf-pro bg-gray-200 w-full py-2.5 text-airvik-blue transition-colors duration-normal focus:outline-none rounded-radius-sm"
+              onClick={() => router.push(AUTH_PATHS.LOGIN)}
+              className="font-sf-pro bg-gray-200 font-medium tracking-normal text-gray-700  w-full py-space-3 transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login
             </button>

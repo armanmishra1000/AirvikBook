@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../components/common/Toast';
 import ErrorBoundary from '../components/common/ErrorBoundary';
+import TokenTestProvider from '../components/dev/TokenTestProvider';
+import { LayoutWrapper } from '../components/common/LayoutWrapper';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -20,9 +22,10 @@ export default function RootLayout({
         <ErrorBoundary>
           <ToastProvider>
             <AuthProvider>
-              <main className="min-h-screen bg-white dark:bg-airvik-midnight">
+              <TokenTestProvider />
+              <LayoutWrapper>
                 {children}
-              </main>
+              </LayoutWrapper>
             </AuthProvider>
           </ToastProvider>
         </ErrorBoundary>

@@ -150,6 +150,22 @@
   .font-fallback {
     @apply font-sf-pro;
   }
+  
+  /* Global checkbox focus overrides to prevent unwanted styles */
+  input[type="checkbox"] {
+    @apply focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0;
+  }
+  
+  /* Override @tailwindcss/forms plugin focus styles */
+  input[type="checkbox"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  input[type="checkbox"]:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
 }
 
 /* Brand System Utilities */

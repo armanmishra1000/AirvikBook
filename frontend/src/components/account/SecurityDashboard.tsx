@@ -43,7 +43,7 @@ export const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
     <div className={`w-full ${className}`}>
       {/* Error/Success Messages */}
       {error && (
-        <div className="mb-space-6 p-space-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-radius-md">
+        <div className="border border-red-200 mb-space-6 p-space-4 bg-red-50 dark:bg-red-900/20 dark:border-red-800 rounded-radius-md">
           <p className="text-body font-sf-pro text-error">
             {error}
           </p>
@@ -51,7 +51,7 @@ export const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
       )}
 
       {success && (
-        <div className="mb-space-6 p-space-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-radius-md">
+        <div className="border border-green-200 mb-space-6 p-space-4 bg-green-50 dark:bg-green-900/20 dark:border-green-800 rounded-radius-md">
           <p className="text-body font-sf-pro text-success">
             {success}
           </p>

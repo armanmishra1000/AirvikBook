@@ -4,11 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth, useIsAuthenticated } from '../../context/AuthContext';
+import { AUTH_PATHS } from '../../lib/paths';
 import { useToastHelpers } from '../../components/common/Toast';
+import { useTokenExpiration } from '../../hooks/useTokenExpiration';
 import { ProfileCard } from '../../components/profile/ProfileCard';
 import { ProfileErrorBoundary } from '../../components/profile/ProfileErrorBoundary';
 import { UserProfile, isSuccessResponse } from '../../types/userProfile.types';
 import { UserProfileService } from '../../services/userProfile.service';
+import { UserLoginService } from '../../services/userLogin.service';
 
 // =====================================================
 // MODERN PROFILE SETTINGS PAGE
@@ -17,12 +20,14 @@ import { UserProfileService } from '../../services/userProfile.service';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { authState } = useAuth();
+  const { authState, logout } = useAuth();
   const isAuthenticated = useIsAuthenticated();
   const { showError } = useToastHelpers();
+  const { handleTokenExpiration } = useTokenExpiration();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // =====================================================
   // AUTHENTICATION CHECK
@@ -30,7 +35,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!authState.isLoading && !isAuthenticated) {
-      router.replace('/auth/login');
+      router.replace(AUTH_PATHS.LOGIN);
       return;
     }
 
@@ -61,10 +66,35 @@ export default function ProfilePage() {
       if (isSuccessResponse(response)) {
         setProfile(response.data);
       } else {
+        // Handle specific error codes
+        if (response.code === 'SESSION_EXPIRED') {
+          await handleTokenExpiration('SESSION_EXPIRED');
+          return;
+        }
+        
+        if (response.code === 'TOKEN_EXPIRED') {
+          console.log('Token expired, attempting refresh...');
+          // Try to refresh token and retry
+          const refreshResult = await UserLoginService.refreshToken();
+          if (isSuccessResponse(refreshResult)) {
+            // Retry loading profile
+            const retryResponse = await UserProfileService.getProfile();
+            if (isSuccessResponse(retryResponse)) {
+              setProfile(retryResponse.data);
+              return;
+            }
+          } else {
+            // Refresh failed, properly logout the user
+            await handleTokenExpiration('TOKEN_EXPIRED');
+            return;
+          }
+        }
+        
         setIsError(true);
         showError(response.error || 'Failed to load profile');
       }
     } catch (error) {
+      console.error('Profile loading error:', error);
       setIsError(true);
       showError('Failed to load profile. Please try again.');
     } finally {
@@ -82,6 +112,32 @@ export default function ProfilePage() {
 
   const handlePictureChange = () => {
     router.push('/profile/picture');
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout(false);
+      router.push(`/auth${AUTH_PATHS.LOGIN}`);
+    } catch (error) {
+      console.error('Logout error:', error);
+      showError('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  const handleLogoutAllDevices = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout(true);
+      router.push(`/auth${AUTH_PATHS.LOGIN}`);
+    } catch (error) {
+      console.error('Logout error:', error);
+      showError('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   // =====================================================
@@ -265,10 +321,10 @@ export default function ProfilePage() {
                 {/* Profile Picture */}
                 <Link
                   href="/profile/picture"
-                  className="relative overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-400 group rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 hover:shadow-shadow-md transition-all duration-normal"
+                  className="relative overflow-hidden transition-all border border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-400 group rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 hover:shadow-shadow-md duration-normal"
                 >
                   <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
-                    <div className="flex items-center justify-center w-12 h-12 lg:w-14 lg:h-14 bg-white rounded-radius-md shadow-shadow-sm">
+                    <div className="flex items-center justify-center w-12 h-12 bg-white lg:w-14 lg:h-14 rounded-radius-md shadow-shadow-sm">
                       <svg className="w-7 h-7 text-airvik-black" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                       </svg>
@@ -290,10 +346,10 @@ export default function ProfilePage() {
                 {/* Privacy Settings */}
                 <Link
                   href="/profile/privacy"
-                  className="relative overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-400 group rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 hover:shadow-shadow-md transition-all duration-normal"
+                  className="relative overflow-hidden transition-all border border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-400 group rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 hover:shadow-shadow-md duration-normal"
                 >
                   <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
-                    <div className="flex items-center justify-center w-12 h-12 lg:w-14 lg:h-14 bg-white rounded-radius-md shadow-shadow-sm">
+                    <div className="flex items-center justify-center w-12 h-12 bg-white lg:w-14 lg:h-14 rounded-radius-md shadow-shadow-sm">
                       <svg className="w-7 h-7 text-airvik-black" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                       </svg>
@@ -315,10 +371,10 @@ export default function ProfilePage() {
                 {/* Connected Accounts */}
                 <Link
                   href="/profile/connections"
-                  className="relative overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-400 group rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 hover:shadow-shadow-md transition-all duration-normal"
+                  className="relative overflow-hidden transition-all border border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-400 group rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 hover:shadow-shadow-md duration-normal"
                 >
                   <div className="relative flex items-start space-x-space-3 lg:space-x-space-4">
-                    <div className="flex items-center justify-center w-12 h-12 lg:w-14 lg:h-14 bg-white rounded-radius-md shadow-shadow-sm">
+                    <div className="flex items-center justify-center w-12 h-12 bg-white lg:w-14 lg:h-14 rounded-radius-md shadow-shadow-sm">
                       <svg className="w-7 h-7 text-airvik-black" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                       </svg>

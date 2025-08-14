@@ -347,6 +347,37 @@ export class JwtService {
   }
 
   /**
+   * Invalidate multiple refresh tokens at once
+   */
+  static async invalidateMultipleRefreshTokens(refreshTokens: string[]): Promise<void> {
+    try {
+      // Add all tokens to blacklist with expiration
+      const blacklistEntries = refreshTokens.map(token => ({
+        token,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+      }));
+
+      // Use Redis for blacklisting if available, otherwise use in-memory
+      if (redisConnected && redis) {
+        const pipeline = redis.pipeline();
+        blacklistEntries.forEach(({ token }) => {
+          pipeline.setex(`blacklist:${token}`, 24 * 60 * 60, '1'); // 24 hours TTL
+        });
+        await pipeline.exec();
+      } else {
+        // Fallback to in-memory blacklist
+        blacklistEntries.forEach(({ token }) => {
+          // In a real application, you'd manage this in a global map or similar
+          // For now, we'll just log a warning if Redis is not available
+          console.warn(`Redis not available - token blacklisting disabled for token: ${token}`);
+        });
+      }
+    } catch (error) {
+      console.error('Error invalidating multiple refresh tokens:', error);
+    }
+  }
+
+  /**
    * Check if refresh token is blacklisted
    */
   static async isRefreshTokenValid(refreshToken: string): Promise<boolean> {

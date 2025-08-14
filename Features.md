@@ -9,7 +9,7 @@ This document outlines the complete feature set for a modern, scalable hotel man
 
 ### 1.1 Authentication & User Management
 **Status**: PLANNING  
-**Approach**: NEW  
+**Approach**: NEW
 **Documentation**: `/docs/auth.md`  
 **Integration**: JWT + Database  
 **Development Readiness**: HIGH

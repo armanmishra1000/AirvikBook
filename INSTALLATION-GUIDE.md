@@ -56,9 +56,7 @@ REDIS_URL=redis://localhost:6379
 SECURITY_HEADERS_ENABLED=true
 CSP_REPORT_URI=your-csp-report-uri
 
-# Security & Antivirus Configuration
-CLAMAV_PATH="C:\Program Files\ClamAV\clamscan.exe"
-VIRUSTOTAL_API_KEY=your-virustotal-api-key-here
+# Security Configuration
 
 # AWS S3 (Optional - for file uploads)
 AWS_ACCESS_KEY_ID=your-aws-access-key
@@ -67,17 +65,7 @@ AWS_REGION=us-east-1
 AWS_S3_BUCKET=your-s3-bucket-name
 ```
 
-### Step 5: Install ClamAV (Antivirus)
-```bash
-# Method 1: Using Winget (Recommended)
-winget install Cisco.ClamAV
 
-# Method 2: Using Chocolatey
-choco install clamav
-
-# Method 3: Manual Installation
-# Download from: https://www.clamav.net/downloads
-```
 
 ### Step 6: Database Setup
 ```bash
@@ -102,22 +90,6 @@ npm start
 ```
 
 ## 🔧 Security Features Installation
-
-### 1. ClamAV Setup
-After installing ClamAV, verify the installation:
-```bash
-# Check if ClamAV is installed
-"C:\Program Files\ClamAV\clamscan.exe" --version
-
-# Update virus definitions (requires admin privileges)
-"C:\Program Files\ClamAV\freshclam.exe"
-```
-
-### 2. VirusTotal API Setup
-1. Go to [VirusTotal](https://www.virustotal.com/)
-2. Create an account
-3. Get your API key from the profile section
-4. Add it to your `.env` file
 
 ### 3. Redis Setup
 ```bash
@@ -168,11 +140,7 @@ node test-jwt-redis.js
 # Test all security endpoints
 .\test-api.ps1
 
-# Test ClamAV integration
-.\test-clamav-simple.ps1
 
-# Test VirusTotal integration
-.\test-virustotal-integration.ps1
 ```
 
 ### Redis Testing (Required)
@@ -198,7 +166,7 @@ node test-jwt-redis.js
 ## 📊 Security Features Overview
 
 ### ✅ Implemented Security Measures
-- **Multi-layer Malware Scanning** (ClamAV + VirusTotal + Signature-based)
+- **Signature-based Malware Detection** (File type and content analysis)
 - **Enhanced Password Security** (Length, complexity, history check)
 - **Rate Limiting** (Global, auth, registration, email)
 - **JWT Token Security** (Rotation, blacklisting, secure storage with Redis)
@@ -226,14 +194,7 @@ node test-jwt-redis.js
 
 ### Common Issues
 
-#### 1. ClamAV Not Found
-```bash
-# Check if ClamAV is installed
-dir "C:\Program Files\ClamAV"
 
-# Verify the path in .env
-echo $env:CLAMAV_PATH
-```
 
 #### 2. Database Connection Issues
 ```bash
@@ -280,11 +241,7 @@ node -e "console.log(require('dotenv').config())"
 
 ### Error Solutions
 
-#### ClamAV Database Missing
-```bash
-# Run as Administrator
-"C:\Program Files\ClamAV\freshclam.exe" --update-db
-```
+
 
 #### Permission Denied
 ```bash
@@ -305,12 +262,10 @@ taskkill /PID <process-id> /F
 
 ### Documentation
 - [Prisma Documentation](https://www.prisma.io/docs/)
-- [ClamAV Documentation](https://docs.clamav.net/)
-- [VirusTotal API Documentation](https://developers.virustotal.com/)
+
 - [Redis Documentation](https://redis.io/documentation)
 
 ### Security Best Practices
-- Keep ClamAV virus definitions updated
 - Regularly rotate JWT secrets
 - Monitor audit logs for suspicious activity
 - Use HTTPS in production
@@ -325,8 +280,7 @@ PORT=5000
 DATABASE_URL=your-production-database-url
 JWT_SECRET=your-production-jwt-secret
 REDIS_URL=your-production-redis-url
-CLAMAV_PATH="C:\Program Files\ClamAV\clamscan.exe"
-VIRUSTOTAL_API_KEY=your-production-virustotal-key
+
 ```
 
 ### Security Checklist
@@ -335,7 +289,7 @@ VIRUSTOTAL_API_KEY=your-production-virustotal-key
 - [ ] Database backups configured
 - [ ] Monitoring and logging enabled
 - [ ] Rate limiting configured
-- [ ] Antivirus scanning active
+
 - [ ] Audit logging enabled
 - [ ] Redis connection verified
 - [ ] JWT token blacklisting tested

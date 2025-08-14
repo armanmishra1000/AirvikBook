@@ -16,6 +16,7 @@ import {
   LOGIN_ERROR_CODES
 } from '../../types/userLogin.types';
 import { UserLoginService } from '../../services/userLogin.service';
+import { AUTH_PATHS } from '../../lib/paths';
 
 interface GoogleLoginButtonProps {
   onSuccess?: (result: any) => void;
@@ -252,7 +253,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
     
     if (shouldLink) {
       // Navigate to account linking flow
-      window.location.href = '/auth/link-account';
+      window.location.href = `/auth${AUTH_PATHS.LINK_ACCOUNT}`;
     }
     // If not linking, continue with separate Google account
   };

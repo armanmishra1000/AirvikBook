@@ -2,7 +2,9 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { UserLoginService } from '../services/userLogin.service';
+import { AUTH_PATHS } from '../lib/paths';
 import { PasswordManagementService } from '../services/passwordManagement.service';
+import { useToastHelpers } from '../components/common/Toast';
 import {
   AuthState,
   AuthContextValue,
@@ -198,6 +200,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [authState, dispatch] = useReducer(authReducer, initialState);
   const initializationRef = useRef(false);
   const tokenRefreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { showSuccess } = useToastHelpers();
 
   // =====================================================
   // INITIALIZATION EFFECT
@@ -209,15 +212,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const initializeAuth = async () => {
       try {
-        // Check if user is already authenticated
-        const isAuthenticated = UserLoginService.isAuthenticated();
+        // Check if user has refresh token (even if access token is missing)
+        const hasRefreshToken = UserLoginService.hasRefreshToken();
         const user = UserLoginService.getCurrentUser();
         
-        if (isAuthenticated && user) {
-          // Try to refresh token to verify authentication
+        if (hasRefreshToken && user) {
+          console.log('Found refresh token, attempting to restore authentication...');
+          // Try to refresh token to restore authentication
           const refreshResult = await UserLoginService.refreshToken();
           
           if (isSuccessResponse(refreshResult)) {
+            console.log('Authentication restored successfully');
             dispatch({
               type: 'AUTH_SUCCESS',
               payload: {
@@ -227,14 +232,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               }
             });
             
+            // Show welcome message for OAuth users (only if coming from OAuth callback)
+            const isFromOAuth = sessionStorage.getItem('oauth_redirect');
+            if (isFromOAuth) {
+              sessionStorage.removeItem('oauth_redirect'); // Clear the flag
+              showSuccess(
+                'Welcome to AirVikBook!',
+                `Successfully signed in as ${refreshResult.data.user.fullName}`
+              );
+            }
+            
             // Setup automatic token refresh
             setupTokenRefresh();
           } else {
+            console.log('Failed to restore authentication, clearing storage');
             // Invalid authentication, clear storage
             UserLoginService.clearAuthData();
             dispatch({ type: 'AUTH_LOGOUT' });
           }
         } else {
+          console.log('No refresh token found, user not authenticated');
           dispatch({ type: 'AUTH_LOGOUT' });
         }
       } catch (error) {
@@ -260,11 +277,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Setup automatic refresh 2 minutes before expiration (13 minutes)
     const refreshTimeout = 13 * 60 * 1000; // 13 minutes
     
+    console.log(`Setting up token refresh in ${refreshTimeout / 1000 / 60} minutes`);
+    
     tokenRefreshTimeoutRef.current = setTimeout(async () => {
       try {
+        console.log('Executing automatic token refresh...');
         const refreshResult = await UserLoginService.refreshToken();
         
         if (isSuccessResponse(refreshResult)) {
+          console.log('Automatic token refresh successful');
           dispatch({
             type: 'TOKEN_REFRESH',
             payload: {
@@ -276,12 +297,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Setup next refresh
           setupTokenRefresh();
         } else {
+          console.log('Automatic token refresh failed:', refreshResult.error);
           // Refresh failed, logout user
           await handleLogout();
+          // Redirect to login using router if available, otherwise fallback to window.location
+          if (typeof window !== 'undefined') {
+            window.location.href = AUTH_PATHS.LOGIN;
+          }
         }
       } catch (error) {
         console.error('Token refresh error:', error);
         await handleLogout();
+        if (typeof window !== 'undefined') {
+          window.location.href = AUTH_PATHS.LOGIN;
+        }
       }
     }, refreshTimeout);
   };
@@ -420,6 +449,68 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: errorMessage,
         code: 'REFRESH_FAILED'
       };
+    }
+  };
+
+  /**
+   * Handle authentication after email verification
+   * This method is called when user completes email verification
+   */
+  const handleEmailVerificationAuth = async (): Promise<void> => {
+    try {
+      // Check if we have tokens from email verification
+      const accessToken = sessionStorage.getItem('airvik_access_token');
+      const refreshToken = localStorage.getItem('airvik_refresh_token');
+      const user = UserLoginService.getCurrentUser();
+      
+      if (accessToken && refreshToken && user) {
+        console.log('Email verification completed, setting up authentication...');
+        
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: {
+            user: user,
+            accessToken: accessToken,
+            refreshToken: user.id // We don't expose refresh token
+          }
+        });
+        
+        // Setup automatic token refresh
+        setupTokenRefresh();
+        
+        showSuccess(
+          'Welcome to AirVikBook!',
+          `Your email has been verified. Welcome, ${user.fullName}!`
+        );
+      } else {
+        console.log('No tokens found after email verification, attempting refresh...');
+        // Try to refresh token if we have refresh token but no access token
+        const refreshResult = await UserLoginService.refreshToken();
+        
+        if (isSuccessResponse(refreshResult)) {
+          dispatch({
+            type: 'AUTH_SUCCESS',
+            payload: {
+              user: refreshResult.data.user,
+              accessToken: refreshResult.data.accessToken,
+              refreshToken: refreshResult.data.user.id
+            }
+          });
+          
+          setupTokenRefresh();
+          
+          showSuccess(
+            'Welcome to AirVikBook!',
+            `Your email has been verified. Welcome, ${refreshResult.data.user.fullName}!`
+          );
+        } else {
+          console.log('Failed to authenticate after email verification');
+          dispatch({ type: 'AUTH_LOGOUT' });
+        }
+      }
+    } catch (error) {
+      console.error('Error handling email verification auth:', error);
+      dispatch({ type: 'AUTH_LOGOUT' });
     }
   };
 
@@ -865,7 +956,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updatePrivacySettings,
     connectGoogleAccount,
     disconnectGoogleAccount,
-    refreshUserData
+    refreshUserData,
+    
+    // Email Verification
+    handleEmailVerificationAuth
   };
 
   return (

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JwtService } from '../services/jwt.service';
 import { ResponseUtil } from '../utils/response.utils';
+import { SessionManagementService } from '../services/auth/sessionManagement.service';
 
 // Extend Express Request interface to include user
 declare global {
@@ -17,39 +18,56 @@ declare global {
 
 export class AuthMiddleware {
   /**
-   * Verify JWT access token and attach user to request
+   * Verify JWT token and attach user to request
    */
   static async verifyToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-      // Get token from Authorization header
       const authHeader = req.headers.authorization;
+      
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        ResponseUtil.error(res, 'Access token required', 'MISSING_TOKEN', 401);
-      return;
+        return ResponseUtil.error(res, 'Access token required', 'MISSING_TOKEN', 401);
       }
 
       const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-
-      // Validate token
-      const validation = JwtService.validateAccessToken(token);
-      if (!validation.isValid) {
-        const statusCode = validation.code === 'TOKEN_EXPIRED' ? 401 : 403;
-        ResponseUtil.error(res, validation.error!, validation.code!, statusCode);
-      return;
+      
+      const validation = await JwtService.validateAccessToken(token);
+      
+      if (!validation.isValid || !validation.payload) {
+        return ResponseUtil.error(res, 'Invalid or expired token', 'INVALID_TOKEN', 401);
       }
 
-      // Attach user info to request
+      // Attach user information to request
       req.user = {
-        userId: validation.payload!.userId,
-        email: validation.payload!.email,
-        role: validation.payload!.role
+        userId: validation.payload.userId,
+        email: validation.payload.email,
+        role: validation.payload.role
       };
 
       next();
     } catch (error) {
-      console.error('Auth middleware error:', error);
-      ResponseUtil.error(res, 'Token validation failed', 'AUTH_ERROR', 500);
-      return;
+      console.error('Token verification error:', error);
+      return ResponseUtil.error(res, 'Authentication failed', 'AUTH_ERROR', 401);
+    }
+  }
+
+  /**
+   * Update session activity on each authenticated request
+   */
+  static async updateSessionActivity(req: Request, _res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (req.user && req.user.userId) {
+        const refreshToken = req.headers['x-refresh-token'] as string;
+        if (refreshToken) {
+          // Update session activity asynchronously (don't block the request)
+          SessionManagementService.updateSessionActivity(refreshToken, req.ip).catch(error => {
+            console.error('Failed to update session activity:', error);
+          });
+        }
+      }
+      next();
+    } catch (error) {
+      console.error('Error in session activity middleware:', error);
+      next();
     }
   }
 

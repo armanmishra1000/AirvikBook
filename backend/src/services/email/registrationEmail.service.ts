@@ -1,5 +1,6 @@
 import { EmailService } from '../email.service';
 import { EmailTemplatesService } from './emailTemplates.service';
+import { AUTH_PATHS } from '../../lib/paths';
 
 // Helper function to mask email addresses for security
 const maskEmail = (email: string) => {
@@ -34,7 +35,7 @@ export class RegistrationEmailService {
   private static generateVerificationUrl(token: string, email: string): string {
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const encodedEmail = encodeURIComponent(email);
-    return `${baseUrl}/auth/verify-email?token=${token}&email=${encodedEmail}`;
+    return `${baseUrl}${AUTH_PATHS.VERIFY_EMAIL}?token=${token}&email=${encodedEmail}`;
   }
 
   /**
@@ -42,7 +43,7 @@ export class RegistrationEmailService {
    */
   private static generateLoginUrl(): string {
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    return `${baseUrl}/auth/login`;
+    return `${baseUrl}${AUTH_PATHS.LOGIN}`;
   }
 
   /**
@@ -154,7 +155,7 @@ export class RegistrationEmailService {
 
       // Generate reset link (will be implemented in password reset feature)
       const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const resetLink = `${baseUrl}/auth/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+      const resetLink = `${baseUrl}${AUTH_PATHS.RESET_PASSWORD}?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
       // Generate email template
       const template = EmailTemplatesService.generatePasswordResetTemplate({

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth, useIsAuthenticated } from '../../../context/AuthContext';
+import { AUTH_PATHS } from '../../../lib/paths';
 import { useToastHelpers } from '../../../components/common/Toast';
 import { ProfileForm } from '../../../components/profile/ProfileForm';
 import { UserProfile, isSuccessResponse } from '../../../types/userProfile.types';
@@ -29,7 +30,7 @@ export default function EditProfilePage() {
 
   useEffect(() => {
     if (!authState.isLoading && !isAuthenticated) {
-      router.replace('/auth/login');
+      router.replace(AUTH_PATHS.LOGIN);
       return;
     }
 

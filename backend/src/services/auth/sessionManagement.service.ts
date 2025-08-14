@@ -54,12 +54,13 @@ export class SessionManagementService {
     currentRefreshToken?: string
   ): Promise<ActiveSessionsResult> {
     try {
-      const sessions = await prisma.session.findMany({
-        where: {
+      // Get only active and non-expired sessions
+      const activeSessions = await prisma.session.findMany({
+        where: { 
           userId,
           isActive: true,
           expiresAt: {
-            gt: new Date()
+            gt: new Date() // Only sessions that haven't expired
           }
         },
         select: {
@@ -80,7 +81,18 @@ export class SessionManagementService {
         }
       });
 
-      const sessionData: SessionData[] = sessions.map(session => {
+      // Handle case when no sessions are found
+      if (activeSessions.length === 0) {
+        return {
+          success: true,
+          data: {
+            sessions: [],
+            totalSessions: 0
+          }
+        };
+      }
+
+      const sessionData: SessionData[] = activeSessions.map((session, index) => {
         let deviceInfo: DeviceInfo;
         try {
           deviceInfo = session.deviceInfo ? 
@@ -90,6 +102,11 @@ export class SessionManagementService {
           deviceInfo = { deviceId: 'unknown', deviceName: 'Unknown Device' };
         }
 
+        // Determine if this is the current session
+        const isCurrent = currentRefreshToken ? 
+          session.refreshToken === currentRefreshToken : 
+          index === 0; // First session (most recent) is current if no refresh token provided
+
         return {
           id: session.id,
           deviceInfo: {
@@ -98,7 +115,7 @@ export class SessionManagementService {
           },
           createdAt: session.createdAt.toISOString(),
           lastActivity: session.updatedAt.toISOString(),
-          isCurrent: session.refreshToken === currentRefreshToken,
+          isCurrent,
           ipAddress: session.ipAddress || undefined,
           location: this.getLocationFromIP(session.ipAddress || '')
         };
@@ -188,26 +205,45 @@ export class SessionManagementService {
         }
       });
 
-      // Invalidate all sessions
+      if (activeSessions.length === 0) {
+        return {
+          success: true,
+          data: {
+            loggedOut: true,
+            sessionsInvalidated: 0,
+            message: 'No active sessions found'
+          }
+        };
+      }
+
+      // Invalidate all sessions in database
       await prisma.session.updateMany({
         where: {
           userId,
           isActive: true
         },
         data: {
-          isActive: false
+          isActive: false,
+          updatedAt: new Date()
         }
       });
 
-      // Invalidate all refresh tokens
-      await JwtService.invalidateAllUserTokens(userId);
+      // Invalidate all refresh tokens in JWT service
+      const refreshTokens = activeSessions.map(session => session.refreshToken);
+      await JwtService.invalidateMultipleRefreshTokens(refreshTokens);
+
+      // Log the action for audit purposes
+      await this.logSessionAction(userId, 'LOGOUT_ALL_DEVICES', {
+        sessionsInvalidated: activeSessions.length,
+        deviceCount: activeSessions.length
+      });
 
       return {
         success: true,
         data: {
           loggedOut: true,
           sessionsInvalidated: activeSessions.length,
-          message: 'Logged out from all devices'
+          message: `Logged out from ${activeSessions.length} devices`
         }
       };
 
@@ -273,12 +309,11 @@ export class SessionManagementService {
     error?: string;
   }> {
     try {
+      // Only delete sessions that have actually expired
+      // Don't delete inactive sessions as they might be needed for audit purposes
       const result = await prisma.session.deleteMany({
         where: {
-          OR: [
-            { expiresAt: { lt: new Date() } },
-            { isActive: false }
-          ]
+          expiresAt: { lt: new Date() }  // Only delete expired sessions
         }
       });
 
@@ -548,6 +583,26 @@ export class SessionManagementService {
         averageSessionDuration: 0,
         topDeviceTypes: []
       };
+    }
+  }
+
+  /**
+   * Log session actions for audit purposes
+   */
+  private static async logSessionAction(userId: string, action: string, details: any): Promise<void> {
+    try {
+      await prisma.auditLog.create({
+        data: {
+          userId,
+          action,
+          details: JSON.stringify(details),
+          ipAddress: 'system',
+          userAgent: 'session-management',
+          success: true
+        }
+      });
+    } catch (error) {
+      console.error('Failed to log session action:', error);
     }
   }
 }
