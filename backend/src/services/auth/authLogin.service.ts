@@ -338,18 +338,18 @@ export class AuthLoginService {
     userAgent?: string,
     rememberMe: boolean = false
   ): Promise<{ id: string }> {
-    const expiresAt = new Date();
-    if (rememberMe) {
-      expiresAt.setDate(expiresAt.getDate() + 30); // 30 days
-    } else {
-      expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
-    }
+    try {
+      const expiresAt = new Date();
+      if (rememberMe) {
+        expiresAt.setDate(expiresAt.getDate() + 30); // 30 days
+      } else {
+        expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+      }
 
-    // Generate a unique session token
-    const sessionToken = require('crypto').randomBytes(32).toString('hex');
+      // Generate a unique session token
+      const sessionToken = require('crypto').randomBytes(32).toString('hex');
 
-    const session = await prisma.session.create({
-      data: {
+      const sessionData = {
         userId,
         token: sessionToken, // Unique session identifier
         refreshToken,
@@ -358,10 +358,16 @@ export class AuthLoginService {
         deviceInfo: deviceInfo ? JSON.stringify(deviceInfo) : Prisma.JsonNull,
         ipAddress,
         userAgent
-      }
-    });
+      };
 
-    return { id: session.id };
+      const session = await prisma.session.create({
+        data: sessionData
+      });
+      
+      return { id: session.id };
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**

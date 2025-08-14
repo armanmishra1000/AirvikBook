@@ -83,14 +83,15 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     <div className={`bg-airvik-white dark:bg-airvik-midnight rounded-radius-lg shadow-shadow-sm overflow-hidden ${className}`}>
       {/* Header with Profile Picture */}
       <div className="relative bg-gradient-to-r from-airvik-blue to-airvik-purple p-space-6">
-        <div className="flex items-center space-x-space-4">
-          {/* Profile Picture */}
-          <div className="relative">
-            <img
-              src={profile.profilePicture || '/images/profile_picture.jpg'}
-              alt={`${profile.fullName}'s profile picture`}
-              className="w-20 h-20 rounded-radius-full object-cover border-4 border-airvik-white shadow-shadow-md"
-            />
+        <div className="flex items-center justify-between">
+          {/* Profile Picture and Info */}
+          <div className="flex items-center space-x-space-3">
+            <div className="relative">
+              <img
+                src={profile.profilePicture || '/images/profile_picture.jpg'}
+                alt={`${profile.fullName}'s profile picture`}
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-radius-full object-cover border-4 border-airvik-white shadow-shadow-md"
+              />
             {showActions && onPictureChange && (
               <button
                 onClick={onPictureChange}
@@ -103,30 +104,31 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
               </button>
             )}
           </div>
-
+          
           {/* Profile Info */}
-          <div className="flex-1">
-            <h2 className="text-h2 text-airvik-white font-bold">
-              {profile.fullName}
-            </h2>
-            {profile.occupation && (
-              <p className="text-body text-airvik-white/90 mt-space-1">
-                {profile.occupation}
-              </p>
-            )}
-            {profile.location && (
-              <p className="text-caption text-airvik-white/80 mt-space-1">
-                📍 {profile.location}
-              </p>
-            )}
+            <div className="flex-1">
+              <h2 className="text-h3 sm:text-h2 text-airvik-white font-bold">
+                {profile.fullName}
+              </h2>
+              {profile.occupation && (
+                <p className="text-body-sm sm:text-body text-airvik-white/90 mt-space-1">
+                  {profile.occupation}
+                </p>
+              )}
+              {profile.location && (
+                <p className="text-caption text-airvik-white/80 mt-space-1">
+                  📍 {profile.location}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Actions */}
           {showActions && onEdit && (
             <button
               onClick={onEdit}
-              className="px-space-4 py-space-2 bg-airvik-blue text-airvik-white rounded-radius-md font-sf-pro text-button
-                hover:bg-airvik-blue-mid focus:outline-none focus:ring-airvik-blue focus:ring-offset-2"
+              className="px-space-4 py-space-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-radius-md font-sf-pro text-button
+                focus:outline-none focus:ring-airvik-blue focus:ring-offset-2"
             >
               Edit Profile
             </button>
@@ -135,7 +137,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
       </div>
 
       {/* Profile Content */}
-      <div className="p-space-6 space-y-space-6">
+      <div className="p-space-4 lg:p-space-8 space-y-space-8 lg:space-y-space-6">
         {/* Bio */}
         {profile.bio && (
           <div>
@@ -149,7 +151,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
         )}
 
         {/* Personal Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-space-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-4">
           {/* Contact Information */}
           <div className="space-y-space-3">
             <h3 className="text-h5 text-airvik-black dark:text-airvik-white">

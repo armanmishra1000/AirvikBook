@@ -9,16 +9,19 @@
  * TOAST NOTIFICATIONS: Uses toast system for success/error messages
  */
 
-import React, { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { isSuccessResponse } from "../../../types/userRegistration.types";
-import UserRegistrationService from "../../../services/userRegistration.service";
-import { useToastHelpers } from "../../../components/common/Toast";
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { isSuccessResponse } from '../../types/userRegistration.types';
+import UserRegistrationService from '../../services/userRegistration.service';
+import { AUTH_PATHS } from '../../lib/paths';
+import { useToastHelpers } from '../../components/common/Toast';
+import { useAuth } from '../../context/AuthContext';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showSuccess, showError } = useToastHelpers();
+  const { handleEmailVerificationAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -65,7 +68,7 @@ export default function VerifyEmailPage() {
 
     // If no email provided, redirect to registration
     if (!emailParam) {
-      router.push("/auth/register");
+      router.push(AUTH_PATHS.REGISTER);
       return;
     }
 
@@ -152,9 +155,16 @@ export default function VerifyEmailPage() {
           );
         }
 
+        // Handle authentication after email verification
+        try {
+          await handleEmailVerificationAuth();
+        } catch (error) {
+          console.error('Failed to authenticate after email verification:', error);
+        }
+
         // Always redirect, even if component unmounted (user will see success page)
         setTimeout(() => {
-          router.push("/auth/success");
+          router.push(AUTH_PATHS.SUCCESS);
         }, 2000);
       } else {
         // Only update state if component is still mounted
@@ -243,7 +253,7 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 py-space-12 px-space-4 sm:px-space-6 lg:px-space-8">
-      <div className="w-full max-w-md mx-auto relative pb-6">
+      <div className="relative w-full max-w-md pb-6 mx-auto">
         {/* Main Card */}
         <div className="bg-airvik-white dark:bg-gray-800 rounded-radius-lg sm:shadow-lg sm:p-space-6 sm:card-auth">
           <div className="space-y-space-4">
@@ -258,7 +268,7 @@ export default function VerifyEmailPage() {
                   <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
                     Verifying Email...
                   </h1>
-                  <p className="text-body text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 text-body dark:text-gray-400">
                     Please wait while we verify your email address
                   </p>
                 </>
@@ -283,7 +293,7 @@ export default function VerifyEmailPage() {
                   <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
                     Email Verified! 🎉
                   </h1>
-                  <p className="text-body text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 text-body dark:text-gray-400">
                     Your account has been successfully verified
                   </p>
                 </>
@@ -308,14 +318,14 @@ export default function VerifyEmailPage() {
                   <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
                     Verification Failed
                   </h1>
-                  <p className="text-body text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 text-body dark:text-gray-400">
                     There was a problem verifying your email
                   </p>
                 </>
               ) : (
                 // Default state (waiting for verification)
                 <>
-                  <div className="flex items-center justify-center sm:size-16 size-12 mx-auto bg-blue-100 rounded-full dark:bg-blue-900 mb-space-4">
+                  <div className="flex items-center justify-center mx-auto bg-blue-100 rounded-full sm:size-16 size-12 dark:bg-blue-900 mb-space-4">
                     <svg
                       className="w-8 h-8 text-blue-600 dark:text-blue-400"
                       fill="none"
@@ -333,7 +343,7 @@ export default function VerifyEmailPage() {
                   <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
                     Check Your Email
                   </h1>
-                  <p className="text-body text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 text-body dark:text-gray-400">
                     We've sent a verification link to:
                   </p>
                   <p className="font-semibold text-airvik-black dark:text-airvik-white text-body mt-space-1">
@@ -354,11 +364,11 @@ export default function VerifyEmailPage() {
                   <button
                     onClick={handleResendVerification}
                     disabled={isResending}
-                    className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
+                    className="w-full font-medium transition-all duration-100 ease-linear bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
                   >
                     {isResending ? (
                       <div className="flex items-center justify-center">
-                        <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
+                        <div className="w-5 h-5 border-2 animate-spin border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
                         Sending...
                       </div>
                     ) : (
@@ -387,8 +397,8 @@ export default function VerifyEmailPage() {
             {/* Success Actions - Show when verified */}
             {isVerified && (
               <button
-                onClick={() => router.push("/auth/success")}
-                className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
+                onClick={() => router.push(AUTH_PATHS.SUCCESS)}
+                className="w-full font-medium transition-all duration-100 ease-linear bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
               >
                 Continue to Dashboard
               </button>
@@ -403,14 +413,14 @@ export default function VerifyEmailPage() {
                   </p>
                   <div className="space-y-space-2">
                     <button
-                      onClick={() => router.push("/auth/register")}
-                      className="block w-full text-sm text-airvik-blue underline dark:text-airvik-blue hover:text-airvik-bluehover dark:hover:text-airvik-blue transition-colors duration-normal"
+                      onClick={() => router.push(AUTH_PATHS.REGISTER)}
+                      className="block w-full text-sm underline transition-colors text-airvik-blue dark:text-airvik-blue hover:text-airvik-bluehover dark:hover:text-airvik-blue duration-normal"
                     >
                       Try registering again
                     </button>
                     <a
                       href="/contact"
-                      className="block w-full text-sm text-airvik-blue underline dark:text-airvik-blue hover:text-airvik-bluehover dark:hover:text-airvik-blue transition-colors duration-normal"
+                      className="block w-full text-sm underline transition-colors text-airvik-blue dark:text-airvik-blue hover:text-airvik-bluehover dark:hover:text-airvik-blue duration-normal"
                     >
                       Contact support
                     </a>

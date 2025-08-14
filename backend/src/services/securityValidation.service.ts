@@ -661,7 +661,7 @@ export class SecurityValidationService {
       'WHATSAPP_ACCESS_TOKEN',
       'RAZORPAY_KEY_SECRET',
       'ICICI_ENCRYPTION_KEY',
-      'VIRUSTOTAL_API_KEY',
+
       'AWS_SECRET_ACCESS_KEY',
     ];
 

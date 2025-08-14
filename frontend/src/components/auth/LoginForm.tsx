@@ -14,6 +14,7 @@ import {
 import { UserLoginService } from "../../services/userLogin.service";
 import { Eye, EyeOff } from "lucide-react";
 import GoogleOAuthRedirectButton from "./GoogleOAuthRedirectButton";
+import { AUTH_PATHS } from "../../lib/paths";
 import Checkbox from "../common/Checkbox";
 
 // =====================================================
@@ -215,7 +216,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <h1 className="md:text-h1 text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-2">
           Welcome Back
         </h1>
-        <p className="text-body text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600 text-body dark:text-gray-400">
           Sign in to your account
         </p>
       </div>
@@ -246,11 +247,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             disabled:bg-gray-100 dark:disabled:bg-gray-200 
             disabled:text-gray-500 dark:disabled:text-gray-400
             disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
-              ${
-                errors.email
+              ${errors.email
                   ? "border-error focus:ring-1 focus:ring-error"
                   : "border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
-              }`}
+                }`}
               placeholder="Enter your email address"
               disabled={isSubmitting}
               autoComplete="email"
@@ -287,11 +287,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             disabled:bg-gray-100 dark:disabled:bg-gray-200 
             disabled:text-gray-500 dark:disabled:text-gray-400
             disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
-                ${
-                  errors.password
+                ${errors.password
                     ? "border-error focus:ring-1 focus:ring-error"
                     : "border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400"
-                }`}
+                  }`}
                 placeholder="Enter your password"
                 disabled={isSubmitting}
                 autoComplete="current-password"
@@ -300,13 +299,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute right-space-3 top-1/2 transform -translate-y-1/2
-              p-space-2 rounded-radius-sm
-              text-gray-500 dark:text-gray-400
-              hover:text-gray-700 dark:hover:text-gray-200
-              focus:outline-none
-              disabled:opacity-50 disabled:cursor-not-allowed
-              transition-colors duration-normal"
+                className="absolute text-gray-500 transition-colors transform -translate-y-1/2 right-space-3 top-1/2 p-space-2 rounded-radius-sm dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed duration-normal"
                 disabled={isSubmitting}
               >
                 {showPassword ? (
@@ -326,10 +319,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting || authState.isLoading}
+            disabled={isSubmitting}
             className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 ease-linear focus:outline-none"
           >
-            {isSubmitting || authState.isLoading ? (
+            {isSubmitting ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin h-5 w-5 border-2 border-airvik-white border-t-transparent rounded-radius-full mr-space-2" />
                 Signing In...
@@ -356,8 +349,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
             {showForgotPassword && (
               <a
-                href="/auth/forgot-password"
-                className="text-body text-airvik-blue underline transition-colors duration-normal"
+                href={AUTH_PATHS.FORGOT_PASSWORD}
+                className="underline transition-colors text-body text-airvik-blue duration-normal"
               >
                 Forgot password?
               </a>
@@ -371,7 +364,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-center text-caption">
-            <span className="px-space-2 bg-airvik-white text-sm  text-gray-500 font-sf-pro">
+            <span className="text-sm text-gray-500 px-space-2 bg-airvik-white font-sf-pro">
               Or Sign in with
             </span>
           </div>
@@ -383,12 +376,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </GoogleOAuthRedirectButton>
 
         {/* Back to Login */}
-        <div className="mt-space-4 text-center">
-          <p className="text-body text-gray-600 dark:text-gray-400">
+        <div className="text-center mt-space-4">
+          <p className="text-gray-600 text-body dark:text-gray-400">
             Don't have an account?{" "}
             <a
-              href="/auth/register"
-              className="text-airvik-blue transition-colors duration-normal font-medium"
+              href={AUTH_PATHS.REGISTER}
+              className="font-medium transition-colors text-airvik-blue duration-normal"
             >
               Sign up
             </a>

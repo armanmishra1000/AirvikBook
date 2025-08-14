@@ -295,7 +295,7 @@ export default function RegistrationForm({
     if (!validateForm() || isLoading) return;
 
     setIsLoading(true);
-    setErrors({});
+    // Don't clear errors here - let them remain visible during the submission process
 
     try {
       const registrationData = {
@@ -309,13 +309,12 @@ export default function RegistrationForm({
       const response = await UserRegistrationService.register(registrationData);
 
       if (isSuccessResponse(response)) {
-        // Show success toast but don't wait - let parent handle redirect
+        // Clear errors only on successful submission
+        setErrors({});
         showSuccess(
           "Account Created",
           "Your account has been created successfully!"
         );
-        
-        // Call onSuccess callback immediately - parent will handle redirect
         onSuccess?.(response.data.user, response.data.tokens);
       } else {
         const errorMessage =

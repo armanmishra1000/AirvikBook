@@ -4,6 +4,7 @@ import { LoginController } from '../controllers/auth/login.controller';
 import { GoogleOAuthRedirectController } from '../controllers/auth/googleOAuthRedirect.controller';
 import { AuthMiddleware } from '../middleware/auth.middleware';
 import passwordManagementRoutes from './passwordManagement.routes';
+import { AUTH_PATHS } from '../lib/paths';
 
 const router = Router();
 
@@ -15,7 +16,7 @@ const router = Router();
 // ==================== REGISTRATION ROUTES ====================
 // POST /api/v1/auth/register
 router.post(
-  '/register',
+  AUTH_PATHS.REGISTER,
   AuthController.registrationLimiter,
   AuthController.validateRegistration,
   AuthController.register
@@ -23,7 +24,7 @@ router.post(
 
 // POST /api/v1/auth/google
 router.post(
-  '/google',
+  AUTH_PATHS.GOOGLE_AUTH,
   AuthController.registrationLimiter,
   AuthController.validateGoogleAuth,
   AuthController.googleAuth
@@ -31,21 +32,21 @@ router.post(
 
 // ==================== GOOGLE OAUTH REDIRECT ROUTES ====================
 // GET /api/v1/auth/google/redirect
-router.get('/google/redirect', GoogleOAuthRedirectController.initiateOAuth);
+router.get(AUTH_PATHS.GOOGLE_REDIRECT, GoogleOAuthRedirectController.initiateOAuth);
 
 // GET /api/v1/auth/google/callback  
-router.get('/google/callback', GoogleOAuthRedirectController.handleCallback);
+router.get(AUTH_PATHS.GOOGLE_CALLBACK, GoogleOAuthRedirectController.handleCallback);
 
 // POST /api/v1/auth/verify-email
 router.post(
-  '/verify-email',
+  AUTH_PATHS.VERIFY_EMAIL,
   AuthController.validateEmailVerification,
   AuthController.verifyEmail
 );
 
 // POST /api/v1/auth/resend-verification
 router.post(
-  '/resend-verification',
+  AUTH_PATHS.RESEND_VERIFICATION,
   AuthController.verificationLimiter,
   AuthController.validateResendVerification,
   AuthController.resendVerification
@@ -53,7 +54,7 @@ router.post(
 
 // GET /api/v1/auth/check-email/:email
 router.get(
-  '/check-email/:email',
+  `${AUTH_PATHS.CHECK_EMAIL}/:email`,
   AuthController.validateEmailParam,
   AuthController.checkEmailAvailability
 );
@@ -61,7 +62,7 @@ router.get(
 // ==================== LOGIN ROUTES ====================
 // POST /api/v1/auth/login
 router.post(
-  '/login',
+  AUTH_PATHS.LOGIN,
   LoginController.loginLimiter,
   LoginController.validateLogin,
   LoginController.login
@@ -69,7 +70,7 @@ router.post(
 
 // POST /api/v1/auth/google-login
 router.post(
-  '/google-login',
+  AUTH_PATHS.GOOGLE_LOGIN,
   LoginController.loginLimiter,
   LoginController.validateGoogleLogin,
   LoginController.googleLogin
@@ -77,14 +78,14 @@ router.post(
 
 // POST /api/v1/auth/refresh
 router.post(
-  '/refresh',
+  AUTH_PATHS.REFRESH,
   LoginController.validateRefresh,
   LoginController.refresh
 );
 
 // POST /api/v1/auth/logout
 router.post(
-  '/logout',
+  AUTH_PATHS.LOGOUT,
   AuthMiddleware.verifyToken,
   LoginController.validateLogout,
   LoginController.logout
@@ -93,7 +94,7 @@ router.post(
 // ==================== SESSION MANAGEMENT ROUTES ====================
 // GET /api/v1/auth/sessions
 router.get(
-  '/sessions',
+  AUTH_PATHS.SESSIONS,
   AuthMiddleware.verifyToken,
   LoginController.sessionLimiter,
   LoginController.getSessions
@@ -101,7 +102,7 @@ router.get(
 
 // DELETE /api/v1/auth/sessions
 router.delete(
-  '/sessions',
+  AUTH_PATHS.SESSIONS,
   AuthMiddleware.verifyToken,
   LoginController.sessionLimiter,
   LoginController.logoutFromAllDevices
@@ -109,7 +110,7 @@ router.delete(
 
 // DELETE /api/v1/auth/sessions/:sessionId
 router.delete(
-  '/sessions/:sessionId',
+  `${AUTH_PATHS.SESSIONS}/:sessionId`,
   AuthMiddleware.verifyToken,
   LoginController.sessionLimiter,
   LoginController.invalidateSpecificSession
@@ -118,7 +119,7 @@ router.delete(
 // ==================== ACCOUNT LINKING ROUTES ====================
 // POST /api/v1/auth/link-google
 router.post(
-  '/link-google',
+  AUTH_PATHS.LINK_GOOGLE,
   AuthMiddleware.verifyToken,
   LoginController.validateLinkGoogle,
   LoginController.linkGoogleAccount

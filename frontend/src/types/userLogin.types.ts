@@ -305,6 +305,9 @@ export interface AuthContextValue {
   connectGoogleAccount: (token: string) => Promise<ConnectGoogleApiResponse>;
   disconnectGoogleAccount: () => Promise<DisconnectGoogleApiResponse>;
   refreshUserData: () => Promise<GetProfileApiResponse>;
+  
+  // Email Verification
+  handleEmailVerificationAuth: () => Promise<void>;
 }
 
 // =====================================================

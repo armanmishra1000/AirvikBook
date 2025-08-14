@@ -22,6 +22,7 @@ import {
   isSuccessResponse,
   isErrorResponse
 } from '../types/userRegistration.types';
+import { AUTH_PATHS } from '../lib/paths';
 
 export class UserRegistrationService {
   private static readonly API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -116,7 +117,7 @@ export class UserRegistrationService {
    * Register new user with email/password
    */
   static async register(userData: UserRegistrationRequest): Promise<ApiResponse<RegistrationResponse>> {
-    const response = await this.makeRequest<RegistrationResponse>('/auth/register', {
+    const response = await this.makeRequest<RegistrationResponse>(`/auth${AUTH_PATHS.REGISTER}`, {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -136,7 +137,7 @@ export class UserRegistrationService {
   static async registerWithGoogle(
     googleData: GoogleAuthRequest
   ): Promise<ApiResponse<RegistrationResponse>> {
-    const response = await this.makeRequest<RegistrationResponse>('/auth/google', {
+    const response = await this.makeRequest<RegistrationResponse>(`/auth${AUTH_PATHS.GOOGLE_AUTH}`, {
       method: 'POST',
       body: JSON.stringify(googleData),
     });
@@ -156,14 +157,20 @@ export class UserRegistrationService {
   static async verifyEmail(
     verificationData: EmailVerificationRequest
   ): Promise<ApiResponse<EmailVerificationResponse>> {
-    const response = await this.makeRequest<EmailVerificationResponse>('/auth/verify-email', {
+    const response = await this.makeRequest<EmailVerificationResponse>(`/auth${AUTH_PATHS.VERIFY_EMAIL}`, {
       method: 'POST',
       body: JSON.stringify(verificationData),
     });
 
-    // Update stored user data if verification successful
+    // Update stored user data and tokens if verification successful
     if (isSuccessResponse(response)) {
       this.storeUser(response.data.user);
+      
+      // Store new tokens after email verification
+      if (response.data.tokens) {
+        sessionStorage.setItem('airvik_access_token', response.data.tokens.accessToken);
+        localStorage.setItem('airvik_refresh_token', response.data.tokens.refreshToken);
+      }
     }
 
     return response;
@@ -175,7 +182,7 @@ export class UserRegistrationService {
   static async resendVerification(
     resendData: ResendVerificationRequest
   ): Promise<ApiResponse<ResendVerificationResponse>> {
-    return this.makeRequest<ResendVerificationResponse>('/auth/resend-verification', {
+    return this.makeRequest<ResendVerificationResponse>(`/auth${AUTH_PATHS.RESEND_VERIFICATION}`, {
       method: 'POST',
       body: JSON.stringify(resendData),
     });
@@ -202,7 +209,7 @@ export class UserRegistrationService {
     }
 
     try {
-      const response = await this.makeRequest<{ accessToken: string }>('/auth/refresh', {
+      const response = await this.makeRequest<{ accessToken: string }>(`/auth${AUTH_PATHS.REFRESH}`, {
         method: 'POST',
         body: JSON.stringify({ refreshToken }),
       });
@@ -236,7 +243,7 @@ export class UserRegistrationService {
     // Optionally notify server to blacklist token
     if (refreshToken) {
       try {
-        await this.makeRequest('/auth/logout', {
+        await this.makeRequest(`/auth${AUTH_PATHS.LOGOUT}`, {
           method: 'POST',
           body: JSON.stringify({ refreshToken }),
         });

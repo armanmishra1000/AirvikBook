@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth, useIsAuthenticated } from '../../../context/AuthContext';
+import { AUTH_PATHS } from '../../../lib/paths';
 import { useToastHelpers } from '../../../components/common/Toast';
 import { ProfilePictureUpload } from '../../../components/profile/ProfilePictureUpload';
 import { UserProfile, isSuccessResponse } from '../../../types/userProfile.types';
@@ -29,7 +30,7 @@ export default function ProfilePicturePage() {
 
   useEffect(() => {
     if (!authState.isLoading && !isAuthenticated) {
-      router.replace('/auth/login');
+      router.replace(AUTH_PATHS.LOGIN);
       return;
     }
 
@@ -149,12 +150,12 @@ export default function ProfilePicturePage() {
             </svg>
             <span className="font-medium text-airvik-blue dark:text-airvik-white">Profile Picture</span>
           </nav>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-space-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-4">
             <div>
-              <h1 className="font-bold text-h2 text-airvik-black dark:text-airvik-white">Profile Picture</h1>
-              <p className="text-gray-600 mt-space-2 text-body dark:text-gray-400">Upload or sync your profile picture</p>
+              <h1 className="font-bold text-h3 lg:text-h2 text-airvik-black dark:text-airvik-white">Profile Picture</h1>
+              <p className="text-gray-600 mt-space-2 text-body-sm lg:text-body dark:text-gray-400">Upload or sync your profile picture</p>
             </div>
-            <Link href="/profile" className="group inline-flex items-center gap-space-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal  active:translate-y-0 border border-gray-200 dark:border-gray-700">
+            <Link href="/profile" className="group inline-flex items-center gap-space-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal active:translate-y-0 border border-gray-200 dark:border-gray-700 self-start sm:self-auto">
               <svg className="w-5 h-5 transition-transform " viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
               </svg>
@@ -165,9 +166,9 @@ export default function ProfilePicturePage() {
       </div>
 
       <div className="container mx-auto px-space-4 pb-space-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-space-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-space-6">
           {/* Upload card */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-2">
             {profile && (
               <ProfilePictureUpload
                 currentPictureUrl={profile.profilePicture}
@@ -177,8 +178,8 @@ export default function ProfilePicturePage() {
             )}
           </div>
           {/* Guidelines */}
-          <aside className="space-y-space-6">
-            <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-5 shadow-shadow-sm">
+          <aside className="space-y-space-4 lg:space-y-space-6">
+            <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
               <h3 className="text-h6 mb-space-2 text-airvik-black dark:text-airvik-white">File Requirements</h3>
               <ul className="text-gray-600 text-caption dark:text-gray-400 space-y-space-1">
                 <li>• Max size: 5MB</li>
@@ -186,7 +187,7 @@ export default function ProfilePicturePage() {
                 <li>• 100×100 to 2000×2000 px</li>
               </ul>
             </div>
-            <div className="border border-green-200 rounded-radius-lg dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-space-5">
+            <div className="border border-green-200 rounded-radius-lg dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-space-4 lg:p-space-5">
               <h3 className="text-green-800 text-h6 mb-space-2 dark:text-green-200">Pro Tips</h3>
               <ul className="text-green-700 text-caption dark:text-green-300 space-y-space-1">
                 <li>• Use a recent, clear headshot</li>
@@ -195,12 +196,12 @@ export default function ProfilePicturePage() {
               </ul>
             </div>
             {profile?.profilePicture && (
-              <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-5">
+              <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5">
                 <h3 className="text-h6 mb-space-2 text-airvik-black dark:text-airvik-white">Current Picture</h3>
                 <div className="flex items-center space-x-space-4">
-                  <img src={profile.profilePicture} alt="Current profile" className="object-cover w-16 h-16 border-2 border-gray-200 rounded-radius-full dark:border-gray-600" />
+                  <img src={profile.profilePicture} alt="Current profile" className="object-cover w-12 h-12 sm:w-16 sm:h-16 border-2 border-gray-200 rounded-radius-full dark:border-gray-600" />
                   <div>
-                    <p className="text-gray-700 text-body dark:text-gray-300"><span className="font-medium">Source:</span> {profile.profilePictureSource || 'DEFAULT'}</p>
+                    <p className="text-gray-700 text-body-sm lg:text-body dark:text-gray-300"><span className="font-medium">Source:</span> {profile.profilePictureSource || 'DEFAULT'}</p>
                     {profile.lastUpdated && (
                       <p className="text-gray-500 text-caption dark:text-gray-400">Last updated: {new Date(profile.lastUpdated).toLocaleDateString()}</p>
                     )}

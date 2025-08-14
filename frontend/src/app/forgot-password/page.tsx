@@ -2,13 +2,14 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { PasswordManagementService } from "../../../services/passwordManagement.service";
+import { PasswordManagementService } from "../../services/passwordManagement.service";
 import {
   isSuccessResponse,
   PASSWORD_ERROR_CODES,
-} from "../../../types/passwordManagement.types";
-import { useToastHelpers } from "../../../components/common/Toast";
-
+} from "../../types/passwordManagement.types";
+import { useToastHelpers } from "../../components/common/Toast";
+import { ArrowLeft } from "lucide-react";
+import { AUTH_PATHS } from "../../lib/paths";
 
 // =====================================================
 // FORGOT PASSWORD PAGE COMPONENT
@@ -186,7 +187,7 @@ const ForgotPasswordPage: React.FC = () => {
               {/* Action Buttons */}
               <div className="space-y-space-3">
                 <button
-                  onClick={() => router.push("/auth/login")}
+                  onClick={() => router.push(AUTH_PATHS.LOGIN)}
                   className="w-full bg-gradient-to-r from-airvik-blue to-airvik-purple hover:from-airvik-purple hover:to-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium transition-all duration-100 ease-linear focus:outline-none"
                 >
                   Back to Login
@@ -285,7 +286,7 @@ const ForgotPasswordPage: React.FC = () => {
           {/* Back to Login */}
           <div className="mt-space-4 text-center">
             <button
-              onClick={() => router.push("/auth/login")}
+              onClick={() => router.push(AUTH_PATHS.LOGIN)}
               className="font-sf-pro bg-gray-200 font-medium tracking-normal text-gray-700  w-full py-space-3 transition-colors duration-normal focus:outline-none rounded-radius-sm"
             >
               Back to Login

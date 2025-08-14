@@ -54,12 +54,13 @@ export class SessionManagementService {
     currentRefreshToken?: string
   ): Promise<ActiveSessionsResult> {
     try {
-      const sessions = await prisma.session.findMany({
-        where: {
+      // Get only active and non-expired sessions
+      const activeSessions = await prisma.session.findMany({
+        where: { 
           userId,
           isActive: true,
           expiresAt: {
-            gt: new Date()
+            gt: new Date() // Only sessions that haven't expired
           }
         },
         select: {
@@ -80,7 +81,7 @@ export class SessionManagementService {
         }
       });
 
-      const sessionData: SessionData[] = sessions.map(session => {
+      const sessionData: SessionData[] = activeSessions.map((session, index) => {
         let deviceInfo: DeviceInfo;
         try {
           deviceInfo = session.deviceInfo ? 
@@ -90,6 +91,11 @@ export class SessionManagementService {
           deviceInfo = { deviceId: 'unknown', deviceName: 'Unknown Device' };
         }
 
+        // If no current refresh token is provided, mark the most recent session as current
+        const isCurrent = currentRefreshToken ? 
+          session.refreshToken === currentRefreshToken : 
+          index === 0; // First session (most recent) is current
+
         return {
           id: session.id,
           deviceInfo: {
@@ -98,7 +104,7 @@ export class SessionManagementService {
           },
           createdAt: session.createdAt.toISOString(),
           lastActivity: session.updatedAt.toISOString(),
-          isCurrent: session.refreshToken === currentRefreshToken,
+          isCurrent,
           ipAddress: session.ipAddress || undefined,
           location: this.getLocationFromIP(session.ipAddress || '')
         };
@@ -273,12 +279,11 @@ export class SessionManagementService {
     error?: string;
   }> {
     try {
+      // Only delete sessions that have actually expired
+      // Don't delete inactive sessions as they might be needed for audit purposes
       const result = await prisma.session.deleteMany({
         where: {
-          OR: [
-            { expiresAt: { lt: new Date() } },
-            { isActive: false }
-          ]
+          expiresAt: { lt: new Date() }  // Only delete expired sessions
         }
       });
 

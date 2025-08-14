@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, useIsAuthenticated } from '../../../context/AuthContext';
+import { AUTH_PATHS } from '../../../lib/paths';
 import { PasswordManagementService } from '../../../services/passwordManagement.service';
 import { PasswordInput } from '../../../components/auth/PasswordInput';
 import { PasswordRequirements } from '../../../components/auth/PasswordRequirements';
@@ -18,7 +19,8 @@ import { isSuccessResponse, PASSWORD_ERROR_CODES } from '../../../types/password
 const SecurityPage: React.FC = () => {
   const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
-  const { authState } = useAuth();
+  const { authState, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Password management state
   const [passwordStatus, setPasswordStatus] = useState<any>(null);
@@ -62,7 +64,7 @@ const SecurityPage: React.FC = () => {
   useEffect(() => {
     // Redirect if not authenticated
     if (!isAuthenticated && !authState.isLoading) {
-      router.replace('/auth/login');
+      router.replace(AUTH_PATHS.LOGIN);
       return;
     }
 
@@ -88,6 +90,36 @@ const SecurityPage: React.FC = () => {
       setError('Network error. Please try again.');
     } finally {
       setIsLoadingStatus(false);
+    }
+  };
+
+  // =====================================================
+  // LOGOUT HANDLERS
+  // =====================================================
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout(false);
+      router.push(`/auth${AUTH_PATHS.LOGIN}`);
+    } catch (error) {
+      console.error('Logout error:', error);
+      setError('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  const handleLogoutAllDevices = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout(true);
+      router.push(`/auth${AUTH_PATHS.LOGIN}`);
+    } catch (error) {
+      console.error('Logout error:', error);
+      setError('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -281,10 +313,10 @@ const SecurityPage: React.FC = () => {
   // Show loading while checking authentication
   if (authState.isLoading || isLoadingStatus) {
     return (
-      <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen bg-airvik-white dark:bg-gray-900">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 mx-auto mb-space-4 border-4 border-airvik-blue border-t-transparent rounded-radius-full" />
-          <p className="text-body text-gray-600 dark:text-gray-400 font-sf-pro">
+          <div className="w-8 h-8 mx-auto border-4 animate-spin mb-space-4 border-airvik-blue border-t-transparent rounded-radius-full" />
+          <p className="text-gray-600 text-body dark:text-gray-400 font-sf-pro">
             Loading...
           </p>
         </div>
@@ -300,13 +332,13 @@ const SecurityPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-airvik-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-space-4 sm:px-space-6 lg:px-space-8">
+      <div className="shadow-sm bg-airvik-white dark:bg-gray-800">
+        <div className="mx-auto max-w-7xl px-space-4 sm:px-space-6 lg:px-space-8">
           <div className="flex items-center justify-between py-space-6">
             <div className="flex items-center">
               <button
                 onClick={() => router.back()}
-                className="mr-space-4 p-space-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors duration-normal"
+                className="text-gray-400 transition-colors mr-space-4 p-space-2 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 duration-normal"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -316,7 +348,7 @@ const SecurityPage: React.FC = () => {
                 <h1 className="text-h2 font-sf-pro text-airvik-black dark:text-airvik-white">
                   Account Security
                 </h1>
-                <p className="text-body text-gray-600 dark:text-gray-400 mt-space-1">
+                <p className="text-gray-600 text-body dark:text-gray-400 mt-space-1">
                   Manage your authentication methods and password
                 </p>
               </div>
@@ -331,7 +363,7 @@ const SecurityPage: React.FC = () => {
                   className="w-10 h-10 rounded-radius-full"
                 />
               ) : (
-                <div className="w-10 h-10 bg-airvik-blue text-airvik-white rounded-radius-full flex items-center justify-center font-sf-pro font-medium">
+                <div className="flex items-center justify-center w-10 h-10 font-medium bg-airvik-blue text-airvik-white rounded-radius-full font-sf-pro">
                   {authState.user?.fullName.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -339,7 +371,7 @@ const SecurityPage: React.FC = () => {
                 <p className="text-label font-sf-pro text-airvik-black dark:text-airvik-white">
                   {authState.user?.fullName}
                 </p>
-                <p className="text-caption text-gray-600 dark:text-gray-400">
+                <p className="text-gray-600 text-caption dark:text-gray-400">
                   {authState.user?.email}
                 </p>
               </div>
@@ -352,7 +384,7 @@ const SecurityPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-space-4 sm:px-space-6 lg:px-space-8 py-space-8">
         {/* Error/Success Messages */}
         {error && (
-          <div className="mb-space-6 p-space-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-radius-md">
+          <div className="border border-red-200 mb-space-6 p-space-4 bg-red-50 dark:bg-red-900/20 dark:border-red-800 rounded-radius-md">
             <p className="text-body font-sf-pro text-error">
               {error}
             </p>
@@ -360,7 +392,7 @@ const SecurityPage: React.FC = () => {
         )}
 
         {success && (
-          <div className="mb-space-6 p-space-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-radius-md">
+          <div className="border border-green-200 mb-space-6 p-space-4 bg-green-50 dark:bg-green-900/20 dark:border-green-800 rounded-radius-md">
             <p className="text-body font-sf-pro text-success">
               {success}
             </p>
@@ -386,7 +418,7 @@ const SecurityPage: React.FC = () => {
 
         {/* Change Password Form */}
         {showChangePassword && (
-          <div className="mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-sm p-space-6">
+          <div className="shadow-sm mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6">
             <h3 className="text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-6">
               Change Password
             </h3>
@@ -443,7 +475,7 @@ const SecurityPage: React.FC = () => {
                   id="invalidateOtherSessions"
                   checked={changePasswordForm.invalidateOtherSessions}
                   onChange={(e) => setChangePasswordForm(prev => ({ ...prev, invalidateOtherSessions: e.target.checked }))}
-                  className="w-4 h-4 text-airvik-blue border-gray-300 rounded focus:ring-airvik-blue"
+                  className="w-4 h-4 border-gray-300 rounded text-airvik-blue focus:ring-airvik-blue"
                 />
                 <label htmlFor="invalidateOtherSessions" className="text-body font-sf-pro text-airvik-black dark:text-airvik-white">
                   Sign out from all other devices
@@ -455,14 +487,14 @@ const SecurityPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoadingAction}
-                  className="bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-blue-mid disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-normal"
+                  className="font-medium transition-colors bg-airvik-blue text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro hover:bg-airvik-blue-mid disabled:opacity-50 disabled:cursor-not-allowed duration-normal"
                 >
                   {isLoadingAction ? 'Changing Password...' : 'Change Password'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowChangePassword(false)}
-                  className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-normal"
+                  className="font-medium text-gray-700 transition-colors bg-gray-100 dark:bg-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro hover:bg-gray-200 dark:hover:bg-gray-600 duration-normal"
                 >
                   Cancel
                 </button>
@@ -473,7 +505,7 @@ const SecurityPage: React.FC = () => {
 
         {/* Set Password Form */}
         {showSetPassword && (
-          <div className="mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-sm p-space-6">
+          <div className="shadow-sm mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6">
             <h3 className="text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-6">
               Set Password
             </h3>
@@ -516,14 +548,14 @@ const SecurityPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoadingAction}
-                  className="bg-airvik-purple text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-airvik-purple-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-normal"
+                  className="font-medium transition-colors bg-airvik-purple text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro hover:bg-airvik-purple-light disabled:opacity-50 disabled:cursor-not-allowed duration-normal"
                 >
                   {isLoadingAction ? 'Setting Password...' : 'Set Password'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowSetPassword(false)}
-                  className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-normal"
+                  className="font-medium text-gray-700 transition-colors bg-gray-100 dark:bg-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro hover:bg-gray-200 dark:hover:bg-gray-600 duration-normal"
                 >
                   Cancel
                 </button>
@@ -534,13 +566,13 @@ const SecurityPage: React.FC = () => {
 
         {/* Remove Password Form */}
         {showRemovePassword && (
-          <div className="mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg shadow-sm p-space-6">
+          <div className="shadow-sm mt-space-8 bg-airvik-white dark:bg-gray-800 rounded-radius-lg p-space-6">
             <h3 className="text-h3 font-sf-pro text-airvik-black dark:text-airvik-white mb-space-6">
               Remove Password
             </h3>
             
-            <div className="mb-space-6 p-space-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-radius-md">
-              <p className="text-body font-sf-pro text-yellow-800 dark:text-yellow-200">
+            <div className="border border-yellow-200 mb-space-6 p-space-4 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 rounded-radius-md">
+              <p className="text-yellow-800 text-body font-sf-pro dark:text-yellow-200">
                 <strong>Warning:</strong> Removing your password will make your account Google-only. You will need to use Google sign-in for all future logins.
               </p>
             </div>
@@ -565,7 +597,7 @@ const SecurityPage: React.FC = () => {
                   id="confirmGoogleOnly"
                   checked={removePasswordForm.confirmGoogleOnly}
                   onChange={(e) => setRemovePasswordForm(prev => ({ ...prev, confirmGoogleOnly: e.target.checked }))}
-                  className="w-4 h-4 text-airvik-blue border-gray-300 rounded focus:ring-airvik-blue"
+                  className="w-4 h-4 border-gray-300 rounded text-airvik-blue focus:ring-airvik-blue"
                 />
                 <label htmlFor="confirmGoogleOnly" className="text-body font-sf-pro text-airvik-black dark:text-airvik-white">
                   I understand that my account will become Google-only
@@ -583,14 +615,14 @@ const SecurityPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoadingAction}
-                  className="bg-error text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-normal"
+                  className="font-medium transition-colors bg-error text-airvik-white py-space-3 px-space-6 rounded-radius-md font-sf-pro hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed duration-normal"
                 >
                   {isLoadingAction ? 'Removing Password...' : 'Remove Password'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowRemovePassword(false)}
-                  className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-normal"
+                  className="font-medium text-gray-700 transition-colors bg-gray-100 dark:bg-gray-700 dark:text-gray-300 py-space-3 px-space-6 rounded-radius-md font-sf-pro hover:bg-gray-200 dark:hover:bg-gray-600 duration-normal"
                 >
                   Cancel
                 </button>
@@ -598,6 +630,41 @@ const SecurityPage: React.FC = () => {
             </form>
           </div>
         )}
+
+        {/* Emergency Logout Section */}
+        <div className="border border-red-200 mt-space-8 bg-red-50 dark:bg-red-900/20 dark:border-red-800 rounded-radius-lg p-space-6">
+          <div className="flex items-center space-x-space-3 mb-space-4">
+            <div className="flex items-center justify-center w-8 h-8 bg-red-600 rounded-radius-lg">
+              <svg className="w-4 h-4 text-airvik-white" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h3 className="text-red-800 text-h4 font-sf-pro dark:text-red-200">
+              Emergency Logout
+            </h3>
+          </div>
+          
+          <p className="text-red-700 text-body dark:text-red-300 mb-space-6">
+            Use these options to immediately end your session for security purposes. This is useful if you suspect unauthorized access to your account.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row space-y-space-3 sm:space-y-0 sm:space-x-space-4">
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="font-medium transition-colors bg-red-600 hover:bg-red-700 text-airvik-white px-space-6 py-space-3 rounded-radius-md font-sf-pro disabled:opacity-50 disabled:cursor-not-allowed duration-normal focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            >
+              {isLoggingOut ? 'Logging out...' : 'Logout Current Device'}
+            </button>
+            <button
+              onClick={handleLogoutAllDevices}
+              disabled={isLoggingOut}
+              className="font-medium transition-colors bg-red-800 hover:bg-red-900 text-airvik-white px-space-6 py-space-3 rounded-radius-md font-sf-pro disabled:opacity-50 disabled:cursor-not-allowed duration-normal focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            >
+              {isLoggingOut ? 'Logging out...' : 'Logout All Devices'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

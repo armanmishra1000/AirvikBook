@@ -12,7 +12,7 @@ export class LoginController {
    */
   static loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Maximum 5 login attempts per IP per window
+    max: process.env.NODE_ENV === 'development' ? 100 : 5, // Higher limit for development
     message: {
       success: false,
       error: 'Too many login attempts from this IP, please try again later',
@@ -353,18 +353,22 @@ export class LoginController {
       }
 
       const userId = req.user.userId;
-      // const authHeader = req.headers.authorization; // Not used yet
-      let currentRefreshToken: string | undefined;
-
-      // Try to get current refresh token for identifying current session
-      // This would need to be passed by the client or derived from the access token
-      // For now, we'll mark current session based on latest activity
+      
+      // Get current refresh token from the request headers
+      const currentRefreshToken = req.headers['x-refresh-token'] as string | undefined;
 
       const result = await SessionManagementService.getActiveSessions(userId, currentRefreshToken);
 
       if (!result.success) {
         return ResponseUtil.error(res, result.error || 'Failed to get sessions', 'SESSION_RETRIEVAL_ERROR', 500);
       }
+
+      // Set cache control headers to prevent caching
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
 
       return ResponseUtil.success(res, result.data);
 

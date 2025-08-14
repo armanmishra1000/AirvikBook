@@ -83,20 +83,23 @@ export const Checkbox: React.FC<CheckboxProps> = ({
             "w-5 h-5 rounded-radius-sm",
             "border-2 transition-all duration-fast",
             "flex items-center justify-center",
+            "relative",
             
             // Colors based on state
             checked
               ? "bg-airvik-blue border-airvik-blue"
               : "bg-airvik-white dark:bg-gray-900 border-gray-300 dark:border-gray-700",
             
-            // Error state
+            // Error state - red border when unchecked and has error
             error && !checked && "border-error",
             
-            // Hover states (only when not disabled)
-            !disabled && !checked && "hover:border-airvik-blue dark:hover:border-airvik-cyan",
+            // Hover states (only when not disabled and not in error state)
+            !disabled && !checked && !error && "hover:border-airvik-blue dark:hover:border-airvik-cyan",
             
-            // Focus states (using peer selector for proper focus management)
-            "peer-focus-visible:ring-2 peer-focus-visible:ring-airvik-blue/20 peer-focus-visible:ring-offset-2",
+            // Focus states - use error color when in error state, otherwise use brand blue
+            error && !checked 
+              ? "focus-within:ring-2 focus-within:ring-error/20 focus-within:ring-offset-2"
+              : "focus-within:ring-2 focus-within:ring-airvik-blue/20 focus-within:ring-offset-2",
             
             // Disabled state
             disabled && "opacity-50 cursor-not-allowed"
@@ -110,6 +113,14 @@ export const Checkbox: React.FC<CheckboxProps> = ({
             <Check 
               className="w-3 h-3 text-airvik-white" 
               strokeWidth={3}
+              aria-hidden="true"
+            />
+          )}
+          
+          {/* Error indicator - always visible when in error state */}
+          {error && !checked && (
+            <div 
+              className="absolute -inset-2 rounded-radius-sm border-2 border-error bg-error/5 pointer-events-none"
               aria-hidden="true"
             />
           )}

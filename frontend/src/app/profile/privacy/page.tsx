@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth, useIsAuthenticated } from '../../../context/AuthContext';
+import { AUTH_PATHS } from '../../../lib/paths';
 import { useToastHelpers } from '../../../components/common/Toast';
 import { PrivacySettings } from '../../../components/profile/PrivacySettings';
 import { UserProfile, isSuccessResponse } from '../../../types/userProfile.types';
@@ -29,7 +30,7 @@ export default function PrivacyPage() {
 
   useEffect(() => {
     if (!authState.isLoading && !isAuthenticated) {
-      router.replace('/auth/login');
+      router.replace(AUTH_PATHS.LOGIN);
       return;
     }
 
@@ -145,12 +146,12 @@ export default function PrivacyPage() {
             </svg>
             <span className="font-medium text-airvik-blue dark:text-airvik-white">Privacy Settings</span>
           </nav>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-space-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-4">
             <div>
-              <h1 className="font-bold text-h2 text-airvik-black dark:text-airvik-white">Privacy Settings</h1>
-              <p className="text-gray-600 mt-space-2 text-body dark:text-gray-400">Control who can see your profile information</p>
+              <h1 className="font-bold text-h3 lg:text-h2 text-airvik-black dark:text-airvik-white">Privacy Settings</h1>
+              <p className="text-gray-600 mt-space-2 text-body-sm lg:text-body dark:text-gray-400">Control who can see your profile information</p>
             </div>
-            <Link href="/profile" className="group inline-flex items-center gap-space-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal  active:translate-y-0 border border-gray-200 dark:border-gray-700">
+            <Link href="/profile" className="group inline-flex items-center gap-space-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-space-4 py-space-3 rounded-radius-lg shadow-shadow-sm hover:shadow-shadow-md transition-all duration-normal active:translate-y-0 border border-gray-200 dark:border-gray-700 self-start sm:self-auto">
               <svg className="w-5 h-5 transition-transform " viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
               </svg>
@@ -161,9 +162,9 @@ export default function PrivacyPage() {
       </div>
 
       <div className="container mx-auto px-space-4 pb-space-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-space-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-space-6">
           {/* Main settings */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-2">
             {profile && (
               <PrivacySettings
                 initialData={profile}
@@ -174,8 +175,8 @@ export default function PrivacyPage() {
           </div>
 
           {/* Informational sidebar */}
-          <aside className="space-y-space-6">
-            <div className="border border-yellow-200 rounded-radius-lg dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 p-space-5">
+          <aside className="space-y-space-4 lg:space-y-space-6">
+            <div className="border border-yellow-200 rounded-radius-lg dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 p-space-4 lg:p-space-5">
               <h3 className="text-yellow-800 text-h6 mb-space-2 dark:text-yellow-200">Visibility Levels</h3>
               <ul className="text-yellow-700 text-caption dark:text-yellow-300 space-y-space-1">
                 <li><strong>Public:</strong> Anyone can view your profile</li>
@@ -183,7 +184,7 @@ export default function PrivacyPage() {
                 <li><strong>Private:</strong> Only you can view</li>
               </ul>
             </div>
-            <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-5 shadow-shadow-sm">
+            <div className="bg-white border border-gray-200 rounded-radius-lg dark:border-gray-700 dark:bg-gray-800 p-space-4 lg:p-space-5 shadow-shadow-sm">
               <h3 className="text-h6 mb-space-2 text-airvik-black dark:text-airvik-white">Current Status</h3>
               {profile && (
                 <ul className="text-gray-700 text-caption dark:text-gray-300 space-y-space-1">

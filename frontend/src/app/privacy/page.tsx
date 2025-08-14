@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { AUTH_PATHS } from '../../lib/paths';
 
 export default function PrivacyPolicyPage() {
   return (
@@ -82,7 +83,7 @@ export default function PrivacyPolicyPage() {
 
         <div className="mt-space-8 text-center">
           <a
-            href="/auth/login"
+            href={AUTH_PATHS.LOGIN}
             className="text-airvik-blue hover:text-airvik-purple transition-colors duration-normal font-medium"
           >
             ← Back to Login

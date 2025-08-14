@@ -9,14 +9,15 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import RegistrationForm from '../../../components/auth/RegistrationForm';
+import RegistrationForm from '../../components/auth/RegistrationForm';
+import { getVerifyEmailPath } from '../../lib/paths';
 
 export default function RegisterPage() {
   const router = useRouter();
 
   const handleRegistrationSuccess = (user: any, tokens: any) => {
     // Immediately redirect to verification page without showing success message
-    router.push(`/auth/verify-email?email=${encodeURIComponent(user.email)}`);
+    router.push(getVerifyEmailPath(user.email));
   };
 
   const handleRegistrationError = (error: string) => {

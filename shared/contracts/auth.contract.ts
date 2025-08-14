@@ -25,6 +25,9 @@ export const TOKEN_KEYS = {
   USER: 'airvik_user',
 } as const;
 
+// Note: These endpoints are now managed by the centralized path configuration
+// in frontend/src/lib/paths.ts and backend/src/lib/paths.ts
+// This is kept for backward compatibility but should be updated to use the centralized paths
 export const AUTH_ENDPOINTS = {
   REGISTER: '/auth/register',
   LOGIN: '/auth/login',
