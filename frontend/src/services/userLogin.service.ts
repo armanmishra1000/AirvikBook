@@ -564,17 +564,67 @@ export class UserLoginService {
    * Get active sessions for current user
    */
   static async getSessions(): Promise<SessionsApiResponse> {
-    const refreshToken = TokenStorage.getRefreshToken();
-    const response = await ApiClient.request<SessionsApiResponse['data']>(
-      'GET',
-      `/auth${AUTH_PATHS.SESSIONS}`,
-      undefined,
-      { 
-        requiresAuth: true,
-        customHeaders: refreshToken ? { 'X-Refresh-Token': refreshToken } : {}
+    try {
+      const refreshToken = TokenStorage.getRefreshToken();
+      
+      if (!refreshToken) {
+        return {
+          success: false,
+          error: 'No refresh token available',
+          code: 'NO_REFRESH_TOKEN'
+        };
       }
-    );
-    return response as SessionsApiResponse;
+
+      const response = await ApiClient.request<SessionsApiResponse['data']>(
+        'GET',
+        `/auth${AUTH_PATHS.SESSIONS}`,
+        undefined,
+        { 
+          requiresAuth: true,
+          customHeaders: { 'X-Refresh-Token': refreshToken }
+        }
+      );
+      
+      return response as SessionsApiResponse;
+    } catch (error) {
+      console.error('Error getting sessions:', error);
+      return {
+        success: false,
+        error: 'Failed to get sessions',
+        code: 'SESSION_ERROR'
+      };
+    }
+  }
+
+  /**
+   * Logout from all devices
+   */
+  static async logoutFromAllDevices(): Promise<LogoutApiResponse> {
+    try {
+      const response = await ApiClient.request<LogoutApiResponse['data']>(
+        'DELETE',
+        `/auth${AUTH_PATHS.SESSIONS}`,
+        undefined,
+        { requiresAuth: true }
+      );
+
+      // Always clear local storage regardless of API response
+      TokenStorage.clearAll();
+      
+      return response as LogoutApiResponse;
+    } catch (error) {
+      console.error('Logout from all devices failed:', error);
+      // Clear local storage even if API call fails
+      TokenStorage.clearAll();
+      return {
+        success: true,
+        data: {
+          loggedOut: true,
+          sessionsInvalidated: 0,
+          message: 'Logged out locally'
+        }
+      };
+    }
   }
 
   /**

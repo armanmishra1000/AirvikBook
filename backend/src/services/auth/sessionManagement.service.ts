@@ -81,6 +81,17 @@ export class SessionManagementService {
         }
       });
 
+      // Handle case when no sessions are found
+      if (activeSessions.length === 0) {
+        return {
+          success: true,
+          data: {
+            sessions: [],
+            totalSessions: 0
+          }
+        };
+      }
+
       const sessionData: SessionData[] = activeSessions.map((session, index) => {
         let deviceInfo: DeviceInfo;
         try {
@@ -91,10 +102,10 @@ export class SessionManagementService {
           deviceInfo = { deviceId: 'unknown', deviceName: 'Unknown Device' };
         }
 
-        // If no current refresh token is provided, mark the most recent session as current
+        // Determine if this is the current session
         const isCurrent = currentRefreshToken ? 
           session.refreshToken === currentRefreshToken : 
-          index === 0; // First session (most recent) is current
+          index === 0; // First session (most recent) is current if no refresh token provided
 
         return {
           id: session.id,
@@ -194,26 +205,45 @@ export class SessionManagementService {
         }
       });
 
-      // Invalidate all sessions
+      if (activeSessions.length === 0) {
+        return {
+          success: true,
+          data: {
+            loggedOut: true,
+            sessionsInvalidated: 0,
+            message: 'No active sessions found'
+          }
+        };
+      }
+
+      // Invalidate all sessions in database
       await prisma.session.updateMany({
         where: {
           userId,
           isActive: true
         },
         data: {
-          isActive: false
+          isActive: false,
+          updatedAt: new Date()
         }
       });
 
-      // Invalidate all refresh tokens
-      await JwtService.invalidateAllUserTokens(userId);
+      // Invalidate all refresh tokens in JWT service
+      const refreshTokens = activeSessions.map(session => session.refreshToken);
+      await JwtService.invalidateMultipleRefreshTokens(refreshTokens);
+
+      // Log the action for audit purposes
+      await this.logSessionAction(userId, 'LOGOUT_ALL_DEVICES', {
+        sessionsInvalidated: activeSessions.length,
+        deviceCount: activeSessions.length
+      });
 
       return {
         success: true,
         data: {
           loggedOut: true,
           sessionsInvalidated: activeSessions.length,
-          message: 'Logged out from all devices'
+          message: `Logged out from ${activeSessions.length} devices`
         }
       };
 
@@ -553,6 +583,26 @@ export class SessionManagementService {
         averageSessionDuration: 0,
         topDeviceTypes: []
       };
+    }
+  }
+
+  /**
+   * Log session actions for audit purposes
+   */
+  private static async logSessionAction(userId: string, action: string, details: any): Promise<void> {
+    try {
+      await prisma.auditLog.create({
+        data: {
+          userId,
+          action,
+          details: JSON.stringify(details),
+          ipAddress: 'system',
+          userAgent: 'session-management',
+          success: true
+        }
+      });
+    } catch (error) {
+      console.error('Failed to log session action:', error);
     }
   }
 }

@@ -96,6 +96,7 @@ router.post(
 router.get(
   AUTH_PATHS.SESSIONS,
   AuthMiddleware.verifyToken,
+  AuthMiddleware.updateSessionActivity, // Add session activity tracking
   LoginController.sessionLimiter,
   LoginController.getSessions
 );
@@ -104,6 +105,7 @@ router.get(
 router.delete(
   AUTH_PATHS.SESSIONS,
   AuthMiddleware.verifyToken,
+  AuthMiddleware.updateSessionActivity, // Add session activity tracking
   LoginController.sessionLimiter,
   LoginController.logoutFromAllDevices
 );
@@ -112,6 +114,7 @@ router.delete(
 router.delete(
   `${AUTH_PATHS.SESSIONS}/:sessionId`,
   AuthMiddleware.verifyToken,
+  AuthMiddleware.updateSessionActivity, // Add session activity tracking
   LoginController.sessionLimiter,
   LoginController.invalidateSpecificSession
 );

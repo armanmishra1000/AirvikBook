@@ -63,6 +63,9 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
         return;
       }
 
+      // Get current refresh token for session identification
+      const currentRefreshToken = localStorage.getItem('airvik_refresh_token');
+      
       const result = await getSessions();
       
       if (isSuccessResponse(result) && mountedRef.current) {
@@ -117,6 +120,10 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
   // Auto-refresh setup
   useEffect(() => {
     if (autoRefresh && refreshInterval > 0 && authState.isAuthenticated) {
+      // Initial load
+      loadSessions();
+      
+      // Set up periodic refresh
       autoRefreshRef.current = setInterval(loadSessions, refreshInterval);
       
       return () => {
@@ -160,6 +167,8 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
       if (isSuccessResponse(result)) {
         // Clear all sessions since user is logged out
         setSessions([]);
+        // Show success message
+        setError(null);
         // The auth context will handle the global logout state
       } else {
         setError(result.error || 'Failed to logout from all devices');
@@ -169,6 +178,11 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
     } finally {
       setIsLogoutLoading(null);
     }
+  };
+
+  // Add manual refresh button
+  const handleManualRefresh = () => {
+    loadSessions();
   };
 
   // =====================================================
@@ -250,15 +264,32 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
           </p>
         </div>
         
-        {sessions.length > 1 && (
+        <div className="flex items-center space-x-space-4">
           <button
-            onClick={() => setShowLogoutAllConfirm(true)}
-            disabled={isLogoutLoading === 'all'}
-            className="transition-colors px-space-4 py-space-2 bg-error text-airvik-white rounded-radius-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed duration-normal font-sf-pro text-button"
+            onClick={handleManualRefresh}
+            disabled={isLoading}
+            className="transition-colors px-space-3 py-space-2 border border-gray-300 dark:border-gray-600 rounded-radius-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-airvik-blue focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed duration-normal font-sf-pro text-button"
           >
-            {isLogoutLoading === 'all' ? 'Logging Out...' : 'Logout All Devices'}
+            {isLoading ? (
+              <div className="flex items-center">
+                <div className="w-4 h-4 border border-gray-400 animate-spin mr-space-2 border-t-transparent rounded-radius-full" />
+                Refreshing...
+              </div>
+            ) : (
+              'Refresh'
+            )}
           </button>
-        )}
+          
+          {sessions.length > 1 && (
+            <button
+              onClick={() => setShowLogoutAllConfirm(true)}
+              disabled={isLogoutLoading === 'all'}
+              className="transition-colors px-space-4 py-space-2 bg-error text-airvik-white rounded-radius-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed duration-normal font-sf-pro text-button"
+            >
+              {isLogoutLoading === 'all' ? 'Logging Out...' : 'Logout All Devices'}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Error Message */}
