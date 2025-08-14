@@ -191,7 +191,9 @@ export default function ProfilePage() {
               {/* Profile Picture Box Skeleton */}
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-400 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6">
                 <div className="flex items-start space-x-space-3 lg:space-x-space-4">
-                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-50 rounded-radius-md shadow-shadow-sm animate-pulse" />
+                  <div className="flex items-center justify-center w-12 h-12 lg:w-14 lg:h-14 bg-gray-50 rounded-radius-md shadow-shadow-sm">
+                    <div className="w-7 h-7 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  </div>
                   <div className="flex-1 min-w-0 space-y-space-2">
                     <div className="h-5 bg-gray-200 w-32 dark:bg-gray-700 rounded-radius-md animate-pulse" />
                     <div className="h-3 bg-gray-200 w-48 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
@@ -203,9 +205,11 @@ export default function ProfilePage() {
               {/* Privacy Settings Box Skeleton */}
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-400 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6">
                 <div className="flex items-start space-x-space-3 lg:space-x-space-4">
-                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-50 rounded-radius-md shadow-shadow-sm animate-pulse" />
+                  <div className="flex items-center justify-center w-12 h-12 lg:w-14 lg:h-14 bg-gray-50 rounded-radius-md shadow-shadow-sm">
+                    <div className="w-7 h-7 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  </div>
                   <div className="flex-1 min-w-0 space-y-space-2">
-                    <div className="h-5 bg-gray-200 w-36 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    <div className="h-5 bg-gray-200 w-36 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                     <div className="h-3 bg-gray-200 w-56 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                   </div>
                   <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
@@ -215,9 +219,11 @@ export default function ProfilePage() {
               {/* Connected Accounts Box Skeleton */}
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-400 rounded-radius-xl shadow-shadow-sm p-space-4 lg:p-space-6">
                 <div className="flex items-start space-x-space-3 lg:space-x-space-4">
-                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-50 rounded-radius-md shadow-shadow-sm animate-pulse" />
+                  <div className="flex items-center justify-center w-12 h-12 lg:w-14 lg:h-14 bg-gray-50 rounded-radius-md shadow-shadow-sm">
+                    <div className="w-7 h-7 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
+                  </div>
                   <div className="flex-1 min-w-0 space-y-space-2">
-                    <div className="h-5 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-md animate-pulse" />
+                    <div className="h-5 bg-gray-200 w-40 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                     <div className="h-3 bg-gray-200 w-44 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
                   </div>
                   <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded-radius-sm animate-pulse" />
