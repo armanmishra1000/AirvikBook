@@ -309,10 +309,13 @@ export default function RegistrationForm({
       const response = await UserRegistrationService.register(registrationData);
 
       if (isSuccessResponse(response)) {
+        // Show success toast but don't wait - let parent handle redirect
         showSuccess(
           "Account Created",
           "Your account has been created successfully!"
         );
+        
+        // Call onSuccess callback immediately - parent will handle redirect
         onSuccess?.(response.data.user, response.data.tokens);
       } else {
         const errorMessage =
