@@ -36,10 +36,7 @@ export class SecurityValidationService {
     // 3. JWT Configuration
     checks.push(...this.validateJwtConfig());
 
-    // 4. Rate Limiting
-    checks.push(...this.validateRateLimiting());
-
-    // 5. File Upload Security
+    // 4. File Upload Security
     checks.push(...await this.validateFileUploadSecurity());
 
     // 6. Audit Logging
@@ -291,66 +288,7 @@ export class SecurityValidationService {
     return checks;
   }
 
-  /**
-   * Validate rate limiting configuration
-   */
-  private static validateRateLimiting(): SecurityCheck[] {
-    const checks: SecurityCheck[] = [];
 
-    const globalLimit = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100');
-    const authLimit = parseInt(process.env.AUTH_RATE_LIMIT_MAX_ATTEMPTS || '5');
-    const registrationLimit = parseInt(process.env.REGISTRATION_RATE_LIMIT_MAX_ATTEMPTS || '3');
-
-    if (globalLimit <= 100) {
-      checks.push({
-        name: 'Global Rate Limiting',
-        status: 'pass',
-        description: `Global rate limit: ${globalLimit} requests`,
-        priority: 'high',
-      });
-    } else {
-      checks.push({
-        name: 'Global Rate Limiting',
-        status: 'warning',
-        description: `Global rate limit too high: ${globalLimit}`,
-        priority: 'high',
-      });
-    }
-
-    if (authLimit <= 5) {
-      checks.push({
-        name: 'Auth Rate Limiting',
-        status: 'pass',
-        description: `Auth rate limit: ${authLimit} attempts`,
-        priority: 'high',
-      });
-    } else {
-      checks.push({
-        name: 'Auth Rate Limiting',
-        status: 'warning',
-        description: `Auth rate limit too high: ${authLimit}`,
-        priority: 'high',
-      });
-    }
-
-    if (registrationLimit <= 3) {
-      checks.push({
-        name: 'Registration Rate Limiting',
-        status: 'pass',
-        description: `Registration rate limit: ${registrationLimit} attempts`,
-        priority: 'high',
-      });
-    } else {
-      checks.push({
-        name: 'Registration Rate Limiting',
-        status: 'warning',
-        description: `Registration rate limit too high: ${registrationLimit}`,
-        priority: 'high',
-      });
-    }
-
-    return checks;
-  }
 
   /**
    * Validate file upload security

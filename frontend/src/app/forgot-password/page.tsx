@@ -124,8 +124,6 @@ const ForgotPasswordPage: React.FC = () => {
         if (result.code === PASSWORD_ERROR_CODES.GOOGLE_ONLY_ACCOUNT) {
           errorMessage =
             'This account uses Google sign-in. Please use "Sign in with Google" instead.';
-        } else if (result.code === PASSWORD_ERROR_CODES.RATE_LIMIT_EXCEEDED) {
-          errorMessage = "Too many attempts. Please try again in 5 minutes.";
         }
 
         setErrors((prev) => ({

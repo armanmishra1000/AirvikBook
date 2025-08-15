@@ -17,7 +17,6 @@ const router = Router();
 // POST /api/v1/auth/register
 router.post(
   AUTH_PATHS.REGISTER,
-  AuthController.registrationLimiter,
   AuthController.validateRegistration,
   AuthController.register
 );
@@ -25,7 +24,6 @@ router.post(
 // POST /api/v1/auth/google
 router.post(
   AUTH_PATHS.GOOGLE_AUTH,
-  AuthController.registrationLimiter,
   AuthController.validateGoogleAuth,
   AuthController.googleAuth
 );
@@ -47,7 +45,6 @@ router.post(
 // POST /api/v1/auth/resend-verification
 router.post(
   AUTH_PATHS.RESEND_VERIFICATION,
-  AuthController.verificationLimiter,
   AuthController.validateResendVerification,
   AuthController.resendVerification
 );
@@ -63,7 +60,6 @@ router.get(
 // POST /api/v1/auth/login
 router.post(
   AUTH_PATHS.LOGIN,
-  LoginController.loginLimiter,
   LoginController.validateLogin,
   LoginController.login
 );
@@ -71,7 +67,6 @@ router.post(
 // POST /api/v1/auth/google-login
 router.post(
   AUTH_PATHS.GOOGLE_LOGIN,
-  LoginController.loginLimiter,
   LoginController.validateGoogleLogin,
   LoginController.googleLogin
 );
@@ -97,7 +92,6 @@ router.get(
   AUTH_PATHS.SESSIONS,
   AuthMiddleware.verifyToken,
   AuthMiddleware.updateSessionActivity, // Add session activity tracking
-  LoginController.sessionLimiter,
   LoginController.getSessions
 );
 
@@ -106,7 +100,6 @@ router.delete(
   AUTH_PATHS.SESSIONS,
   AuthMiddleware.verifyToken,
   AuthMiddleware.updateSessionActivity, // Add session activity tracking
-  LoginController.sessionLimiter,
   LoginController.logoutFromAllDevices
 );
 
@@ -115,7 +108,6 @@ router.delete(
   `${AUTH_PATHS.SESSIONS}/:sessionId`,
   AuthMiddleware.verifyToken,
   AuthMiddleware.updateSessionActivity, // Add session activity tracking
-  LoginController.sessionLimiter,
   LoginController.invalidateSpecificSession
 );
 

@@ -141,8 +141,7 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
   };
 
   const handleSyncFromGoogle = async () => {
-    const now = Date.now();
-    if (isUploading || now < cooldownUntil) {
+    if (isUploading) {
       return;
     }
     setIsUploading(true);
@@ -156,10 +155,6 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
         onSuccess?.();
       } else {
         const errorMessage = UserProfileService.getErrorMessage(response.code || 'GOOGLE_SYNC_FAILED');
-        // If rate limited, apply a short local cooldown to prevent spam clicks
-        if (response.code === 'RATE_LIMIT_EXCEEDED') {
-          setCooldownUntil(Date.now() + 15000); // 15s client cooldown
-        }
         onError?.(errorMessage);
       }
     } catch (error) {
@@ -309,10 +304,10 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
           
           <button
             onClick={handleSyncFromGoogle}
-            disabled={isUploading || Date.now() < cooldownUntil}
+            disabled={isUploading}
             className="transition-all px-space-4 py-space-2 bg-airvik-blue hover:bg-airvik-purple text-airvik-white rounded-radius-md font-sf-pro text-button duration-normal  focus:outline-none  focus:ring-airvik-purple focus:ring-offset-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:transform-none"
           >
-            {Date.now() < cooldownUntil ? 'Please wait...' : 'Sync from Google'}
+            {isUploading ? 'Please wait...' : 'Sync from Google'}
           </button>
           
           {currentPictureUrl && !previewUrl && (

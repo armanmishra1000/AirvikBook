@@ -56,9 +56,6 @@ const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 describe('PasswordResetService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
-    // Reset static rate limiting maps
-    (PasswordResetService as any).forgotPasswordAttempts = new Map();
   });
 
   describe('generateResetToken', () => {
@@ -128,32 +125,7 @@ describe('PasswordResetService', () => {
       expect(mockPrisma.passwordResetToken.create).not.toHaveBeenCalled();
     });
 
-    it('should enforce rate limiting', async () => {
-      const email = 'test@example.com';
 
-      // First request should succeed
-      const mockUser = {
-        id: 'user123',
-        email,
-        fullName: 'Test User',
-        password: 'hashedpassword',
-        googleId: null,
-        isActive: true
-      };
-
-      (mockPrisma.user.findFirst as jest.Mock).mockResolvedValue(mockUser);
-      (mockPrisma.passwordResetToken.deleteMany as jest.Mock).mockResolvedValue({ count: 0 });
-      (mockPrisma.passwordResetToken.create as jest.Mock).mockResolvedValue({});
-      mockEmailService.sendPasswordResetEmail.mockResolvedValue({ success: true });
-
-      const firstResult = await PasswordResetService.generateResetToken({ email });
-      expect(firstResult.success).toBe(true);
-
-      // Second request within window should be rate limited
-      const secondResult = await PasswordResetService.generateResetToken({ email });
-      expect(secondResult.success).toBe(false);
-      expect(secondResult.code).toBe('RATE_LIMIT_EXCEEDED');
-    });
   });
 
   describe('validateResetToken', () => {

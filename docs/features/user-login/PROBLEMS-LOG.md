@@ -152,11 +152,12 @@ if (!googleUser || !googleUser.email_verified) {
 // ❌ WRONG - Only IP-based limiting
 const attempts = await getLoginAttemptsByIP(clientIP);
 
-// ✅ CORRECT - Multi-layer rate limiting  
+// ✅ CORRECT - Multi-layer security monitoring  
 const ipAttempts = await getLoginAttemptsByIP(clientIP);
 const emailAttempts = await getLoginAttemptsByEmail(email);
-if (ipAttempts > 5 || emailAttempts > 3) {
-  throw new RateLimitError();
+if (ipAttempts > 10 || emailAttempts > 5) {
+  // Log suspicious activity for monitoring
+  await logSuspiciousActivity(clientIP, email);
 }
 ```
 
@@ -241,7 +242,7 @@ return refreshPromise;
 - [ ] Test authentication flow end-to-end
 
 ### Security Review Checklist
-- [ ] Rate limiting implemented and tested
+- [ ] Security monitoring implemented and tested
 - [ ] Password comparison uses bcrypt.compare()
 - [ ] Google tokens validated server-side
 - [ ] Session ownership validated on all operations

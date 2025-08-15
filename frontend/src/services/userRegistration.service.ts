@@ -122,9 +122,13 @@ export class UserRegistrationService {
       body: JSON.stringify(userData),
     });
 
-    // Store auth data if registration successful
+    // Store auth data if registration successful and tokens are provided
     if (isSuccessResponse(response)) {
-      this.storeTokens(response.data.tokens);
+      // Only store tokens if they are provided (some flows like email verification don't provide tokens immediately)
+      if (response.data.tokens) {
+        this.storeTokens(response.data.tokens);
+      }
+      // Always store user data
       this.storeUser(response.data.user);
     }
 

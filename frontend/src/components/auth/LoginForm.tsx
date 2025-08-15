@@ -178,10 +178,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             errorMessage =
               "Your account has been temporarily locked due to multiple failed login attempts. Please try again later.";
             break;
-          case LOGIN_ERROR_CODES.RATE_LIMIT_EXCEEDED:
-            errorMessage =
-              "Too many login attempts. Please wait a few minutes before trying again.";
-            break;
           default:
             break;
         }

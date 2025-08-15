@@ -1,6 +1,7 @@
 import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { EmailVerificationTokenService } from './emailVerificationToken.service';
+import { RegistrationEmailService } from './email/registrationEmail.service';
 import prisma from '../lib/prisma';
 
 export interface UserRegistrationData {
@@ -17,6 +18,8 @@ export interface RegistrationResult {
   error?: string;
   code?: string;
   verificationToken?: string;
+  verificationEmailSent?: boolean;
+  emailError?: string;
 }
 
 export interface ValidationResult {
@@ -216,13 +219,22 @@ export class UserRegistrationService {
         };
       }
 
+      // Send verification email
+      const emailResult = await RegistrationEmailService.sendVerificationEmail({
+        email: newUser.email,
+        fullName: newUser.fullName || 'User',
+        verificationToken: tokenResult.token!
+      });
+
       // Return user data without password
       const { password: _, ...userWithoutPassword } = newUser;
 
       return {
         success: true,
         user: userWithoutPassword,
-        verificationToken: tokenResult.token
+        verificationToken: tokenResult.token!,
+        verificationEmailSent: emailResult.success,
+        emailError: emailResult.success ? undefined : emailResult.error
       };
 
     } catch (error) {

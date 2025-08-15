@@ -186,57 +186,6 @@ export class AuthMiddleware {
   }
 
   /**
-   * Rate limiting by user ID (for authenticated users)
-   * DISABLED IN DEVELOPMENT
-   */
-  static createUserRateLimit(options: {
-    windowMs: number;
-    maxRequests: number;
-    message?: string;
-  }) {
-    const userRequests = new Map<string, { count: number; resetTime: number }>();
-
-    return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      // Skip rate limiting for development
-      if (process.env.NODE_ENV === 'development') {
-        return next();
-      }
-
-      if (!req.user) {
-        return next(); // Skip rate limiting for unauthenticated users
-      }
-
-      const userId = req.user.userId;
-      const now = Date.now();
-      const windowStart = Math.floor(now / options.windowMs) * options.windowMs;
-
-      let userRequest = userRequests.get(userId);
-      
-      if (!userRequest || userRequest.resetTime <= now) {
-        userRequest = { count: 1, resetTime: windowStart + options.windowMs };
-        userRequests.set(userId, userRequest);
-      } else {
-        userRequest.count++;
-      }
-
-      if (userRequest.count > options.maxRequests) {
-        ResponseUtil.error(
-          res,
-          options.message || 'Too many requests from this user',
-          'USER_RATE_LIMIT_EXCEEDED',
-          429,
-          {
-            retryAfter: Math.ceil((userRequest.resetTime - now) / 1000)
-          }
-        );
-        return;
-      }
-
-      next();
-    };
-  }
-
-  /**
    * Extract user ID from token without full validation (for logging)
    */
   static extractUserId(req: Request): string | null {

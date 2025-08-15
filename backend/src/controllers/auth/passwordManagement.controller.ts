@@ -87,12 +87,8 @@ export class PasswordManagementController {
 
       const { currentPassword, newPassword, confirmPassword, invalidateOtherSessions } = req.body;
       const userId = req.user.userId;
-      
-      // Get session ID from the request (we need this to preserve current session)
-      // Note: This would need to be passed from the auth middleware or extracted from the token
-      const sessionId = req.headers['x-session-id'] as string || 'current-session';
 
-      const result = await PasswordManagementService.changePassword(userId, sessionId, {
+      const result = await PasswordManagementService.changePassword(userId, {
         currentPassword,
         newPassword,
         confirmPassword,
@@ -103,9 +99,6 @@ export class PasswordManagementController {
         let statusCode = 400;
         
         switch (result.code) {
-          case 'RATE_LIMIT_EXCEEDED':
-            statusCode = 429;
-            break;
           case 'USER_NOT_FOUND':
             statusCode = 404;
             break;

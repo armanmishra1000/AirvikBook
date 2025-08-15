@@ -9,155 +9,69 @@ const router = Router();
 /**
  * Password Management Routes
  * Base path: /api/v1/auth
- * 
- * These routes handle authenticated password operations
- * like changing, setting, and removing passwords
  */
 
-// ==================== AUTHENTICATED PASSWORD MANAGEMENT ====================
+// ==================== PASSWORD CHANGE ROUTES ====================
 
 /**
- * Change password for authenticated user
- * PUT /api/v1/auth/password
- * Requires: Authentication
- * Rate Limited: 5 attempts per 15 minutes per user
+ * POST /api/v1/auth/password
  */
-router.put(
+router.post(
   AUTH_PATHS.PASSWORD,
   AuthMiddleware.verifyToken,
-  AuthMiddleware.requireActiveUser,
-  AuthMiddleware.createUserRateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    maxRequests: 5,
-    message: 'Too many password change attempts. Please try again later.'
-  }),
   PasswordManagementController.validateChangePassword,
   PasswordManagementController.changePassword
 );
 
 /**
- * Set password for Google-only users (enable mixed authentication)
  * POST /api/v1/auth/set-password
- * Requires: Authentication with Google account
- * Rate Limited: 3 attempts per 30 minutes per user
  */
 router.post(
   AUTH_PATHS.SET_PASSWORD,
   AuthMiddleware.verifyToken,
-  AuthMiddleware.requireActiveUser,
-  AuthMiddleware.createUserRateLimit({
-    windowMs: 30 * 60 * 1000, // 30 minutes
-    maxRequests: 3,
-    message: 'Too many password set attempts. Please try again later.'
-  }),
   PasswordManagementController.validateSetPassword,
   PasswordManagementController.setPassword
 );
 
 /**
- * Remove password from mixed account (become Google-only)
  * DELETE /api/v1/auth/password
- * Requires: Authentication with mixed account
- * Rate Limited: 3 attempts per 30 minutes per user
  */
 router.delete(
   AUTH_PATHS.PASSWORD,
   AuthMiddleware.verifyToken,
-  AuthMiddleware.requireActiveUser,
-  AuthMiddleware.createUserRateLimit({
-    windowMs: 30 * 60 * 1000, // 30 minutes
-    maxRequests: 3,
-    message: 'Too many password removal attempts. Please try again later.'
-  }),
   PasswordManagementController.validateRemovePassword,
   PasswordManagementController.removePassword
 );
 
-/**
- * Get password status and authentication methods
- * GET /api/v1/auth/password-status
- * Requires: Authentication
- * No rate limiting (read-only operation)
- */
-router.get(
-  AUTH_PATHS.PASSWORD_STATUS,
-  AuthMiddleware.verifyToken,
-  AuthMiddleware.requireActiveUser,
-  PasswordManagementController.getPasswordStatus
-);
-
-// ==================== UNAUTHENTICATED PASSWORD RESET ====================
+// ==================== PASSWORD RESET ROUTES ====================
 
 /**
- * Initiate password reset process
  * POST /api/v1/auth/forgot-password
- * Rate Limited: 1 request per 5 minutes per IP/email
  */
 router.post(
   AUTH_PATHS.FORGOT_PASSWORD,
-  // Rate limiting is handled internally by the service for email-based limiting
   PasswordResetController.validateForgotPassword,
   PasswordResetController.forgotPassword
 );
 
 /**
- * Complete password reset using reset token
  * POST /api/v1/auth/reset-password
- * Rate Limited: 5 attempts per 15 minutes per IP
  */
 router.post(
   AUTH_PATHS.RESET_PASSWORD,
-  AuthMiddleware.createUserRateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    maxRequests: 5,
-    message: 'Too many password reset attempts. Please try again later.'
-  }),
   PasswordResetController.validateResetPassword,
   PasswordResetController.resetPassword
 );
 
+// ==================== PASSWORD SECURITY ROUTES ====================
+
 /**
- * Validate reset token before showing password reset form
- * GET /api/v1/auth/reset-token/:token
- * Rate Limited: 10 requests per minute per IP
+ * GET /api/v1/auth/password-status
  */
 router.get(
-  `${AUTH_PATHS.RESET_TOKEN}/:token`,
-  AuthMiddleware.createUserRateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    maxRequests: 10,
-    message: 'Too many token validation attempts. Please try again later.'
-  }),
-  PasswordResetController.validateResetTokenParam,
-  PasswordResetController.validateResetToken
-);
-
-// ==================== ADMIN ROUTES ====================
-
-/**
- * Get password reset statistics (admin only)
- * GET /api/v1/auth/reset-statistics
- * Requires: Admin authentication
- */
-router.get(
-  AUTH_PATHS.RESET_STATISTICS,
+  AUTH_PATHS.PASSWORD_STATUS,
   AuthMiddleware.verifyToken,
-  AuthMiddleware.requireActiveUser,
-  AuthMiddleware.requireRole(['ADMIN', 'OWNER']),
-  PasswordResetController.getResetStatistics
-);
-
-/**
- * Cleanup expired reset tokens (admin only)
- * POST /api/v1/auth/cleanup-reset-tokens
- * Requires: Admin authentication
- */
-router.post(
-  AUTH_PATHS.CLEANUP_RESET_TOKENS,
-  AuthMiddleware.verifyToken,
-  AuthMiddleware.requireActiveUser,
-  AuthMiddleware.requireRole(['ADMIN', 'OWNER']),
-  PasswordResetController.cleanupExpiredTokens
+  PasswordManagementController.getPasswordStatus
 );
 
 export default router;

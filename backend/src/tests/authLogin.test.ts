@@ -166,7 +166,7 @@ describe('AuthLoginService', () => {
           updatedAt: new Date()
         });
 
-        const result = await AuthLoginService.authenticateWithEmail(
+        const result = await AuthLoginService.loginWithEmailPassword(
           {
             email: testEmail,
             password: testPassword,
@@ -175,9 +175,7 @@ describe('AuthLoginService', () => {
               deviceId: 'test-device-001',
               deviceName: 'Test Device'
             }
-          },
-          '127.0.0.1',
-          'Test User Agent'
+          }
         );
 
 
@@ -201,14 +199,12 @@ describe('AuthLoginService', () => {
       // Mock password comparison failure
       mockBcrypt.compare.mockResolvedValue(false as never);
 
-      const result = await AuthLoginService.authenticateWithEmail(
+      const result = await AuthLoginService.loginWithEmailPassword(
         {
           email: testEmail,
           password: 'WrongPassword123!',
           rememberMe: false
-        },
-        '127.0.0.1',
-        'Test User Agent'
+        }
       );
 
       expect(result.success).toBe(false);
@@ -220,14 +216,12 @@ describe('AuthLoginService', () => {
       // Mock user lookup - no user found
       (mockPrisma.user.findFirst as jest.Mock).mockResolvedValue(null);
 
-      const result = await AuthLoginService.authenticateWithEmail(
+      const result = await AuthLoginService.loginWithEmailPassword(
         {
           email: 'nonexistent@example.com',
           password: testPassword,
           rememberMe: false
-        },
-        '127.0.0.1',
-        'Test User Agent'
+        }
       );
 
       expect(result.success).toBe(false);
@@ -260,7 +254,7 @@ describe('AuthLoginService', () => {
         updatedAt: new Date()
       });
 
-      const result = await AuthLoginService.authenticateWithEmail(
+      const result = await AuthLoginService.loginWithEmailPassword(
         {
           email: testEmail,
           password: testPassword,
@@ -269,9 +263,7 @@ describe('AuthLoginService', () => {
             deviceId: 'test-device-002',
             deviceName: 'Test Device'
           }
-        },
-        '127.0.0.1',
-        'Test User Agent'
+        }
       );
 
       expect(result.success).toBe(true);
@@ -307,7 +299,7 @@ describe('AuthLoginService', () => {
       });
 
       // First, login to get a refresh token
-      const loginResult = await AuthLoginService.authenticateWithEmail(
+      const loginResult = await AuthLoginService.loginWithEmailPassword(
         {
           email: testEmail,
           password: testPassword,
@@ -316,9 +308,7 @@ describe('AuthLoginService', () => {
             deviceId: 'test-device-003',
             deviceName: 'Test Device'
           }
-        },
-        '127.0.0.1',
-        'Test User Agent'
+        }
       );
 
       expect(loginResult.success).toBe(true);

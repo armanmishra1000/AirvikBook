@@ -226,9 +226,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
           case LOGIN_ERROR_CODES.ACCOUNT_DISABLED:
             errorMessage = 'Your account has been disabled. Please contact support.';
             break;
-          case LOGIN_ERROR_CODES.RATE_LIMIT_EXCEEDED:
-            errorMessage = 'Too many login attempts. Please wait a few minutes before trying again.';
-            break;
+
           default:
             break;
         }

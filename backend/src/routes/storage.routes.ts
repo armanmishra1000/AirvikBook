@@ -21,12 +21,6 @@ const upload = multer({
   },
 });
 
-// Per-user rate limiter for uploads (optional)
-const userUploadLimiter = AuthMiddleware.createUserRateLimit({
-  windowMs: 15 * 60 * 1000,
-  maxRequests: 50,
-});
-
 /**
  * @route POST /api/v1/storage/upload/profile-picture
  * @desc Upload user profile picture
@@ -35,7 +29,6 @@ const userUploadLimiter = AuthMiddleware.createUserRateLimit({
 router.post(
   '/upload/profile-picture',
   AuthMiddleware.verifyToken,
-  userUploadLimiter,
   upload.single('profilePicture'),
   async (req, res) => {
     try {
@@ -91,7 +84,6 @@ router.post(
 router.post(
   '/upload/room-image',
   AuthMiddleware.verifyToken,
-  userUploadLimiter,
   upload.single('roomImage'),
   async (req, res) => {
     try {
@@ -151,7 +143,6 @@ router.post(
 router.post(
   '/upload/property-image',
   AuthMiddleware.verifyToken,
-  userUploadLimiter,
   upload.single('propertyImage'),
   async (req, res) => {
     try {
@@ -211,7 +202,6 @@ router.post(
 router.delete(
   '/delete',
   AuthMiddleware.verifyToken,
-  userUploadLimiter,
   async (req, res) => {
     try {
       const { filePath } = req.body;
@@ -256,7 +246,6 @@ router.delete(
 router.get(
   '/stats',
   AuthMiddleware.verifyToken,
-  userUploadLimiter,
   async (_req, res) => {
     try {
       const stats = await StorageFactoryService.getStorageStats();
@@ -285,7 +274,6 @@ router.get(
 router.post(
   '/presigned-url',
   AuthMiddleware.verifyToken,
-  userUploadLimiter,
   async (req, res) => {
     try {
       const { key, contentType, expiresIn = 3600 } = req.body;
@@ -333,7 +321,6 @@ router.post(
 router.get(
   '/file-exists',
   AuthMiddleware.verifyToken,
-  userUploadLimiter,
   async (req, res) => {
     try {
       const { filePath } = req.query;
@@ -375,7 +362,6 @@ router.get(
 router.get(
   '/file-metadata',
   AuthMiddleware.verifyToken,
-  userUploadLimiter,
   async (req, res) => {
     try {
       const { filePath } = req.query;

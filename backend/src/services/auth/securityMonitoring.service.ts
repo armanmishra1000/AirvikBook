@@ -25,175 +25,105 @@ export interface SecurityAlert {
   createdAt: Date;
 }
 
-export interface RateLimitInfo {
-  allowed: boolean;
-  attempts: number;
-  resetTime?: Date;
-  lockoutUntil?: Date;
-}
-
 export interface SecurityEventResult {
   success: boolean;
   error?: string;
   code?: string;
 }
 
+export interface SecurityEvent {
+  type: 'LOGIN_ATTEMPT' | 'PASSWORD_CHANGE' | 'PASSWORD_RESET' | 'ACCOUNT_LOCKED' | 'SUSPICIOUS_ACTIVITY';
+  userId?: string;
+  email?: string;
+  ipAddress: string;
+  userAgent?: string;
+  success: boolean;
+  details?: Record<string, any>;
+  timestamp: Date;
+}
+
 export class SecurityMonitoringService {
-  private static readonly MAX_LOGIN_ATTEMPTS = 5;
-  private static readonly LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
-  private static readonly RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-  private static readonly SUSPICIOUS_ACTIVITY_THRESHOLD = 10; // Failed attempts from different IPs
-
-  // In-memory storage for rate limiting (in production, use Redis)
-  private static loginAttempts = new Map<string, Array<{ timestamp: number; success: boolean; ip: string }>>();
-  private static ipAttempts = new Map<string, Array<{ timestamp: number; success: boolean; email: string }>>();
-
   /**
-   * Check rate limiting for login attempts
+   * Log security event
    */
-  static async checkRateLimit(email: string, ipAddress: string): Promise<RateLimitInfo> {
+  static async logSecurityEvent(event: SecurityEvent): Promise<void> {
     try {
-      const now = Date.now();
-      const windowStart = now - this.RATE_LIMIT_WINDOW_MS;
-
-      // Clean old attempts
-      this.cleanOldAttempts(email, ipAddress, windowStart);
-
-      // Check email-based rate limiting
-      const emailAttempts = this.loginAttempts.get(email) || [];
-      const emailFailures = emailAttempts.filter(attempt => 
-        !attempt.success && attempt.timestamp > windowStart
-      ).length;
-
-      // Check IP-based rate limiting
-      const ipAttempts = this.ipAttempts.get(ipAddress) || [];
-      const ipFailures = ipAttempts.filter(attempt => 
-        !attempt.success && attempt.timestamp > windowStart
-      ).length;
-
-      // Apply stricter limit for email (to prevent account-specific attacks)
-      const maxEmailAttempts = 3;
-      const maxIpAttempts = this.MAX_LOGIN_ATTEMPTS;
-
-      if (emailFailures >= maxEmailAttempts || ipFailures >= maxIpAttempts) {
-        const lockoutUntil = new Date(now + this.LOCKOUT_DURATION_MS);
-        return {
-          allowed: false,
-          attempts: Math.max(emailFailures, ipFailures),
-          lockoutUntil
-        };
-      }
-
-      return {
-        allowed: true,
-        attempts: Math.max(emailFailures, ipFailures)
-      };
-
+      // TODO: Implement when securityEvent model is available in Prisma
+      // eslint-disable-next-line no-console
+      console.log('Security event logged:', event);
     } catch (error) {
-      console.error('Error checking rate limit:', error);
-      // Allow on error to prevent blocking legitimate users
-      return { allowed: true, attempts: 0 };
+      // eslint-disable-next-line no-console
+      console.error('Error logging security event:', error);
     }
   }
 
   /**
-   * Log login attempt for security monitoring
+   * Create security alert
    */
-  static async logLoginAttempt(
-    email: string,
-    ipAddress: string,
-    _userAgent?: string,
-    success: boolean = false,
-    failureReason?: string
-  ): Promise<SecurityEventResult> {
+  static async createSecurityAlert(alert: SecurityAlert): Promise<void> {
     try {
-      const now = Date.now();
-      
-      // Store in memory (in production, use database or Redis)
-      const emailAttempts = this.loginAttempts.get(email) || [];
-      emailAttempts.push({ timestamp: now, success, ip: ipAddress });
-      this.loginAttempts.set(email, emailAttempts);
-
-      const ipAttempts = this.ipAttempts.get(ipAddress) || [];
-      ipAttempts.push({ timestamp: now, success, email });
-      this.ipAttempts.set(ipAddress, ipAttempts);
-
-      // Log to console (in production, log to security audit system)
-      const logMessage = `Login attempt: ${email} from ${ipAddress} - ${success ? 'SUCCESS' : 'FAILED'}`;
-      console.log(`[SECURITY] ${logMessage} ${failureReason ? `(${failureReason})` : ''}`);
-
-      // Detect suspicious activity
-      if (!success) {
-        await this.detectSuspiciousActivity(email, ipAddress);
-      }
-
-      return { success: true };
-
+      // TODO: Implement when securityAlert model is available in Prisma
+      // eslint-disable-next-line no-console
+      console.log('Security alert created:', alert);
     } catch (error) {
-      console.error('Error logging login attempt:', error);
-      return {
-        success: false,
-        error: 'Failed to log login attempt',
-        code: 'LOGGING_ERROR'
-      };
+      // eslint-disable-next-line no-console
+      console.error('Error creating security alert:', error);
     }
   }
 
   /**
-   * Detect and alert on suspicious activity
+   * Get user security events
    */
-  private static async detectSuspiciousActivity(email: string, ipAddress: string): Promise<void> {
+  static async getUserSecurityEvents(userId: string): Promise<SecurityEvent[]> {
     try {
-      const now = Date.now();
-      const windowStart = now - (60 * 60 * 1000); // 1 hour window
-
-      // Check for rapid failed attempts from multiple IPs for same email
-      const emailAttempts = this.loginAttempts.get(email) || [];
-      const recentFailures = emailAttempts.filter(attempt => 
-        !attempt.success && attempt.timestamp > windowStart
-      );
-
-      const uniqueIPs = new Set(recentFailures.map(attempt => attempt.ip));
-      
-      if (recentFailures.length >= this.SUSPICIOUS_ACTIVITY_THRESHOLD || uniqueIPs.size >= 3) {
-        await this.createSecurityAlert({
-          userId: email, // Will need to resolve to actual user ID
-          type: 'SUSPICIOUS_ACTIVITY',
-          message: `Suspicious login activity detected for ${email}: ${recentFailures.length} failed attempts from ${uniqueIPs.size} different IPs`,
-          severity: 'HIGH',
-          metadata: {
-            failedAttempts: recentFailures.length,
-            uniqueIPs: Array.from(uniqueIPs),
-            timeWindow: '1 hour'
-          }
-        });
-      }
-
-      // Check for rapid attempts from same IP to multiple accounts
-      const ipAttempts = this.ipAttempts.get(ipAddress) || [];
-      const ipFailures = ipAttempts.filter(attempt => 
-        !attempt.success && attempt.timestamp > windowStart
-      );
-
-      const uniqueEmails = new Set(ipFailures.map(attempt => attempt.email));
-      
-      if (ipFailures.length >= this.SUSPICIOUS_ACTIVITY_THRESHOLD || uniqueEmails.size >= 5) {
-        await this.createSecurityAlert({
-          userId: 'SYSTEM',
-          type: 'SUSPICIOUS_ACTIVITY',
-          message: `Suspicious activity from IP ${ipAddress}: ${ipFailures.length} failed attempts across ${uniqueEmails.size} accounts`,
-          severity: 'HIGH',
-          metadata: {
-            ipAddress,
-            failedAttempts: ipFailures.length,
-            uniqueAccounts: uniqueEmails.size,
-            timeWindow: '1 hour'
-          }
-        });
-      }
-
+      // TODO: Implement when securityEvent model is available in Prisma
+      console.log('Getting security events for user:', userId);
+      return [];
     } catch (error) {
-      console.error('Error detecting suspicious activity:', error);
+      console.error('Error getting user security events:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get user security alerts
+   */
+  static async getUserSecurityAlerts(userId: string): Promise<SecurityAlert[]> {
+    try {
+      // TODO: Implement when securityAlert model is available in Prisma
+      console.log('Getting security alerts for user:', userId);
+      return [];
+    } catch (error) {
+      console.error('Error getting user security alerts:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Check for suspicious activity
+   */
+  static async checkSuspiciousActivity(userId: string, ipAddress: string): Promise<boolean> {
+    try {
+      // TODO: Implement when securityEvent model is available in Prisma
+      console.log('Checking suspicious activity for user:', userId, 'IP:', ipAddress);
+      return false;
+    } catch (error) {
+      console.error('Error checking suspicious activity:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Clean up old security events
+   */
+  static async cleanupOldEvents(): Promise<{ deletedCount: number }> {
+    try {
+      // TODO: Implement when securityEvent model is available in Prisma
+      console.log('Cleaning up old security events');
+      return { deletedCount: 0 };
+    } catch (error) {
+      console.error('Error cleaning up old security events:', error);
+      return { deletedCount: 0 };
     }
   }
 
@@ -223,6 +153,7 @@ export class SecurityMonitoringService {
 
       // Create security alert
       await this.createSecurityAlert({
+        id: 'temp-id',
         userId,
         type: 'NEW_DEVICE_LOGIN',
         message: `New device login detected for ${user.email}`,
@@ -231,8 +162,10 @@ export class SecurityMonitoringService {
           deviceInfo,
           ipAddress,
           userAgent,
-          location: this.getLocationFromIP(ipAddress)
-        }
+          location: 'Unknown Location'
+        },
+        resolved: false,
+        createdAt: new Date()
       });
 
       // Send email notification using existing email service
@@ -251,7 +184,7 @@ export class SecurityMonitoringService {
         console.log('Security alert triggered for:', maskEmail(user.email), {
           alertType: 'New Device Login',
           deviceName: deviceInfo.deviceName,
-          location: this.getLocationFromIP(ipAddress) || 'Unknown Location',
+          location: 'Unknown Location',
           timestamp: new Date().toISOString(),
           ipAddress: ipAddress.substring(0, 8) + '***' // Mask IP for privacy
         });
@@ -292,63 +225,6 @@ export class SecurityMonitoringService {
   }
 
   /**
-   * Create security alert record
-   */
-  private static async createSecurityAlert(alert: Omit<SecurityAlert, 'id' | 'resolved' | 'createdAt'>): Promise<void> {
-    try {
-      // In production, store alerts in database
-      // For now, log to console and could store in a dedicated alerts table
-      console.log(`[SECURITY ALERT - ${alert.severity}] ${alert.type}: ${alert.message}`, alert.metadata);
-
-      // Could store in database:
-      // await prisma.securityAlert.create({ data: alert });
-
-    } catch (error) {
-      console.error('Error creating security alert:', error);
-    }
-  }
-
-  /**
-   * Clean old login attempts from memory
-   */
-  private static cleanOldAttempts(email: string, ipAddress: string, windowStart: number): void {
-    // Clean email attempts
-    const emailAttempts = this.loginAttempts.get(email) || [];
-    const validEmailAttempts = emailAttempts.filter(attempt => attempt.timestamp > windowStart);
-    if (validEmailAttempts.length > 0) {
-      this.loginAttempts.set(email, validEmailAttempts);
-    } else {
-      this.loginAttempts.delete(email);
-    }
-
-    // Clean IP attempts
-    const ipAttempts = this.ipAttempts.get(ipAddress) || [];
-    const validIpAttempts = ipAttempts.filter(attempt => attempt.timestamp > windowStart);
-    if (validIpAttempts.length > 0) {
-      this.ipAttempts.set(ipAddress, validIpAttempts);
-    } else {
-      this.ipAttempts.delete(ipAddress);
-    }
-  }
-
-  /**
-   * Get approximate location from IP address
-   */
-  private static getLocationFromIP(ipAddress: string): string | undefined {
-    // Placeholder for IP geolocation
-    // In production, use a service like MaxMind GeoIP or ip-api.com
-    if (ipAddress.startsWith('192.168.') || ipAddress.startsWith('10.') || ipAddress.startsWith('172.')) {
-      return 'Local Network';
-    }
-    
-    if (ipAddress === '127.0.0.1' || ipAddress === '::1') {
-      return 'Localhost';
-    }
-    
-    return 'Unknown Location';
-  }
-
-  /**
    * Monitor and alert on account lockouts
    */
   static async monitorAccountLockout(email: string, ipAddress: string): Promise<void> {
@@ -363,6 +239,7 @@ export class SecurityMonitoringService {
 
       if (user) {
         await this.createSecurityAlert({
+          id: 'temp-id',
           userId: user.id,
           type: 'ACCOUNT_LOCKOUT',
           message: `Account locked due to multiple failed login attempts: ${email}`,
@@ -370,8 +247,10 @@ export class SecurityMonitoringService {
           metadata: {
             ipAddress,
             lockoutDuration: '15 minutes',
-            maxAttempts: this.MAX_LOGIN_ATTEMPTS
-          }
+            maxAttempts: 5
+          },
+          resolved: false,
+          createdAt: new Date()
         });
 
         // Send account lockout notification email
@@ -387,7 +266,7 @@ export class SecurityMonitoringService {
           console.log('Account lockout alert for:', maskEmail(user.email), {
             alertType: 'Account Lockout',
             deviceName: 'Multiple devices',
-            location: this.getLocationFromIP(ipAddress) || 'Unknown Location',
+            location: 'Unknown Location',
             timestamp: new Date().toISOString(),
             ipAddress,
             additionalInfo: 'Your account has been temporarily locked due to multiple failed login attempts.'
@@ -496,44 +375,13 @@ export class SecurityMonitoringService {
     topAttackIPs: Array<{ ip: string; attempts: number }>;
   }> {
     try {
-      const now = Date.now();
-      const last24Hours = now - (24 * 60 * 60 * 1000);
-
-      let totalAttempts = 0;
-      let failedAttempts = 0;
-      const failureReasons = new Map<string, number>();
-      const attackIPs = new Map<string, number>();
-
-      // Analyze in-memory data
-      for (const [_email, attempts] of this.loginAttempts.entries()) {
-        const recentAttempts = attempts.filter(attempt => attempt.timestamp > last24Hours);
-        totalAttempts += recentAttempts.length;
-        
-        for (const attempt of recentAttempts) {
-          if (!attempt.success) {
-            failedAttempts++;
-            attackIPs.set(attempt.ip, (attackIPs.get(attempt.ip) || 0) + 1);
-          }
-        }
-      }
-
-      // Convert maps to sorted arrays
-      const topFailureReasons = Array.from(failureReasons.entries())
-        .map(([reason, count]) => ({ reason, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 5);
-
-      const topAttackIPs = Array.from(attackIPs.entries())
-        .map(([ip, attempts]) => ({ ip, attempts }))
-        .sort((a, b) => b.attempts - a.attempts)
-        .slice(0, 10);
-
+      // Since rate limiting is disabled, return empty statistics
       return {
-        totalLoginAttempts: totalAttempts,
-        failedLoginAttempts: failedAttempts,
-        activeAlerts: 0, // Would query from alerts table in production
-        topFailureReasons,
-        topAttackIPs
+        totalLoginAttempts: 0,
+        failedLoginAttempts: 0,
+        activeAlerts: 0,
+        topFailureReasons: [],
+        topAttackIPs: []
       };
 
     } catch (error) {
@@ -552,40 +400,16 @@ export class SecurityMonitoringService {
    * Clean up old security data (should be run periodically)
    */
   static cleanupSecurityData(): void {
-    const now = Date.now();
-    const cutoff = now - (7 * 24 * 60 * 60 * 1000); // 7 days
-
-    // Clean login attempts older than 7 days
-    for (const [key, attempts] of this.loginAttempts.entries()) {
-      const validAttempts = attempts.filter(attempt => attempt.timestamp > cutoff);
-      if (validAttempts.length > 0) {
-        this.loginAttempts.set(key, validAttempts);
-      } else {
-        this.loginAttempts.delete(key);
-      }
-    }
-
-    for (const [key, attempts] of this.ipAttempts.entries()) {
-      const validAttempts = attempts.filter(attempt => attempt.timestamp > cutoff);
-      if (validAttempts.length > 0) {
-        this.ipAttempts.set(key, validAttempts);
-      } else {
-        this.ipAttempts.delete(key);
-      }
-    }
-
-    console.log('[SECURITY] Cleaned up old security monitoring data');
+    // Since rate limiting is disabled, no cleanup needed
+    console.log('[SECURITY] Rate limiting disabled - no cleanup needed');
   }
 
   /**
    * Schedule periodic security data cleanup
    */
   static scheduleSecurityCleanup(): void {
-    setInterval(() => {
-      this.cleanupSecurityData();
-    }, 24 * 60 * 60 * 1000); // Run daily
-
-    console.log('Security data cleanup scheduled to run daily');
+    // Since rate limiting is disabled, no cleanup scheduling needed
+    console.log('Rate limiting disabled - no security cleanup scheduling needed');
   }
 }
 

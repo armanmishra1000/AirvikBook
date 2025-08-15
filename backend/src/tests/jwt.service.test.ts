@@ -17,6 +17,77 @@ jest.mock('../lib/prisma', () => ({
   }
 }));
 
+// Mock jsonwebtoken
+jest.mock('jsonwebtoken', () => {
+  const mockJwt = {
+    sign: jest.fn((payload, _secret, options) => {
+      // Return a mock JWT token with different signatures based on options
+      const header = { alg: 'HS256', typ: 'JWT' };
+      const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64');
+      const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64');
+      const signature = (options as any)?.expiresIn === '1d' ? 'refresh-signature' : 'access-signature';
+      return `${encodedHeader}.${encodedPayload}.${signature}`;
+    }),
+    verify: jest.fn((token: string, _secret, _options) => {
+      // Mock token verification
+      if (token === 'invalid-token') {
+        const error = new Error('Invalid token');
+        error.name = 'JsonWebTokenError';
+        throw error;
+      }
+      if (token.includes('expired')) {
+        const error = new Error('Token expired');
+        error.name = 'TokenExpiredError';
+        throw error;
+      }
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        const error = new Error('Invalid token format');
+        error.name = 'JsonWebTokenError';
+        throw error;
+      }
+      try {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+        return payload;
+      } catch (error) {
+        const jwtError = new Error('Invalid token');
+        jwtError.name = 'JsonWebTokenError';
+        throw jwtError;
+      }
+    }),
+    decode: jest.fn((token: string) => {
+      // Mock token decoding
+      if (token === 'invalid-token') {
+        return null;
+      }
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        return null;
+      }
+      try {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+        return payload;
+      } catch (error) {
+        return null;
+      }
+    }),
+    TokenExpiredError: class TokenExpiredError extends Error {
+      constructor(message: string) {
+        super(message);
+        this.name = 'TokenExpiredError';
+      }
+    },
+    JsonWebTokenError: class JsonWebTokenError extends Error {
+      constructor(message: string) {
+        super(message);
+        this.name = 'JsonWebTokenError';
+      }
+    }
+  };
+  
+  return mockJwt;
+});
+
 // Mock Redis
 const mockRedis = {
   setex: jest.fn(),
@@ -69,14 +140,14 @@ describe('JwtService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Set required environment variables
-    process.env.JWT_ACCESS_SECRET = 'test-access-secret-that-is-long-enough-for-testing';
-    process.env.JWT_REFRESH_SECRET = 'test-refresh-secret-that-is-long-enough-for-testing';
+    // Set required environment variables with proper length
+    process.env.JWT_ACCESS_SECRET = 'test-access-secret-that-is-long-enough-for-testing-purposes-only-64-chars';
+    process.env.JWT_REFRESH_SECRET = 'test-refresh-secret-that-is-long-enough-for-testing-purposes-only-64-chars';
     
-    // Setup default Redis mocks
-    (mockRedis.setex as jest.Mock).mockResolvedValue('OK');
-    (mockRedis.exists as jest.Mock).mockResolvedValue(0);
-    (mockRedis.pipeline().exec as jest.Mock).mockResolvedValue([['OK']]);
+    // Setup default Redis mocks with proper typing
+    (mockRedis.setex as any).mockResolvedValue('OK');
+    (mockRedis.exists as any).mockResolvedValue(0);
+    (mockRedis.pipeline().exec as any).mockResolvedValue([['OK']]);
   });
 
   describe('generateAccessToken', () => {
@@ -188,7 +259,7 @@ describe('JwtService', () => {
       const refreshToken = JwtService.generateRefreshToken(testPayload);
       
       // Mock user lookup
-      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(testUser);
+      (mockPrisma.user.findUnique as any).mockResolvedValue(testUser);
       
       const result = await JwtService.refreshAccessToken(refreshToken);
       
@@ -212,7 +283,7 @@ describe('JwtService', () => {
       const refreshToken = JwtService.generateRefreshToken(testPayload);
       
       // Mock user not found
-      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      (mockPrisma.user.findUnique as any).mockResolvedValue(null);
       
       const result = await JwtService.refreshAccessToken(refreshToken);
       
@@ -224,7 +295,7 @@ describe('JwtService', () => {
       const refreshToken = JwtService.generateRefreshToken(testPayload);
       
       // Mock inactive user
-      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
+      (mockPrisma.user.findUnique as any).mockResolvedValue({
         ...testUser,
         isActive: false
       });
@@ -241,7 +312,7 @@ describe('JwtService', () => {
       const refreshToken = 'test-refresh-token';
       
       // Mock session creation
-      (mockPrisma.session.create as jest.Mock).mockResolvedValue({
+      (mockPrisma.session.create as any).mockResolvedValue({
         id: 'session123',
         userId: testUser.id,
         token: 'mock-session-token',
@@ -268,7 +339,7 @@ describe('JwtService', () => {
       const refreshToken = 'test-refresh-token';
       
       // Mock session creation error
-      (mockPrisma.session.create as jest.Mock).mockRejectedValue(new Error('Database error'));
+      (mockPrisma.session.create as any).mockRejectedValue(new Error('Database error'));
       
       const result = await JwtService.storeRefreshToken(testUser.id, refreshToken);
       
@@ -281,7 +352,7 @@ describe('JwtService', () => {
       const refreshToken = 'test-refresh-token';
       
       // Mock session update
-      (mockPrisma.session.updateMany as jest.Mock).mockResolvedValue({
+      (mockPrisma.session.updateMany as any).mockResolvedValue({
         count: 1
       });
       
@@ -303,7 +374,7 @@ describe('JwtService', () => {
       const refreshToken = 'test-refresh-token';
       
       // Mock session update error
-      (mockPrisma.session.updateMany as jest.Mock).mockRejectedValue(new Error('Database error'));
+      (mockPrisma.session.updateMany as any).mockRejectedValue(new Error('Database error'));
       
       const result = await JwtService.invalidateRefreshToken(refreshToken);
       
@@ -314,7 +385,7 @@ describe('JwtService', () => {
   describe('invalidateAllUserTokens', () => {
     test('should successfully invalidate all user tokens', async () => {
       // Mock session update
-      (mockPrisma.session.updateMany as jest.Mock).mockResolvedValue({
+      (mockPrisma.session.updateMany as any).mockResolvedValue({
         count: 3
       });
       
@@ -334,7 +405,7 @@ describe('JwtService', () => {
 
     test('should handle invalidation errors', async () => {
       // Mock session update error
-      (mockPrisma.session.updateMany as jest.Mock).mockRejectedValue(new Error('Database error'));
+      (mockPrisma.session.updateMany as any).mockRejectedValue(new Error('Database error'));
       
       const result = await JwtService.invalidateAllUserTokens(testUser.id);
       
@@ -347,7 +418,7 @@ describe('JwtService', () => {
       const refreshToken = 'test-refresh-token';
       
       // Mock valid session
-      (mockPrisma.session.findFirst as jest.Mock).mockResolvedValue({
+      (mockPrisma.session.findFirst as any).mockResolvedValue({
         id: 'session123',
         refreshToken,
         isActive: true,
@@ -363,7 +434,7 @@ describe('JwtService', () => {
       const refreshToken = 'test-refresh-token';
       
       // Mock no session found
-      (mockPrisma.session.findFirst as jest.Mock).mockResolvedValue(null);
+      (mockPrisma.session.findFirst as any).mockResolvedValue(null);
       
       const result = await JwtService.isRefreshTokenValid(refreshToken);
       
@@ -374,7 +445,7 @@ describe('JwtService', () => {
       const refreshToken = 'test-refresh-token';
       
       // Mock expired session
-      (mockPrisma.session.findFirst as jest.Mock).mockResolvedValue({
+      (mockPrisma.session.findFirst as any).mockResolvedValue({
         id: 'session123',
         refreshToken,
         isActive: true,
@@ -390,7 +461,7 @@ describe('JwtService', () => {
       const refreshToken = 'test-refresh-token';
       
       // Mock inactive session
-      (mockPrisma.session.findFirst as jest.Mock).mockResolvedValue({
+      (mockPrisma.session.findFirst as any).mockResolvedValue({
         id: 'session123',
         refreshToken,
         isActive: false,
@@ -406,7 +477,7 @@ describe('JwtService', () => {
   describe('cleanupExpiredSessions', () => {
     test('should cleanup expired sessions', async () => {
       // Mock session deletion
-      (mockPrisma.session.deleteMany as jest.Mock).mockResolvedValue({
+      (mockPrisma.session.deleteMany as any).mockResolvedValue({
         count: 5
       });
       
@@ -425,7 +496,7 @@ describe('JwtService', () => {
 
     test('should handle cleanup errors', async () => {
       // Mock session deletion error
-      (mockPrisma.session.deleteMany as jest.Mock).mockRejectedValue(new Error('Database error'));
+      (mockPrisma.session.deleteMany as any).mockRejectedValue(new Error('Database error'));
       
       const result = await JwtService.cleanupExpiredSessions();
       
@@ -514,7 +585,7 @@ describe('JwtService', () => {
       const token = JwtService.generateAccessToken(testPayload);
       
       // Mock Redis error
-      (mockRedis.setex as jest.Mock).mockRejectedValue(new Error('Redis error'));
+      (mockRedis.setex as any).mockRejectedValue(new Error('Redis error'));
       
       const result = await JwtService.blacklistToken(token, testUser.id);
       
@@ -527,7 +598,7 @@ describe('JwtService', () => {
       const token = 'test-token';
       
       // Mock Redis to return token exists
-      (mockRedis.exists as jest.Mock).mockResolvedValue(1);
+      (mockRedis.exists as any).mockResolvedValue(1);
       
       const result = await JwtService.isTokenBlacklisted(token);
       
@@ -539,7 +610,7 @@ describe('JwtService', () => {
       const token = 'test-token';
       
       // Mock Redis to return token doesn't exist
-      (mockRedis.exists as jest.Mock).mockResolvedValue(0);
+      (mockRedis.exists as any).mockResolvedValue(0);
       
       const result = await JwtService.isTokenBlacklisted(token);
       
@@ -550,7 +621,7 @@ describe('JwtService', () => {
       const token = 'test-token';
       
       // Mock Redis error
-      (mockRedis.exists as jest.Mock).mockRejectedValue(new Error('Redis error'));
+      (mockRedis.exists as any).mockRejectedValue(new Error('Redis error'));
       
       const result = await JwtService.isTokenBlacklisted(token);
       
@@ -563,10 +634,10 @@ describe('JwtService', () => {
       const refreshToken = JwtService.generateRefreshToken(testPayload);
       
       // Mock user lookup
-      (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(testUser);
+      (mockPrisma.user.findUnique as any).mockResolvedValue(testUser);
       
       // Mock session creation
-      (mockPrisma.session.create as jest.Mock).mockResolvedValue({
+      (mockPrisma.session.create as any).mockResolvedValue({
         id: 'session123',
         userId: testUser.id,
         token: 'new-session-token',
@@ -600,10 +671,10 @@ describe('JwtService', () => {
       ];
       
       // Mock session lookup
-      (mockPrisma.session.findMany as jest.Mock).mockResolvedValue(sessions);
+      (mockPrisma.session.findMany as any).mockResolvedValue(sessions);
       
       // Mock session deactivation
-      (mockPrisma.session.updateMany as jest.Mock).mockResolvedValue({
+      (mockPrisma.session.updateMany as any).mockResolvedValue({
         count: 2
       });
       
@@ -632,7 +703,7 @@ describe('JwtService', () => {
 
     test('should handle logout errors', async () => {
       // Mock session lookup error
-      (mockPrisma.session.findMany as jest.Mock).mockRejectedValue(new Error('Database error'));
+      (mockPrisma.session.findMany as any).mockRejectedValue(new Error('Database error'));
       
       const result = await JwtService.logoutUser(testUser.id);
       

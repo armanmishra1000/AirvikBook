@@ -129,14 +129,9 @@ class ProfileApiClient {
         }
       }
 
-      // Retry logic: only retry on transient errors (5xx or 408). Do NOT retry on 4xx (e.g., 400/401/429)
+      // Retry logic: only retry on transient errors (5xx or 408). Do NOT retry on 4xx (e.g., 400/401)
       if (!response.ok) {
         const status = response.status;
-
-        // Respect 429 by not retrying immediately; surface error to UI
-        if (status === 429) {
-          return responseData;
-        }
 
         // Transient server/network errors eligible for retry
         const isTransient = status >= 500 || status === 408;
@@ -598,17 +593,16 @@ export class UserProfileService {
    */
   static getErrorMessage(code: string): string {
     const errorMessages: Record<string, string> = {
-      [PROFILE_ERROR_CODES.AUTH_REQUIRED]: 'Authentication required. Please log in.',
+      [PROFILE_ERROR_CODES.USER_NOT_FOUND]: 'User not found.',
       [PROFILE_ERROR_CODES.VALIDATION_ERROR]: 'Please check your input and try again.',
-      [PROFILE_ERROR_CODES.FILE_TOO_LARGE]: 'File is too large. Maximum size is 5MB.',
-      [PROFILE_ERROR_CODES.INVALID_FILE_FORMAT]: 'Invalid file format. Please use JPEG, PNG, or WebP.',
-      [PROFILE_ERROR_CODES.INVALID_PRIVACY_SETTING]: 'Invalid privacy setting.',
+      [PROFILE_ERROR_CODES.UPDATE_FAILED]: 'Failed to update profile. Please try again.',
+      [PROFILE_ERROR_CODES.PRIVACY_SETTINGS_ERROR]: 'Invalid privacy setting.',
+      [PROFILE_ERROR_CODES.GOOGLE_CONNECTION_ERROR]: 'Failed to connect Google account.',
       [PROFILE_ERROR_CODES.GOOGLE_NOT_CONNECTED]: 'No Google account connected.',
-      [PROFILE_ERROR_CODES.GOOGLE_ACCOUNT_EXISTS]: 'Google account is already connected to another user.',
-      [PROFILE_ERROR_CODES.NO_ALTERNATIVE_AUTH]: 'Cannot disconnect Google account without password.',
-      [PROFILE_ERROR_CODES.RATE_LIMIT_EXCEEDED]: 'Too many requests. Please wait before trying again.',
-      [PROFILE_ERROR_CODES.PROFILE_UPDATE_FAILED]: 'Failed to update profile. Please try again.',
-      [PROFILE_ERROR_CODES.FILE_UPLOAD_FAILED]: 'Failed to upload file. Please try again.',
+      [PROFILE_ERROR_CODES.PASSWORD_REQUIRED]: 'Password is required for this operation.',
+      [PROFILE_ERROR_CODES.INTERNAL_ERROR]: 'Internal server error. Please try again.',
+      [PROFILE_ERROR_CODES.NETWORK_ERROR]: 'Network error. Please check your connection.',
+      [PROFILE_ERROR_CODES.UNKNOWN_ERROR]: 'An unexpected error occurred.',
       // Additional backend codes that may surface from picture sync endpoints
       NO_GOOGLE_PICTURE: 'No Google profile picture available to sync.',
       GOOGLE_SYNC_DISABLED: 'Google sync is disabled in your privacy settings.',

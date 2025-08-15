@@ -158,20 +158,7 @@ export class AuditService {
     }
   }
 
-  static async logRateLimitExceeded(ipAddress: string, req: Request, endpoint: string): Promise<void> {
-    await this.logSecurityEvent({
-      userId: 'anonymous',
-      action: 'RATE_LIMIT_EXCEEDED',
-      details: {
-        endpoint,
-        timestamp: new Date().toISOString(),
-      },
-      ipAddress: ipAddress || req.ip || req.connection.remoteAddress || 'unknown',
-      userAgent: req.get('User-Agent') || 'unknown',
-      success: false,
-      errorMessage: 'Rate limit exceeded',
-    });
-  }
+
 
   static async logFailedLogin(email: string, req: Request, reason: string): Promise<void> {
     await this.logSecurityEvent({

@@ -26,7 +26,6 @@ export interface EmailConfig {
   limits: {
     dailyLimit: number;
     hourlyLimit: number;
-    rateLimitDelay: number; // milliseconds between emails
   };
 }
 
@@ -53,7 +52,6 @@ export const emailConfig: EmailConfig = {
   limits: {
     dailyLimit: 300, // Brevo free plan limit
     hourlyLimit: 50,
-    rateLimitDelay: 100, // 100ms between emails
   },
 };
 

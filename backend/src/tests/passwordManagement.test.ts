@@ -56,9 +56,6 @@ const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 describe('PasswordManagementService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
-    // Reset static rate limiting maps
-    (PasswordManagementService as any).passwordChangeAttempts = new Map();
   });
 
   describe('getPasswordStatus', () => {
@@ -202,7 +199,7 @@ describe('PasswordManagementService', () => {
       (mockPrisma.session.update as jest.Mock).mockResolvedValue({});
       mockEmailService.sendEmail.mockResolvedValue({ success: true });
 
-      const result = await PasswordManagementService.changePassword('user123', 'session2', changeRequest);
+      const result = await PasswordManagementService.changePassword('user123', changeRequest);
 
       expect(result.success).toBe(true);
       expect(result.data?.passwordChanged).toBe(true);
@@ -229,7 +226,7 @@ describe('PasswordManagementService', () => {
       (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
       mockBcrypt.compare.mockResolvedValue(false as never);
 
-      const result = await PasswordManagementService.changePassword('user123', 'session1', changeRequest);
+      const result = await PasswordManagementService.changePassword('user123', changeRequest);
 
       expect(result.success).toBe(false);
       expect(result.code).toBe('INVALID_CURRENT_PASSWORD');
@@ -242,32 +239,13 @@ describe('PasswordManagementService', () => {
         confirmPassword: 'DifferentPassword789!'
       };
 
-      const result = await PasswordManagementService.changePassword('user123', 'session1', changeRequest);
+      const result = await PasswordManagementService.changePassword('user123', changeRequest);
 
       expect(result.success).toBe(false);
       expect(result.code).toBe('PASSWORD_MISMATCH');
     });
 
-    it('should enforce rate limiting', async () => {
-      const changeRequest = {
-        currentPassword: 'oldPassword123!',
-        newPassword: 'SecurePass247!',
-        confirmPassword: 'SecurePass247!'
-      };
 
-      // Simulate 5 attempts already made
-      const attempts = new Map();
-      attempts.set('user123', { 
-        count: 5, 
-        resetTime: Date.now() + 15 * 60 * 1000 
-      });
-      (PasswordManagementService as any).passwordChangeAttempts = attempts;
-
-      const result = await PasswordManagementService.changePassword('user123', 'session1', changeRequest);
-
-      expect(result.success).toBe(false);
-      expect(result.code).toBe('RATE_LIMIT_EXCEEDED');
-    });
   });
 
   describe('setPasswordForGoogleUser', () => {

@@ -23,11 +23,9 @@ import { describe, test, expect, beforeEach, jest } from '@jest/globals';
 import { Request, Response, NextFunction } from 'express';
 import { AuthMiddleware } from '../middleware/auth.middleware';
 import { JwtService } from '../services/jwt.service';
-import { SessionManagementService } from '../services/auth/sessionManagement.service';
 import { ResponseUtil } from '../utils/response.utils';
 
 const mockJwtService = JwtService as jest.Mocked<typeof JwtService>;
-const mockSessionManagementService = SessionManagementService as jest.Mocked<typeof SessionManagementService>;
 const mockResponseUtil = ResponseUtil as jest.Mocked<typeof ResponseUtil>;
 
 describe('AuthMiddleware', () => {
@@ -50,8 +48,8 @@ describe('AuthMiddleware', () => {
     };
     
     mockResponse = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis()
+      status: jest.fn().mockReturnThis() as any,
+      json: jest.fn().mockReturnThis() as any
     };
     
     mockNext = jest.fn();

@@ -114,7 +114,7 @@ Extending existing auth routes:
 
 ## Security Integration Points
 ### Extending Existing Middleware
-- **Rate Limiting**: Extend existing rate limiter for login attempts
+- **Security Monitoring**: Extend existing security monitoring for login attempts
 - **Auth Middleware**: Reuse existing `verifyToken`, `requireRole` middleware
 - **Session Management**: Build upon existing session tracking in JWT service
 

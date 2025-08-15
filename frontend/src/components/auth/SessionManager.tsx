@@ -90,21 +90,12 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
           setError('Unable to connect to server. Please check your internet connection and try again.');
         } else if (result.code === 'SESSION_EXPIRED') {
           setError('Your session has expired. Please log in again.');
-        } else if (result.code === 'SESSION_RATE_LIMIT_EXCEEDED' || result.code === 'RATE_LIMIT_EXCEEDED') {
-          setError('Too many requests. Please wait a moment and try again.');
-          // Disable auto-refresh temporarily for rate limit errors
-          if (autoRefreshRef.current) {
-            clearInterval(autoRefreshRef.current);
-            autoRefreshRef.current = null;
-          }
         } else {
-          setError(result.error || 'Failed to load sessions');
+          setError(result.error || 'Failed to load sessions. Please try again.');
         }
         
-        // Increment retry count for network errors
-        if (result.code === 'NETWORK_ERROR') {
-          setRetryCount(prev => prev + 1);
-        }
+        // Increment retry count for failed requests
+        setRetryCount(prev => prev + 1);
       }
     } catch (error) {
       if (mountedRef.current) {

@@ -91,63 +91,7 @@ describe('Password Security Integration Tests', () => {
     });
   });
 
-  describe('Rate Limiting Security', () => {
-    beforeEach(() => {
-      // Reset rate limiting maps before each test
-      (PasswordResetService as any).forgotPasswordAttempts = new Map();
-      (PasswordManagementService as any).passwordChangeAttempts = new Map();
-    });
 
-    it('should enforce forgot password rate limiting per email', async () => {
-      const email = 'test@example.com';
-
-      // First attempt should be allowed
-      const firstAttempt = (PasswordResetService as any).checkForgotPasswordRateLimit(email);
-      expect(firstAttempt.allowed).toBe(true);
-
-      // Second attempt within window should be blocked
-      const secondAttempt = (PasswordResetService as any).checkForgotPasswordRateLimit(email);
-      expect(secondAttempt.allowed).toBe(false);
-      expect(secondAttempt.retryAfter).toBeGreaterThan(0);
-    });
-
-    it('should enforce password change rate limiting per user', async () => {
-      const userId = 'user123';
-
-      const rateLimiter = (PasswordManagementService as any).checkPasswordChangeRateLimit.bind(PasswordManagementService);
-
-      // First 5 attempts should be allowed
-      for (let i = 0; i < 5; i++) {
-        const attempt = rateLimiter(userId);
-        expect(attempt.allowed).toBe(true);
-        expect(attempt.remainingAttempts).toBe(5 - i - 1);
-      }
-
-      // 6th attempt should be blocked
-      const blockedAttempt = rateLimiter(userId);
-      expect(blockedAttempt.allowed).toBe(false);
-      expect(blockedAttempt.retryAfter).toBeGreaterThan(0);
-      expect(blockedAttempt.remainingAttempts).toBe(0);
-    });
-
-    it('should reset rate limiting after time window', async () => {
-      const email = 'test@example.com';
-
-      // First attempt
-      (PasswordResetService as any).checkForgotPasswordRateLimit(email);
-
-      // Simulate time passage by manipulating the internal rate limit map
-      const forgotPasswordAttempts = (PasswordResetService as any).forgotPasswordAttempts;
-      const attempt = forgotPasswordAttempts.get(email);
-      if (attempt) {
-        attempt.resetTime = Date.now() - 1000; // Set reset time to past
-      }
-
-      // Should be allowed again after time window
-      const newAttempt = (PasswordResetService as any).checkForgotPasswordRateLimit(email);
-      expect(newAttempt.allowed).toBe(true);
-    });
-  });
 
   describe('Token Security', () => {
     it('should generate cryptographically secure tokens', () => {

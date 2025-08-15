@@ -26,7 +26,6 @@ router.get(
 // Update user profile information
 router.put(
   '/profile',
-  ProfileController.profileUpdateLimiter,
   AuthMiddleware.verifyToken,
   ProfileController.validateProfileUpdate,
   ProfileController.updateProfile
@@ -36,7 +35,6 @@ router.put(
 // Update privacy settings
 router.put(
   '/profile/privacy',
-  ProfileController.profileUpdateLimiter,
   AuthMiddleware.verifyToken,
   ProfileController.validatePrivacySettings,
   ProfileController.updatePrivacySettings
@@ -48,7 +46,6 @@ router.put(
 // Upload profile picture
 router.post(
   '/profile/picture',
-  ProfilePictureController.pictureUploadLimiter,
   AuthMiddleware.verifyToken,
   ...profilePictureUploadMiddleware,
   ProfilePictureController.uploadPicture
@@ -58,7 +55,6 @@ router.post(
 // Sync profile picture from Google
 router.post(
   '/profile/picture/sync-google',
-  ProfilePictureController.googleSyncLimiter,
   AuthMiddleware.verifyToken,
   ProfilePictureController.syncFromGoogle
 );
@@ -85,7 +81,6 @@ router.get(
 // Connect Google account to user profile
 router.post(
   '/profile/connect-google',
-  ProfileController.googleOperationLimiter,
   AuthMiddleware.verifyToken,
   ProfileController.validateGoogleConnection,
   ProfileController.connectGoogle
@@ -95,7 +90,6 @@ router.post(
 // Disconnect Google account from user profile
 router.delete(
   '/profile/disconnect-google',
-  ProfileController.googleOperationLimiter,
   AuthMiddleware.verifyToken,
   ProfileController.disconnectGoogle
 );

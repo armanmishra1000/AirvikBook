@@ -114,7 +114,7 @@ export class EmailService {
   }
 
   /**
-   * Send bulk emails (with rate limiting for Brevo)
+   * Send bulk emails
    */
   async sendBulkEmails(emails: EmailOptions[]): Promise<ServiceResponse<any>> {
     const results = [];
@@ -129,8 +129,7 @@ export class EmailService {
           failed.push({ email: email.to, error: result.error });
         }
         
-        // Rate limiting: Wait 100ms between emails to avoid hitting Brevo limits
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Remove rate limiting delay
       } catch (error: any) {
         failed.push({ email: email.to, error: error.message });
       }

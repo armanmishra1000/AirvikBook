@@ -68,8 +68,7 @@ export class PasswordResetController {
       const result = await PasswordResetService.generateResetToken({ email });
 
       if (!result.success) {
-        const statusCode = result.code === 'RATE_LIMIT_EXCEEDED' ? 429 : 500;
-        return ResponseUtil.error(res, result.error!, result.code!, statusCode, result.details);
+        return ResponseUtil.error(res, result.error!, result.code!, 500, result.details);
       }
 
       // Always return success for security (no email enumeration)

@@ -51,8 +51,7 @@ export class ApiErrorHandler {
         return 'Network error. Please check your connection and try again.';
       case 'VALIDATION_ERROR':
         return error.error || 'Please check your input and try again.';
-      case 'RATE_LIMIT_EXCEEDED':
-        return 'Too many requests. Please wait a moment and try again.';
+
       case 'SERVER_ERROR':
         return 'Server error. Please try again later.';
       default:

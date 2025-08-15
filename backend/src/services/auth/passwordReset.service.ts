@@ -63,15 +63,8 @@ export interface ResetPasswordResult {
 }
 
 export class PasswordResetService {
-  private static readonly TOKEN_EXPIRY_HOURS = 1; // 1 hour
-  private static readonly PASSWORD_HISTORY_LIMIT = 5;
-  private static readonly BCRYPT_ROUNDS = 12;
-  private static readonly MIN_PASSWORD_LENGTH = 8;
-
-  // Rate limiting maps
-  private static forgotPasswordAttempts = new Map<string, { count: number; resetTime: number }>();
-  private static readonly FORGOT_PASSWORD_LIMIT = 1; // 1 request per 5 minutes per email
-  private static readonly FORGOT_PASSWORD_WINDOW = 5 * 60 * 1000; // 5 minutes
+  // Remove rate limiting constants and storage
+  private static readonly RESET_TOKEN_EXPIRY_HOURS = 24;
 
   /**
    * Generate a secure password reset token
@@ -86,8 +79,8 @@ export class PasswordResetService {
   private static validatePasswordStrength(password: string): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    if (password.length < this.MIN_PASSWORD_LENGTH) {
-      errors.push(`Password must be at least ${this.MIN_PASSWORD_LENGTH} characters long`);
+    if (password.length < 8) { // Changed from MIN_PASSWORD_LENGTH to 8
+      errors.push(`Password must be at least 8 characters long`);
     }
 
     if (!/[A-Z]/.test(password)) {
@@ -120,7 +113,7 @@ export class PasswordResetService {
       const passwordHistory = await prisma.passwordHistory.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
-        take: this.PASSWORD_HISTORY_LIMIT
+        take: 5 // Changed from PASSWORD_HISTORY_LIMIT to 5
       });
 
       for (const historyEntry of passwordHistory) {
@@ -156,8 +149,8 @@ export class PasswordResetService {
         orderBy: { createdAt: 'desc' }
       });
 
-      if (allHistory.length > this.PASSWORD_HISTORY_LIMIT) {
-        const toDelete = allHistory.slice(this.PASSWORD_HISTORY_LIMIT);
+      if (allHistory.length > 5) { // Changed from PASSWORD_HISTORY_LIMIT to 5
+        const toDelete = allHistory.slice(5); // Changed from PASSWORD_HISTORY_LIMIT to 5
         await prisma.passwordHistory.deleteMany({
           where: {
             id: {
@@ -173,52 +166,12 @@ export class PasswordResetService {
   }
 
   /**
-   * Check rate limiting for forgot password requests
-   */
-  private static checkForgotPasswordRateLimit(email: string): { allowed: boolean; retryAfter?: number } {
-    const now = Date.now();
-    const windowStart = Math.floor(now / this.FORGOT_PASSWORD_WINDOW) * this.FORGOT_PASSWORD_WINDOW;
-    
-    let attempts = this.forgotPasswordAttempts.get(email);
-    
-    if (!attempts || attempts.resetTime <= now) {
-      attempts = { count: 1, resetTime: windowStart + this.FORGOT_PASSWORD_WINDOW };
-      this.forgotPasswordAttempts.set(email, attempts);
-      return { allowed: true };
-    }
-    
-    if (attempts.count >= this.FORGOT_PASSWORD_LIMIT) {
-      return {
-        allowed: false,
-        retryAfter: Math.ceil((attempts.resetTime - now) / 1000)
-      };
-    }
-    
-    attempts.count++;
-    return { allowed: true };
-  }
-
-  /**
    * Initiate password reset process
    */
   static async generateResetToken(request: ForgotPasswordRequest): Promise<ServiceResponse<ForgotPasswordResult>> {
     try {
       const { email } = request;
       const normalizedEmail = email.toLowerCase().trim();
-
-      // Check rate limiting
-      const rateLimitResult = this.checkForgotPasswordRateLimit(normalizedEmail);
-      if (!rateLimitResult.allowed) {
-        return {
-          success: false,
-          error: 'Too many password reset requests. Please try again in 5 minutes.',
-          code: 'RATE_LIMIT_EXCEEDED',
-          details: {
-            retryAfter: rateLimitResult.retryAfter,
-            requestsRemaining: 0
-          }
-        };
-      }
 
       // Find user by email
       const user = await prisma.user.findFirst({
@@ -265,7 +218,7 @@ export class PasswordResetService {
 
       // Generate reset token for email accounts (email-only or mixed)
       const resetToken = this.generateSecureToken();
-      const expiresAt = new Date(Date.now() + this.TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
+      const expiresAt = new Date(Date.now() + this.RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
 
       // Clean up any existing reset tokens for this user
       await prisma.passwordResetToken.deleteMany({
@@ -433,13 +386,13 @@ export class PasswordResetService {
           error: 'Please choose a password you haven\'t used recently',
           code: 'PASSWORD_REUSED',
           details: {
-            historyLimit: this.PASSWORD_HISTORY_LIMIT
+            historyLimit: 5 // Changed from PASSWORD_HISTORY_LIMIT to 5
           }
         };
       }
 
       // Hash new password
-      const passwordHash = await bcrypt.hash(newPassword, this.BCRYPT_ROUNDS);
+      const passwordHash = await bcrypt.hash(newPassword, 12); // Changed from BCRYPT_ROUNDS to 12
 
       // Update user password
       const updatedUser = await prisma.user.update({
@@ -529,10 +482,12 @@ export class PasswordResetService {
         }
       });
 
+      // eslint-disable-next-line no-console
       console.log(`Cleaned up ${result.count} expired password reset tokens`);
       return { deletedCount: result.count };
 
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error cleaning up expired tokens:', error);
       return { deletedCount: 0 };
     }

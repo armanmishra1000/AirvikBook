@@ -96,6 +96,10 @@ export class JwtService {
       );
     } catch (error) {
       console.error('Error generating access token:', error);
+      if (error instanceof Error && error.message.includes('JWT secrets not configured')) {
+        throw error; // Re-throw the original error
+      }
+      console.error('Original error details:', error);
       throw new Error('Failed to generate access token');
     }
   }
@@ -123,6 +127,10 @@ export class JwtService {
       );
     } catch (error) {
       console.error('Error generating refresh token:', error);
+      if (error instanceof Error && error.message.includes('JWT secrets not configured')) {
+        throw error; // Re-throw the original error
+      }
+      console.error('Original error details:', error);
       throw new Error('Failed to generate refresh token');
     }
   }

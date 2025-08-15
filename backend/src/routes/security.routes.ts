@@ -64,12 +64,6 @@ router.get('/status', AuthMiddleware.verifyToken, async (_req: Request, res: Res
         requirements: passwordRequirements,
         strengthTips: PasswordValidationService.getStrengthTips(),
       },
-      rateLimiting: {
-        enabled: true,
-        globalLimit: process.env.RATE_LIMIT_MAX_REQUESTS || 100,
-        authLimit: process.env.AUTH_RATE_LIMIT_MAX_ATTEMPTS || 5,
-        registrationLimit: process.env.REGISTRATION_RATE_LIMIT_MAX_ATTEMPTS || 3,
-      },
       security: {
         corsEnabled: true,
         cspEnabled: true,

@@ -87,7 +87,7 @@ export interface ResendVerificationRequest {
 
 export interface RegistrationResponse {
   user: User;
-  tokens: AuthTokens;
+  tokens?: AuthTokens; // Optional - not provided when email verification is required
   verificationEmailSent?: boolean;
   isNewUser?: boolean;
   welcomeEmailSent?: boolean;
@@ -235,7 +235,6 @@ export type ApiErrorCode =
   | 'VERIFICATION_TOKEN_INVALID'
   | 'VERIFICATION_TOKEN_EXPIRED'
   | 'USER_NOT_FOUND'
-  | 'RATE_LIMIT_EXCEEDED'
   | 'VALIDATION_ERROR'
   | 'INTERNAL_ERROR';
 

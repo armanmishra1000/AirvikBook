@@ -175,7 +175,7 @@ class ApiClient {
           return {
             success: false,
             error: 'Authentication required',
-            code: PASSWORD_ERROR_CODES.SESSION_REQUIRED
+            code: PASSWORD_ERROR_CODES.UNKNOWN_ERROR
           };
         }
         headers['Authorization'] = `Bearer ${accessToken}`;
@@ -215,22 +215,9 @@ class ApiClient {
           return {
             success: false,
             error: 'Authentication failed',
-            code: PASSWORD_ERROR_CODES.SESSION_REQUIRED
+            code: PASSWORD_ERROR_CODES.UNKNOWN_ERROR
           };
         }
-      }
-
-      // Handle rate limiting
-      if (response.status === 429) {
-        const retryAfter = response.headers.get('Retry-After');
-        return {
-          success: false,
-          error: 'Rate limit exceeded. Please try again later.',
-          code: PASSWORD_ERROR_CODES.RATE_LIMIT_EXCEEDED,
-          details: {
-            retryAfter: retryAfter ? parseInt(retryAfter) : undefined
-          }
-        };
       }
 
       // Handle network errors
@@ -252,7 +239,7 @@ class ApiClient {
           return {
             success: false,
             error: 'Request timeout',
-            code: PASSWORD_ERROR_CODES.TIMEOUT_ERROR
+            code: PASSWORD_ERROR_CODES.NETWORK_ERROR
           };
         }
         if (error.message.includes('fetch')) {
@@ -297,7 +284,7 @@ class ApiClient {
       return {
         success: false,
         error: 'No refresh token available',
-        code: PASSWORD_ERROR_CODES.SESSION_REQUIRED
+        code: PASSWORD_ERROR_CODES.UNKNOWN_ERROR
       };
     }
 
@@ -326,7 +313,7 @@ class ApiClient {
         return {
           success: false,
           error: 'Token refresh failed',
-          code: PASSWORD_ERROR_CODES.SESSION_REQUIRED
+          code: PASSWORD_ERROR_CODES.UNKNOWN_ERROR
         };
       }
     } catch (error) {
@@ -334,7 +321,7 @@ class ApiClient {
       return {
         success: false,
         error: 'Token refresh failed',
-        code: PASSWORD_ERROR_CODES.SESSION_REQUIRED
+        code: PASSWORD_ERROR_CODES.UNKNOWN_ERROR
       };
     }
   }
@@ -582,25 +569,14 @@ export class PasswordManagementService {
       [PASSWORD_ERROR_CODES.INVALID_RESET_TOKEN]: 'The reset link is invalid or has expired. Please request a new one.',
       [PASSWORD_ERROR_CODES.RESET_TOKEN_EXPIRED]: 'The reset link has expired. Please request a new one.',
       [PASSWORD_ERROR_CODES.INVALID_CURRENT_PASSWORD]: 'Current password is incorrect.',
-      [PASSWORD_ERROR_CODES.PASSWORD_ALREADY_EXISTS]: 'Account already has a password. Use change password instead.',
       [PASSWORD_ERROR_CODES.NO_PASSWORD_EXISTS]: 'No password exists for this account.',
-      [PASSWORD_ERROR_CODES.GOOGLE_ACCOUNT_REQUIRED]: 'This operation requires a Google account.',
+      [PASSWORD_ERROR_CODES.GOOGLE_ONLY_ACCOUNT]: 'This account uses Google sign-in only.',
       [PASSWORD_ERROR_CODES.PASSWORD_TOO_WEAK]: 'Password does not meet security requirements.',
       [PASSWORD_ERROR_CODES.PASSWORD_MISMATCH]: 'Passwords do not match.',
       [PASSWORD_ERROR_CODES.PASSWORD_REUSED]: 'Cannot reuse a recent password.',
-      [PASSWORD_ERROR_CODES.INVALID_EMAIL_FORMAT]: 'Please enter a valid email address.',
-      [PASSWORD_ERROR_CODES.RATE_LIMIT_EXCEEDED]: 'Too many attempts. Please try again later.',
-      [PASSWORD_ERROR_CODES.PASSWORD_CHANGE_LIMIT]: 'Too many password change attempts. Please try again later.',
-      [PASSWORD_ERROR_CODES.FORGOT_PASSWORD_LIMIT]: 'Too many password reset requests. Please try again later.',
-      [PASSWORD_ERROR_CODES.ACCOUNT_NOT_FOUND]: 'Account not found.',
       [PASSWORD_ERROR_CODES.ACCOUNT_DISABLED]: 'Account has been disabled.',
-      [PASSWORD_ERROR_CODES.GOOGLE_ONLY_ACCOUNT]: 'This account uses Google sign-in only.',
       [PASSWORD_ERROR_CODES.MIXED_AUTH_REQUIRED]: 'This operation requires mixed authentication.',
-      [PASSWORD_ERROR_CODES.SESSION_REQUIRED]: 'Please log in to continue.',
-      [PASSWORD_ERROR_CODES.UNAUTHORIZED_ACCESS]: 'You do not have permission to perform this action.',
-      [PASSWORD_ERROR_CODES.SECURITY_VIOLATION]: 'This action violates security policy.',
       [PASSWORD_ERROR_CODES.NETWORK_ERROR]: 'Network error. Please check your connection.',
-      [PASSWORD_ERROR_CODES.TIMEOUT_ERROR]: 'Request timed out. Please try again.',
       [PASSWORD_ERROR_CODES.UNKNOWN_ERROR]: 'An unexpected error occurred. Please try again.'
     };
 

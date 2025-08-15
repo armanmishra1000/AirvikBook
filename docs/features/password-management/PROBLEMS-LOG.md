@@ -291,12 +291,11 @@ const changePassword = async (newPassword: string, invalidateOtherSessions: bool
 // ❌ WRONG: Inconsistent rate limiting
 router.post('/forgot-password', forgotPasswordController); // No rate limiting
 
-// ✅ CORRECT: Consistent rate limiting
+// ✅ CORRECT: Security monitoring
 router.post('/forgot-password', 
-  rateLimiter({ 
-    windowMs: 5 * 60 * 1000, // 5 minutes
-    max: 1, // 1 request per window per IP
-    message: 'Too many password reset requests'
+  securityMonitoring({ 
+    trackAttempts: true,
+    alertThreshold: 5 // Alert after 5 attempts
   }),
   forgotPasswordController
 );

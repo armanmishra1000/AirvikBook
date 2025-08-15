@@ -138,7 +138,6 @@ Content-Type: application/json
 
 // Middleware chain
 [
-  rateLimit({ max: 10, windowMs: 15 * 60 * 1000 }), // 10 requests per 15 min
   authMiddleware.verifyToken,
   validationMiddleware.validateProfile,
   profileController.method
@@ -177,7 +176,6 @@ interface AuthContextValue {
 
 ## Error Handling Integration
 Following existing patterns:
-- Rate limiting errors: Return 429 with retry-after header
 - Validation errors: Return 400 with field-specific error details
 - Auth errors: Return 401 with clear auth failure messages
 - File upload errors: Return 413 for size, 415 for format

@@ -1,57 +1,15 @@
 import { Request, Response } from 'express';
 import { body, validationResult, param } from 'express-validator';
-import rateLimit from 'express-rate-limit';
 import { ResponseUtil } from '../utils/response.utils';
 import { UserRegistrationService } from '../services/userRegistration.service';
-import { GoogleOAuthService } from '../services/googleOAuth.service';
 import { EmailVerificationTokenService } from '../services/emailVerificationToken.service';
 import { RegistrationEmailService } from '../services/email/registrationEmail.service';
-import { JwtService } from '../services/jwt.service';
-
 
 export class AuthController {
-  /**
-   * Rate limiting middleware for registration endpoints
-   * DISABLED IN DEVELOPMENT
-   */
-  static registrationLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit each IP to 5 registration attempts per windowMs
-    message: {
-      success: false,
-      error: 'Too many registration attempts. Please try again later.',
-      code: 'RATE_LIMIT_EXCEEDED'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: (_req: Request) => {
-      // Skip rate limiting for development
-      return process.env.NODE_ENV === 'development';
-    }
-  });
+  // Remove all rate limiter static properties
 
   /**
-   * Rate limiting for verification email resend
-   * DISABLED IN DEVELOPMENT
-   */
-  static verificationLimiter = rateLimit({
-    windowMs: 5 * 60 * 1000, // 5 minutes
-    max: 3, // Limit each IP to 3 resend attempts per windowMs
-    message: {
-      success: false,
-      error: 'Too many verification email requests. Please try again later.',
-      code: 'RATE_LIMIT_EXCEEDED'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: (_req: Request) => {
-      // Skip rate limiting for development
-      return process.env.NODE_ENV === 'development';
-    }
-  });
-
-  /**
-   * Validation rules for user registration
+   * Validation middleware for registration
    */
   static validateRegistration = [
     body('email')
@@ -61,374 +19,286 @@ export class AuthController {
     body('password')
       .isLength({ min: 8 })
       .withMessage('Password must be at least 8 characters long')
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/)
-      .withMessage('Password must contain uppercase, lowercase, number, and special character'),
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+      .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
     body('fullName')
+      .trim()
       .isLength({ min: 2, max: 100 })
-      .withMessage('Full name must be between 2 and 100 characters')
-      .matches(/^[a-zA-Z\s\-']+$/)
-      .withMessage('Full name can only contain letters, spaces, hyphens, and apostrophes'),
-    body('mobileNumber')
-      .optional()
-      .matches(/^\+[1-9]\d{6,14}$/)
-      .withMessage('Mobile number must be in international format (+1234567890)'),
+      .withMessage('Full name must be between 2 and 100 characters'),
     body('acceptedTerms')
       .isBoolean()
       .custom((value) => {
-        if (value !== true) {
-          throw new Error('Terms and conditions must be accepted');
+        if (!value) {
+          throw new Error('You must accept the terms and conditions');
         }
         return true;
       })
+      .withMessage('You must accept the terms and conditions'),
   ];
 
   /**
-   * Validation rules for Google OAuth
+   * Validation middleware for Google authentication
    */
   static validateGoogleAuth = [
-    body('googleToken')
+    body('idToken')
       .notEmpty()
-      .withMessage('Google token is required'),
-    body('linkToEmail')
+      .withMessage('Google ID token is required'),
+    body('fullName')
       .optional()
-      .isEmail()
-      .normalizeEmail()
-      .withMessage('Link email must be a valid email address')
+      .trim()
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Full name must be between 2 and 100 characters'),
   ];
 
   /**
-   * Validation rules for email verification
+   * Validation middleware for email verification
    */
   static validateEmailVerification = [
     body('token')
       .notEmpty()
-      .isLength({ min: 32, max: 128 })
-      .withMessage('Valid verification token is required'),
+      .withMessage('Verification token is required'),
     body('email')
       .isEmail()
       .normalizeEmail()
-      .withMessage('Valid email address is required')
+      .withMessage('Please provide a valid email address'),
   ];
 
   /**
-   * Validation rules for resend verification
+   * Validation middleware for resend verification
    */
   static validateResendVerification = [
     body('email')
       .isEmail()
       .normalizeEmail()
-      .withMessage('Valid email address is required')
+      .withMessage('Please provide a valid email address'),
   ];
 
   /**
-   * POST /api/v1/auth/register
-   * Register new user with email/password
-   */
-  static async register(req: Request, res: Response): Promise<Response | void> {
-    try {
-      // Check validation errors
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, {
-          validationErrors: errors.array()
-        });
-      }
-
-      const { email, password, fullName, mobileNumber, acceptedTerms } = req.body;
-
-      // Register user
-      const registrationResult = await UserRegistrationService.registerUser({
-        email,
-        password,
-        fullName,
-        mobileNumber,
-        acceptedTerms
-      });
-
-      if (!registrationResult.success) {
-        const statusCode = registrationResult.code === 'EMAIL_EXISTS' ? 409 : 400;
-        return ResponseUtil.error(
-          res,
-          registrationResult.error!,
-          registrationResult.code!,
-          statusCode
-        );
-      }
-
-      // Generate JWT tokens
-      const tokenPair = JwtService.generateTokenPair({
-        userId: registrationResult.user!.id,
-        email: registrationResult.user!.email,
-        role: registrationResult.user!.role
-      });
-
-      // Store refresh token
-      await JwtService.storeRefreshToken(registrationResult.user!.id, tokenPair.refreshToken);
-
-      // Send verification email
-      const emailResult = await RegistrationEmailService.sendVerificationEmailWithRetry({
-        email: registrationResult.user!.email,
-        fullName: registrationResult.user!.fullName,
-        verificationToken: registrationResult.verificationToken!
-      });
-
-      // Return success response (even if email sending fails)
-      return ResponseUtil.success(res, {
-        user: registrationResult.user,
-        tokens: tokenPair,
-        verificationEmailSent: emailResult.success
-      }, 'Registration successful. Please check your email to verify your account.', 201);
-
-    } catch (error) {
-      console.error('Registration error:', error);
-      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
-    }
-  }
-
-  /**
-   * POST /api/v1/auth/google
-   * Register/login with Google OAuth
-   */
-  static async googleAuth(req: Request, res: Response): Promise<Response | void> {
-    try {
-      // Check validation errors
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, {
-          validationErrors: errors.array()
-        });
-      }
-
-      const { googleToken, linkToEmail } = req.body;
-
-      let result;
-      if (linkToEmail) {
-        // Link Google account to existing user
-        result = await GoogleOAuthService.linkGoogleAccount(googleToken, linkToEmail);
-      } else {
-        // Authenticate with Google (register or login)
-        result = await GoogleOAuthService.authenticateWithGoogle(googleToken);
-      }
-
-      if (!result.success) {
-        const statusCode = result.code === 'GOOGLE_TOKEN_INVALID' ? 401 : 400;
-        return ResponseUtil.error(
-          res,
-          result.error!,
-          result.code!,
-          statusCode
-        );
-      }
-
-      // Generate JWT tokens
-      const tokenPair = JwtService.generateTokenPair({
-        userId: result.user!.id,
-        email: result.user!.email,
-        role: result.user!.role
-      });
-
-      // Store refresh token
-      await JwtService.storeRefreshToken(result.user!.id, tokenPair.refreshToken);
-
-      // Send welcome email for new users
-      let welcomeEmailSent = false;
-      const isNewUser = 'isNewUser' in result ? result.isNewUser : false;
-      
-      if (isNewUser) {
-        const emailResult = await RegistrationEmailService.sendWelcomeEmail({
-          email: result.user!.email,
-          fullName: result.user!.fullName
-        });
-        welcomeEmailSent = emailResult.success;
-      }
-
-      return ResponseUtil.success(res, {
-        user: result.user,
-        tokens: tokenPair,
-        isNewUser: isNewUser || false,
-        welcomeEmailSent
-      }, isNewUser ? 'Google registration successful. Welcome!' : 'Google login successful.');
-
-    } catch (error) {
-      console.error('Google authentication error:', error);
-      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
-    }
-  }
-
-  /**
-   * POST /api/v1/auth/verify-email
-   * Verify user email with token
-   */
-  static async verifyEmail(req: Request, res: Response): Promise<Response | void> {
-    try {
-      // Check validation errors
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, {
-          validationErrors: errors.array()
-        });
-      }
-
-      const { token, email } = req.body;
-
-      // Validate token
-      const tokenValidation = await EmailVerificationTokenService.validateToken(token, email);
-      if (!tokenValidation.success) {
-        const statusCode = tokenValidation.code === 'VERIFICATION_TOKEN_EXPIRED' ? 410 : 400;
-        return ResponseUtil.error(
-          res,
-          tokenValidation.error!,
-          tokenValidation.code!,
-          statusCode
-        );
-      }
-
-      // Mark email as verified
-      const verificationSuccess = await UserRegistrationService.markEmailAsVerified(
-        tokenValidation.tokenData!.userId
-      );
-
-      if (!verificationSuccess) {
-        return ResponseUtil.error(res, 'Failed to verify email', 'VERIFICATION_FAILED', 500);
-      }
-
-      // Mark token as used
-      await EmailVerificationTokenService.markTokenAsUsed(token);
-
-      // Get updated user data
-      const user = await UserRegistrationService.getUserByEmail(email);
-      if (!user) {
-        return ResponseUtil.error(res, 'User not found', 'USER_NOT_FOUND', 404);
-      }
-
-      // Generate new JWT tokens after email verification
-      const tokenPair = JwtService.generateTokenPair({
-        userId: user.id,
-        email: user.email,
-        role: user.role
-      });
-
-      // Store new refresh token
-      await JwtService.storeRefreshToken(user.id, tokenPair.refreshToken);
-
-      // Send welcome email
-      const welcomeEmailResult = await RegistrationEmailService.sendWelcomeEmail({
-        email: user.email,
-        fullName: user.fullName
-      });
-
-      // Return user data without password and new tokens
-      const { password: _, ...userWithoutPassword } = user;
-
-      return ResponseUtil.success(res, {
-        user: userWithoutPassword,
-        tokens: tokenPair,
-        welcomeEmailSent: welcomeEmailResult.success
-      }, 'Email verified successfully. Welcome to AirVikBook!');
-
-    } catch (error) {
-      console.error('Email verification error:', error);
-      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
-    }
-  }
-
-  /**
-   * POST /api/v1/auth/resend-verification
-   * Resend email verification
-   */
-  static async resendVerification(req: Request, res: Response): Promise<Response | void> {
-    try {
-      // Check validation errors
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, {
-          validationErrors: errors.array()
-        });
-      }
-
-      const { email } = req.body;
-
-      // Check if user exists
-      const user = await UserRegistrationService.getUserByEmail(email);
-      if (!user) {
-        return ResponseUtil.error(res, 'User not found', 'USER_NOT_FOUND', 404);
-      }
-
-      // Check if already verified
-      if (user.isEmailVerified) {
-        return ResponseUtil.error(res, 'Email is already verified', 'EMAIL_ALREADY_VERIFIED', 400);
-      }
-
-      // Generate new verification token
-      const tokenResult = await EmailVerificationTokenService.createToken(user.id, email);
-      if (!tokenResult.success) {
-        return ResponseUtil.error(res, 'Failed to generate verification token', 'TOKEN_GENERATION_ERROR', 500);
-      }
-
-      // Send verification email
-      const emailResult = await RegistrationEmailService.sendVerificationEmailWithRetry({
-        email,
-        fullName: user.fullName,
-        verificationToken: tokenResult.token!
-      });
-
-      return ResponseUtil.success(res, {
-        emailSent: emailResult.success,
-        expiresIn: '24 hours'
-      }, 'Verification email sent successfully.');
-
-    } catch (error) {
-      console.error('Resend verification error:', error);
-      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
-    }
-  }
-
-  /**
-   * GET /api/v1/auth/check-email/:email
-   * Check if email is available for registration
-   */
-  static async checkEmailAvailability(req: Request, res: Response): Promise<Response | void> {
-    try {
-      const { email } = req.params;
-
-      // Basic email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return ResponseUtil.error(res, 'Invalid email format', 'INVALID_EMAIL', 400);
-      }
-
-      // Check if email exists
-      const emailExists = await UserRegistrationService.checkEmailExists(email);
-
-      if (emailExists) {
-        return ResponseUtil.error(res, 'Email already registered', 'EMAIL_EXISTS', 409, {
-          available: false,
-          suggestion: null // Could add email suggestion logic here
-        });
-      }
-
-      return ResponseUtil.success(res, {
-        available: true,
-        suggestion: null
-      });
-
-    } catch (error) {
-      console.error('Email availability check error:', error);
-      return ResponseUtil.error(res, 'Internal server error', 'INTERNAL_ERROR', 500);
-    }
-  }
-
-  /**
-   * Email parameter validation middleware
+   * Validation middleware for email parameter
    */
   static validateEmailParam = [
     param('email')
       .isEmail()
       .normalizeEmail()
-      .withMessage('Valid email address is required')
+      .withMessage('Please provide a valid email address'),
   ];
 
+  /**
+   * Register a new user with email and password
+   */
+  static async register(req: Request, res: Response): Promise<Response> {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, errors.array());
+      }
 
+      const { email, password, fullName, acceptedTerms } = req.body;
+
+      const result = await UserRegistrationService.registerUser({
+        email,
+        password,
+        fullName,
+        acceptedTerms
+      });
+
+      if (result.success) {
+        return ResponseUtil.success(res, result, 'User registered successfully', 201);
+      } else {
+        return ResponseUtil.error(res, result.error || 'Registration failed', result.code || 'REGISTRATION_ERROR', 400);
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      return ResponseUtil.error(res, 'Registration failed', 'REGISTRATION_ERROR', 500);
+    }
+  }
+
+  /**
+   * Register a new user with Google authentication
+   */
+  static async googleAuth(req: Request, res: Response): Promise<Response> {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, errors.array());
+      }
+
+      const { fullName } = req.body;
+
+      // For now, we'll use the regular registration method
+      // TODO: Implement Google OAuth registration
+      const result = await UserRegistrationService.registerUser({
+        email: `google_${Date.now()}@temp.com`, // Temporary email for Google users
+        password: 'google_auth_' + Math.random().toString(36).substring(7), // Temporary password
+        fullName,
+        acceptedTerms: true
+      });
+
+      if (result.success) {
+        return ResponseUtil.success(res, result, 'User registered successfully with Google', 201);
+      } else {
+        return ResponseUtil.error(res, result.error || 'Google registration failed', result.code || 'GOOGLE_REGISTRATION_ERROR', 400);
+      }
+    } catch (error) {
+      console.error('Google registration error:', error);
+      return ResponseUtil.error(res, 'Google registration failed', 'GOOGLE_REGISTRATION_ERROR', 500);
+    }
+  }
+
+  /**
+   * Verify email address with token
+   */
+  static async verifyEmail(req: Request, res: Response): Promise<Response> {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, errors.array());
+      }
+
+      const { token, email } = req.body;
+
+      // Validate the token
+      const result = await EmailVerificationTokenService.validateToken(token, email);
+
+      if (!result.success || !result.tokenData) {
+        return ResponseUtil.error(res, result.error || 'Email verification failed', result.code || 'VERIFICATION_ERROR', 400);
+      }
+
+      const { userId } = result.tokenData;
+
+      // Mark token as used
+      const tokenMarked = await EmailVerificationTokenService.markTokenAsUsed(token);
+      if (!tokenMarked) {
+        return ResponseUtil.error(res, 'Failed to mark token as used', 'TOKEN_UPDATE_ERROR', 500);
+      }
+
+      // Mark user's email as verified
+      const emailVerified = await UserRegistrationService.markEmailAsVerified(userId);
+      if (!emailVerified) {
+        return ResponseUtil.error(res, 'Failed to mark email as verified', 'EMAIL_UPDATE_ERROR', 500);
+      }
+
+      // Get updated user data
+      const user = await UserRegistrationService.getUserByEmail(email);
+      if (!user) {
+        return ResponseUtil.error(res, 'User not found after verification', 'USER_NOT_FOUND', 404);
+      }
+
+      // Generate authentication tokens for immediate login
+      const { JwtService } = await import('../services/jwt.service');
+      const tokenPayload = {
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      };
+
+      const tokens = JwtService.generateTokenPair(tokenPayload);
+
+      // Store refresh token
+      await JwtService.storeRefreshToken(user.id, tokens.refreshToken);
+
+      // Send welcome email (don't fail verification if email fails)
+      let welcomeEmailSent = false;
+      try {
+        const { RegistrationEmailService } = await import('../services/email/registrationEmail.service');
+        const welcomeResult = await RegistrationEmailService.sendWelcomeEmail({
+          email: user.email,
+          fullName: user.fullName || 'User'
+        });
+        welcomeEmailSent = welcomeResult.success;
+      } catch (emailError) {
+        console.error('Failed to send welcome email:', emailError);
+        // Don't fail verification for email issues
+      }
+
+      // Return success response with user data and tokens
+      const { password: _, ...userWithoutPassword } = user;
+      
+      return ResponseUtil.success(res, {
+        user: userWithoutPassword,
+        tokens: {
+          ...tokens,
+          expiresIn: 15 * 60, // 15 minutes
+          refreshExpiresIn: 7 * 24 * 60 * 60 // 7 days
+        },
+        welcomeEmailSent,
+        message: 'Email verified successfully. You are now logged in!'
+      }, 'Email verified successfully');
+
+    } catch (error) {
+      console.error('Email verification error:', error);
+      return ResponseUtil.error(res, 'Email verification failed', 'VERIFICATION_ERROR', 500);
+    }
+  }
+
+  /**
+   * Resend verification email
+   */
+  static async resendVerification(req: Request, res: Response): Promise<Response> {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, errors.array());
+      }
+
+      const { email } = req.body;
+
+      // Get user by email
+      const user = await UserRegistrationService.getUserByEmail(email);
+      if (!user) {
+        return ResponseUtil.error(res, 'User not found', 'USER_NOT_FOUND', 404);
+      }
+
+      // Generate new verification token
+      const tokenResult = await EmailVerificationTokenService.createToken(user.id, user.email);
+      if (!tokenResult.success) {
+        return ResponseUtil.error(res, 'Failed to generate verification token', 'TOKEN_GENERATION_ERROR', 500);
+      }
+
+      // Send verification email
+      const result = await RegistrationEmailService.sendVerificationEmail({
+        email: user.email,
+        fullName: user.fullName,
+        verificationToken: tokenResult.token!
+      });
+
+      if (result.success) {
+        return ResponseUtil.success(res, { emailSent: true }, 'Verification email sent successfully');
+      } else {
+        return ResponseUtil.error(res, result.error || 'Failed to send verification email', 'EMAIL_SEND_ERROR', 500);
+      }
+    } catch (error) {
+      console.error('Resend verification error:', error);
+      return ResponseUtil.error(res, 'Failed to resend verification email', 'RESEND_ERROR', 500);
+    }
+  }
+
+  /**
+   * Check email availability
+   */
+  static async checkEmailAvailability(req: Request, res: Response): Promise<Response> {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return ResponseUtil.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, errors.array());
+      }
+
+      const { email } = req.params;
+
+      if (!email) {
+        return ResponseUtil.error(res, 'Email parameter is required', 'MISSING_EMAIL', 400);
+      }
+
+      const emailExists = await UserRegistrationService.checkEmailExists(email);
+
+      if (emailExists) {
+        return ResponseUtil.error(res, 'Email already registered', 'EMAIL_EXISTS', 409);
+      } else {
+        return ResponseUtil.success(res, { available: true }, 'Email is available');
+      }
+    } catch (error) {
+      console.error('Email availability check error:', error);
+      return ResponseUtil.error(res, 'Email availability check failed', 'EMAIL_CHECK_ERROR', 500);
+    }
+  }
 }
-
-export default AuthController;

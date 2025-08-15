@@ -300,22 +300,16 @@ class ApiClient {
         }
       }
 
-      // Handle network errors with retry logic
-      if (!response.ok && retryCount < this.MAX_RETRY_ATTEMPTS) {
-        // Don't retry on rate limit errors (429)
-        if (response.status === 429) {
-          return {
-            success: false,
-            error: 'Too many requests. Please try again later.',
-            code: 'RATE_LIMIT_EXCEEDED'
-          };
-        }
-        
-        await this.delay(this.RETRY_DELAY * (retryCount + 1));
-        return this.request<T>(method, endpoint, data, {
-          ...options,
-          retryCount: retryCount + 1
-        });
+      // Remove rate limit error handling
+
+      // Handle network errors
+      if (!response.ok) {
+        return {
+          success: false,
+          error: responseData.error || `HTTP ${response.status}`,
+          code: responseData.code || 'UNKNOWN_ERROR',
+          details: responseData.details
+        };
       }
 
       return responseData;

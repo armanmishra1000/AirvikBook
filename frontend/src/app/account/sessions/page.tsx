@@ -130,9 +130,10 @@ const SessionsPage: React.FC = () => {
           {/* Main Session Manager */}
           <div className="lg:col-span-2">
             <SessionManager
-              autoRefresh={false} // Disabled by default to prevent rate limiting
-              refreshInterval={300000} // 5 minutes instead of 30 seconds
+              className="w-full"
               showCurrentSessionFirst={true}
+              autoRefresh={false}
+              refreshInterval={300000}
             />
           </div>
 

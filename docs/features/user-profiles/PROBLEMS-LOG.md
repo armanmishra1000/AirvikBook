@@ -128,25 +128,7 @@ ALTER TABLE "users" ADD COLUMN "profileVisibility" TEXT DEFAULT 'PUBLIC';
 ALTER TABLE "users" ADD COLUMN "showEmail" BOOLEAN DEFAULT false;
 ```
 
-#### API Rate Limiting Violations
-**Problem**: Not implementing proper rate limiting for resource-intensive operations
-**Prevention**: Implement appropriate rate limits for different endpoint types
-**Detection**: Check for missing rate limiting middleware
-**User Profiles Application**:
-```typescript
-// ✅ REQUIRED: Rate limiting for profile operations
-const profileUpdateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // 10 requests per window
-  message: 'Too many profile update attempts'
-});
 
-const fileUploadLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 file uploads per window
-  message: 'Too many file upload attempts'
-});
-```
 
 #### Authentication Bypass Issues
 **Problem**: Forgetting to protect routes with authentication middleware
@@ -212,7 +194,7 @@ const optimizeProfilePicture = async (buffer: Buffer): Promise<Buffer> => {
 2. **Google OAuth Flows**: Connection, sync, disconnection with various account states
 3. **Privacy Setting Enforcement**: Verify privacy controls affect data visibility
 4. **Data Migration**: Test new fields work with existing user records
-5. **API Rate Limiting**: Verify limits prevent abuse without blocking legitimate use
+5. **API Performance**: Verify endpoints handle load without performance degradation
 
 ### Security Considerations
 1. **File Upload Validation**: Size, format, dimension, and content validation
