@@ -244,4 +244,14 @@
       radial-gradient(circle at 80% 20%, rgb(var(--airvik-purple) / 0.03) 0%, transparent 50%),
       radial-gradient(circle at 40% 40%, rgb(var(--airvik-cyan) / 0.02) 0%, transparent 50%);
   }
+  
+  /* Hide scrollbars while maintaining scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
 }

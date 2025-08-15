@@ -261,10 +261,20 @@ export class ProfileValidator {
     // Validate date of birth if provided
     if (data.dateOfBirth !== undefined && data.dateOfBirth) {
       const birthDate = new Date(data.dateOfBirth);
+      const now = new Date();
+      
       if (isNaN(birthDate.getTime())) {
         errors.push('Date of birth must be a valid date');
-      } else if (birthDate >= new Date()) {
+      } else if (birthDate >= now) {
         errors.push('Date of birth must be in the past');
+      } else {
+        // Check age restrictions (13-120 years old)
+        const age = now.getFullYear() - birthDate.getFullYear();
+        if (age < 13) {
+          errors.push('You must be at least 13 years old to use this service');
+        } else if (age > 120) {
+          errors.push('Please enter a valid date of birth (maximum age: 120 years)');
+        }
       }
     }
 

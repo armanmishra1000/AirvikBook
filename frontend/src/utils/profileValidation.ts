@@ -176,11 +176,11 @@ export function validateDateOfBirth(dateOfBirth: string): { isValid: boolean; er
   // Check for reasonable age limits (13-120 years old)
   const age = now.getFullYear() - date.getFullYear();
   if (age < 13) {
-    return { isValid: false, error: 'You must be at least 13 years old' };
+    return { isValid: false, error: 'You must be at least 13 years old to use this service' };
   }
 
   if (age > 120) {
-    return { isValid: false, error: 'Please enter a valid date of birth' };
+    return { isValid: false, error: 'Please enter a valid date of birth (maximum age: 120 years)' };
   }
 
   return { isValid: true };

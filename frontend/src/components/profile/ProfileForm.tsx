@@ -217,6 +217,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         [name]: undefined
       }));
     }
+    
+    // Clear validation errors for this field
+    clearValidationErrors();
   };
 
   // Function to parse existing mobile number and extract country code and phone number
@@ -313,7 +316,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     // Validate with the enhanced hook
     const currentErrors = validateAllFields(updateData);
     if (Object.keys(currentErrors).length > 0) {
-      onError?.('Please fix the errors in the form');
+      // Check if there's a date of birth error and show specific message
+      if (currentErrors.dateOfBirth) {
+        onError?.(currentErrors.dateOfBirth);
+      } else {
+        onError?.('Please fix the errors in the form');
+      }
       return;
     }
 
@@ -335,9 +343,41 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         showSuccess('Profile updated successfully');
         onSuccess?.();
       } else {
-        // Use the specific error message from the response if available
-        const errorMessage = response.error || UserProfileService.getErrorMessage(response.code || 'PROFILE_UPDATE_FAILED');
-        onError?.(errorMessage);
+        // Handle validation errors with specific field details
+        if (response.code === 'VALIDATION_ERROR' && response.details && Array.isArray(response.details)) {
+          // Extract field-specific validation errors
+          const fieldErrors: ProfileFormErrors = {};
+          let hasDateOfBirthError = false;
+          let dateOfBirthErrorMessage = '';
+          
+          response.details.forEach((detail: string) => {
+            const [field, message] = detail.split(': ');
+            if (field && message) {
+              const fieldName = field as keyof ProfileFormErrors;
+              fieldErrors[fieldName] = message;
+              
+              // Check if this is a date of birth error
+              if (fieldName === 'dateOfBirth') {
+                hasDateOfBirthError = true;
+                dateOfBirthErrorMessage = message;
+              }
+            }
+          });
+          
+          // Set field-specific errors
+          setErrors(fieldErrors);
+          
+          // Show specific error message for date of birth, or general message for other fields
+          if (hasDateOfBirthError) {
+            onError?.(dateOfBirthErrorMessage);
+          } else {
+            onError?.('Please fix the errors in the form');
+          }
+        } else {
+          // Use the specific error message from the response if available
+          const errorMessage = response.error || UserProfileService.getErrorMessage(response.code || 'PROFILE_UPDATE_FAILED');
+          onError?.(errorMessage);
+        }
       }
     } catch (error) {
       const errorMessage = 'Failed to update profile. Please try again.';
@@ -509,15 +549,16 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               value={formData.dateOfBirth}
               onChange={handleInputChange}
               className={`w-full px-space-4 py-space-3 shadow-none text-body font-sf-pro bg-airvik-white dark:bg-gray-100 rounded-radius-md placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed focus:border-airvik-blue focus:ring-2 focus:ring-airvik-blue
-                ${errors.dateOfBirth 
+                ${(errors.dateOfBirth || validationErrors.dateOfBirth)
                   ? 'border-error focus:ring-1 focus:ring-error' 
                   : 'border-gray-300 dark:border-gray-600 bg-airvik-white dark:bg-gray-800 text-airvik-black dark:text-airvik-white hover:border-gray-400'
                 }`}
               disabled={isSubmitting}
+              max={new Date().toISOString().split('T')[0]}
             />
-            {errors.dateOfBirth && (
+            {(errors.dateOfBirth || validationErrors.dateOfBirth) && (
               <p className="mt-space-1 text-caption text-error">
-                {errors.dateOfBirth}
+                {errors.dateOfBirth || validationErrors.dateOfBirth}
               </p>
             )}
           </div>

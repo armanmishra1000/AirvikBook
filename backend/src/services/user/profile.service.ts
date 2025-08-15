@@ -182,6 +182,8 @@ export class ProfileService {
         } else {
           const dobInput = profileData.dateOfBirth;
           const dob = typeof dobInput === 'string' ? new Date(dobInput) : dobInput;
+          const now = new Date();
+          
           if (isNaN(dob.getTime())) {
             return {
               success: false,
@@ -190,6 +192,36 @@ export class ProfileService {
               details: ['dateOfBirth: Invalid date format']
             };
           }
+          
+          if (dob >= now) {
+            return {
+              success: false,
+              error: 'Validation failed',
+              code: 'VALIDATION_ERROR',
+              details: ['dateOfBirth: Date of birth must be in the past']
+            };
+          }
+          
+          // Check age restrictions (13-120 years old)
+          const age = now.getFullYear() - dob.getFullYear();
+          if (age < 13) {
+            return {
+              success: false,
+              error: 'Validation failed',
+              code: 'VALIDATION_ERROR',
+              details: ['dateOfBirth: You must be at least 13 years old to use this service']
+            };
+          }
+          
+          if (age > 120) {
+            return {
+              success: false,
+              error: 'Validation failed',
+              code: 'VALIDATION_ERROR',
+              details: ['dateOfBirth: Please enter a valid date of birth (maximum age: 120 years)']
+            };
+          }
+          
           updateData.dateOfBirth = dob;
         }
         changesApplied.push('dateOfBirth');
