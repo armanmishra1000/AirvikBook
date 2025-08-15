@@ -26,8 +26,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-airvik-white dark:bg-gray-900 flex items-center justify-center px-space-4 pb-6">
-      <div className="max-w-md w-full">
+    <div className="flex items-center justify-center min-h-screen pb-6 bg-airvik-white dark:bg-gray-900 px-space-4">
+      <div className="w-full max-w-md">
         <RegistrationForm
           onSuccess={handleRegistrationSuccess}
           onError={handleRegistrationError}

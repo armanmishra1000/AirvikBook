@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { EnvironmentConfig } from './environment.config';
 
 export interface DatabaseConfig {
   maxConnections: number;
@@ -18,34 +19,36 @@ export class DatabaseConfigService {
    * Get database configuration from environment variables
    */
   static getConfig(): DatabaseConfig {
+    const isProduction = EnvironmentConfig.isProduction();
+    
     return {
-      maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS || '20'),
-      minConnections: parseInt(process.env.DB_MIN_CONNECTIONS || '5'),
+      maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS || (isProduction ? '20' : '10')),
+      minConnections: parseInt(process.env.DB_MIN_CONNECTIONS || (isProduction ? '5' : '2')),
       connectionTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT || '30000'),
       idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT || '300000'),
       acquireTimeout: parseInt(process.env.DB_ACQUIRE_TIMEOUT || '60000'),
       timeout: parseInt(process.env.DB_TIMEOUT || '30000'),
-      ssl: process.env.NODE_ENV === 'production',
-      sslMode: (process.env.DB_SSL_MODE as 'require' | 'prefer' | 'allow' | 'disable') || 'require',
+      ssl: isProduction, // Only use SSL in production
+      sslMode: isProduction ? 'require' : 'disable',
     };
   }
 
   /**
-   * Build secure database URL with SSL configuration
+   * Build secure database URL with environment-specific configuration
    */
   static buildSecureDatabaseUrl(): string {
-    const baseUrl = process.env.DATABASE_URL;
+    const baseUrl = EnvironmentConfig.getDatabaseUrl();
     if (!baseUrl) {
       throw new Error('DATABASE_URL environment variable is required');
     }
 
     const config = this.getConfig();
+    const isProduction = EnvironmentConfig.isProduction();
     
-    // If in production, ensure SSL is enabled
-    if (config.ssl && process.env.NODE_ENV === 'production') {
+    if (isProduction && config.ssl) {
       const url = new URL(baseUrl);
       
-      // Add SSL parameters
+      // Add SSL parameters for production
       url.searchParams.set('sslmode', config.sslMode);
       url.searchParams.set('ssl', 'true');
       
@@ -60,22 +63,22 @@ export class DatabaseConfigService {
   }
 
   /**
-   * Get Prisma client instance with connection pooling and SSL
+   * Get Prisma client instance with environment-specific settings
    */
   static getPrismaClient(): PrismaClient {
     if (!this.instance) {
+      const isProduction = EnvironmentConfig.isProduction();
+      
       this.instance = new PrismaClient({
         datasources: {
           db: {
             url: this.buildSecureDatabaseUrl(),
           },
         },
-        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-        // Enhanced security configuration
-        errorFormat: process.env.NODE_ENV === 'production' ? 'minimal' : 'pretty',
+        log: isProduction ? ['error'] : ['query', 'error', 'warn'],
+        errorFormat: isProduction ? 'minimal' : 'pretty',
       });
 
-      // Add connection event handlers
       this.setupConnectionHandlers();
     }
 
@@ -88,13 +91,15 @@ export class DatabaseConfigService {
   private static setupConnectionHandlers(): void {
     if (!this.instance) return;
 
-    // Log successful connection
-    console.log('✅ Database connection established with SSL security');
+    const isProduction = EnvironmentConfig.isProduction();
+    const environment = isProduction ? 'PRODUCTION' : 'DEVELOPMENT';
     
-    // Log SSL status
-    const config = this.getConfig();
-    if (config.ssl) {
-      console.log(`🔒 SSL enabled with mode: ${config.sslMode}`);
+    console.log(`✅ Database connection established (${environment})`);
+    
+    if (isProduction) {
+      console.log('🔒 SSL enabled for production security');
+    } else {
+      console.log('🛠️ Development mode - SSL disabled for local development');
     }
   }
 
