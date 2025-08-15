@@ -3,7 +3,6 @@ import { ResponseUtil } from '../../utils/response.utils';
 import ProfilePictureService from '../../services/user/profilePicture.service';
 
 export class ProfilePictureController {
-  // Remove all rate limiter static properties
 
   /**
    * Upload profile picture

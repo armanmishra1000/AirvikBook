@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ResponseUtil } from '../utils/response.utils';
 import ImageOptimization from '../utils/imageOptimization';
 import AntivirusService from '../services/antivirus.service';
+import { StorageConfig } from '../config/storage.config';
 
 // Type definition for Multer file
 interface MulterFile {
@@ -87,6 +88,10 @@ export const profilePictureUpload = multer({
   },
   fileFilter: (_req: Request, file: MulterFile, cb: multer.FileFilterCallback) => {
     try {
+      // Log storage type for debugging
+      const storageType = StorageConfig.getStorageType();
+      console.log(`📁 File upload using ${storageType} storage: ${file.originalname}`);
+      
       // Check MIME type
       if (!FILE_CONFIG.ALLOWED_MIME_TYPES.includes(file.mimetype)) {
         return cb(new Error(`File type not allowed. Allowed types: ${FILE_CONFIG.ALLOWED_MIME_TYPES.join(', ')}`));

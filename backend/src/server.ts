@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 import { Request, Response } from 'express';
 import emailRoutes from './routes/email.routes';
 import authRoutes from './routes/auth.routes';
@@ -14,10 +16,31 @@ import HttpsMiddleware from './middleware/https.middleware';
 import ApiVersioningMiddleware from './middleware/apiVersioning.middleware';
 import RequestLoggingMiddleware from './middleware/requestLogging.middleware';
 import DatabaseConfigService from './config/database.config';
+import { StorageConfig } from './config/storage.config';
 
 // Load environment variables
 dotenv.config();
 console.log('🔧 Environment variables loaded:');
+
+// Log storage configuration on startup
+const storageInfo = StorageConfig.getStorageInfo();
+console.log(`📁 Storage Configuration: ${storageInfo.type} storage in ${storageInfo.environment} environment`);
+console.log(`📁 Storage Configured: ${storageInfo.isConfigured ? '✅ Yes' : '❌ No'}`);
+if (storageInfo.type === 's3') {
+  console.log(`📁 S3 Bucket: ${storageInfo.bucketName || 'Not configured'}`);
+  console.log(`📁 S3 Region: ${storageInfo.region || 'Not configured'}`);
+}
+
+// Ensure upload directory exists for local storage
+if (storageInfo.type === 'local') {
+  const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'profiles');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log(`📁 Created upload directory: ${uploadDir}`);
+  } else {
+    console.log(`📁 Upload directory exists: ${uploadDir}`);
+  }
+}
 
 // Create Express app
 const app = express();
@@ -73,6 +96,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+
+// Serve static files for local storage
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 
 // Apply input sanitization middleware
 app.use(SanitizationMiddleware.sanitizeBody);

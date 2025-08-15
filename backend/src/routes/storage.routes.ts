@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import AuthMiddleware from '../middleware/auth.middleware';
 import StorageFactoryService from '../services/storage/storageFactory.service';
+import { StorageHealthService } from '../services/storage/storageHealth.service';
 
 const router = express.Router();
 
@@ -383,6 +384,74 @@ router.get(
       });
     } catch (error) {
       console.error('Error getting file metadata:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR'
+      });
+    }
+  }
+);
+
+/**
+ * @route GET /api/v1/storage/health
+ * @desc Check storage health and configuration
+ * @access Private
+ */
+router.get(
+  '/health',
+  AuthMiddleware.verifyToken,
+  async (_req, res) => {
+    try {
+      const healthStatus = await StorageHealthService.checkStorageHealth();
+      const configStatus = StorageHealthService.getConfigurationStatus();
+      const uploadTest = await StorageHealthService.testUploadCapability();
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          health: healthStatus,
+          configuration: configStatus,
+          uploadCapability: uploadTest,
+          timestamp: new Date().toISOString()
+        },
+        message: 'Storage health check completed successfully'
+      });
+    } catch (error) {
+      console.error('Error checking storage health:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR'
+      });
+    }
+  }
+);
+
+/**
+ * @route GET /api/v1/storage/info
+ * @desc Get storage information and configuration
+ * @access Private
+ */
+router.get(
+  '/info',
+  AuthMiddleware.verifyToken,
+  async (_req, res) => {
+    try {
+      const storageInfo = StorageHealthService.getStorageInfo();
+      const configValidation = StorageHealthService.validateConfiguration();
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          storage: storageInfo,
+          validation: configValidation,
+          timestamp: new Date().toISOString()
+        },
+        message: 'Storage information retrieved successfully'
+      });
+    } catch (error) {
+      console.error('Error getting storage info:', error);
       return res.status(500).json({
         success: false,
         error: 'Internal server error',
